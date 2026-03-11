@@ -135,7 +135,7 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
           .eq("id", drug.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("drugs").insert(values);
+        const { error } = await supabase.from("drugs").insert([values]);
         if (error) throw error;
       }
     },
