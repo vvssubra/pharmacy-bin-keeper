@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen } from "lucide-react";
+import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -178,7 +178,14 @@ export default function DrugMaster() {
                   const baki = bakiMap[drug.id];
                   return (
                     <TableRow key={drug.id} className={drug.is_active ? "" : "opacity-50"}>
-                      <TableCell className="font-medium">{drug.drug_name}</TableCell>
+                      <TableCell className="font-medium">
+                        <button
+                          className="text-left hover:text-primary hover:underline underline-offset-2 transition-colors"
+                          onClick={() => navigate(`/drugs/${drug.id}/bincard`)}
+                        >
+                          {drug.drug_name}
+                        </button>
+                      </TableCell>
                       <TableCell>{drug.no_kod}</TableCell>
                       <TableCell className="capitalize">{drug.unit_pengukuran}</TableCell>
                       <TableCell>{drug.kumpulan}</TableCell>
@@ -218,6 +225,9 @@ export default function DrugMaster() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/bincard`)} title="Lihat Kad">
+                            <CreditCard className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/ledger`)} title="Lihat Lejar">
                             <BookOpen className="h-4 w-4" />
                           </Button>
