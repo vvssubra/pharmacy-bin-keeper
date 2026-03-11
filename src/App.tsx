@@ -48,6 +48,14 @@ const App = () => (
               }
             />
             <Route
+              path="/drugs/:id/bincard"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><BinCard /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/upload"
               element={
                 <ProtectedRoute>
