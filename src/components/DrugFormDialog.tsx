@@ -128,14 +128,15 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
         throw new Error("DUPLICATE");
       }
 
+      const payload = { ...values, drug_name: values.drug_name } as { drug_name: string; [key: string]: unknown };
       if (isEdit && drug) {
         const { error } = await supabase
           .from("drugs")
-          .update(values)
+          .update(payload)
           .eq("id", drug.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("drugs").insert([values]);
+        const { error } = await supabase.from("drugs").insert([payload as any]);
         if (error) throw error;
       }
     },
