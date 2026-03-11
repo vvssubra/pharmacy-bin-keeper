@@ -1,4 +1,4 @@
-import { Home, Pill, Upload, PackagePlus, FileText } from "lucide-react";
+import { Home, Pill, PackagePlus, FileText } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import {
@@ -15,7 +15,6 @@ import {
 const items = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Drug Master", url: "/drugs", icon: Pill },
-  { title: "Upload Mingguan", url: "/upload", icon: Upload },
   { title: "Terimaan", url: "/terimaan", icon: PackagePlus },
   { title: "Laporan", url: "/laporan", icon: FileText },
 ];

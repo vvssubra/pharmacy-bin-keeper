@@ -2,8 +2,7 @@ import { useState } from "react";
 import { format } from "date-fns";
 import { ms } from "date-fns/locale";
 import {
-  FileDown, FileSpreadsheet, Search, CalendarIcon, ChevronDown, ChevronUp,
-  Clock, CheckCircle2, AlertCircle, RotateCcw, Eye,
+  FileDown, FileSpreadsheet, Search, CalendarIcon, ChevronDown,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,13 +11,11 @@ import { toast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from "@/lib/utils";
 
 // Mock quarterly data
@@ -40,44 +37,16 @@ const mockMovementData = [
   { drug: "Omeprazole 20mg", totalQty: 2100, totalRM: 1050.00, count: 21, avg: 100, lastDate: "2026-03-07" },
 ];
 
-// Mock import history
-const mockImportHistory = [
-  {
-    id: "1", tarikh: "2026-03-10", oleh: "Pn. Siti Aminah", fail: 3, berjaya: 147, ralat: 2,
-    details: [
-      { drug: "Paracetamol 500mg", qty: 500, status: "Berjaya" },
-      { drug: "Amoxicillin 250mg", qty: 300, status: "Berjaya" },
-      { drug: "Unknown Drug X", qty: 100, status: "Ralat — ubat tidak dijumpai" },
-    ],
-  },
-  {
-    id: "2", tarikh: "2026-03-03", oleh: "En. Ahmad Faiz", fail: 2, berjaya: 98, ralat: 0,
-    details: [
-      { drug: "Metformin 500mg", qty: 400, status: "Berjaya" },
-      { drug: "Amlodipine 5mg", qty: 200, status: "Berjaya" },
-    ],
-  },
-  {
-    id: "3", tarikh: "2026-02-24", oleh: "Pn. Siti Aminah", fail: 4, berjaya: 203, ralat: 5,
-    details: [
-      { drug: "Omeprazole 20mg", qty: 250, status: "Berjaya" },
-      { drug: "Atorvastatin 20mg", qty: 150, status: "Berjaya" },
-      { drug: "Bad Format Row", qty: 0, status: "Ralat — format tidak sah" },
-    ],
-  },
-  {
-    id: "4", tarikh: "2026-02-17", oleh: "En. Ahmad Faiz", fail: 1, berjaya: 52, ralat: 0,
-    details: [
-      { drug: "Losartan 50mg", qty: 300, status: "Berjaya" },
-    ],
-  },
-  {
-    id: "5", tarikh: "2026-02-10", oleh: "Pn. Noraini", fail: 2, berjaya: 110, ralat: 1,
-    details: [
-      { drug: "Simvastatin 20mg", qty: 200, status: "Berjaya" },
-      { drug: "Duplicate Entry", qty: 50, status: "Ralat — rekod pendua" },
-    ],
-  },
+// Mock daily dispensing data
+const mockDailyDispensing = [
+  { drug: "Empagliflozin 25mg", pesakit: "AHMAD BIN HASSAN", ic: "720315-01-5533", qty: 30, pegawai: "Pn. Siti", masa: "10:30" },
+  { drug: "Metformin 500mg", pesakit: "MARY LOO AH KENG", ic: "650822-01-6744", qty: 60, pegawai: "En. Ahmad", masa: "10:15" },
+  { drug: "Amlodipine 5mg", pesakit: "MUTHU A/L RAJU", ic: "580114-01-4421", qty: 30, pegawai: "Dr. Lee", masa: "09:55" },
+  { drug: "Losartan 50mg", pesakit: "NOR AZIZAH BINTI YUSOF", ic: "810607-01-5566", qty: 30, pegawai: "Pn. Siti", masa: "09:40" },
+  { drug: "Omeprazole 20mg", pesakit: "TAN AH BENG", ic: "700430-01-3322", qty: 14, pegawai: "En. Ahmad", masa: "09:20" },
+  { drug: "Paracetamol 500mg", pesakit: "SITI NURHALIZA BINTI AHMAD", ic: "890215-01-7788", qty: 20, pegawai: "Pn. Siti", masa: "09:00" },
+  { drug: "Atorvastatin 20mg", pesakit: "LEE CHONG WEI", ic: "821021-01-5511", qty: 30, pegawai: "Dr. Lee", masa: "08:45" },
+  { drug: "Aspirin 100mg", pesakit: "RAJESH A/L KUMAR", ic: "750903-01-4455", qty: 30, pegawai: "En. Ahmad", masa: "08:30" },
 ];
 
 function DatePickerField({ label, date, onSelect }: { label: string; date?: Date; onSelect: (d?: Date) => void }) {
@@ -119,8 +88,8 @@ export default function Laporan() {
   const [movTo, setMovTo] = useState<Date>();
   const [showMovement, setShowMovement] = useState(false);
 
-  // Import history expand state
-  const [expandedImport, setExpandedImport] = useState<string | null>(null);
+  // Card 4 state
+  const [dailyDate, setDailyDate] = useState<Date>(new Date());
 
   // Fetch drugs for combobox
   const { data: drugs = [] } = useQuery({
@@ -141,8 +110,8 @@ export default function Laporan() {
         <p className="text-sm text-muted-foreground">Jana laporan dan eksport data</p>
       </div>
 
-      {/* 3 Report Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* 4 Report Cards — 2x2 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* CARD 1 — KEW.PS-3 */}
         <Card>
           <CardHeader className="pb-3">
@@ -296,104 +265,52 @@ export default function Laporan() {
             )}
           </CardContent>
         </Card>
-      </div>
 
-      {/* Import History Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Clock className="h-4 w-4" />
-            Sejarah Import
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tarikh</TableHead>
-                <TableHead>Diupload Oleh</TableHead>
-                <TableHead className="text-center">Bil. Fail</TableHead>
-                <TableHead className="text-center">Berjaya</TableHead>
-                <TableHead className="text-center">Ralat</TableHead>
-                <TableHead>Tindakan</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockImportHistory.map((row) => (
-                <Collapsible key={row.id} open={expandedImport === row.id} onOpenChange={(open) => setExpandedImport(open ? row.id : null)} asChild>
-                  <>
-                    <TableRow>
-                      <TableCell className="font-medium">{row.tarikh}</TableCell>
-                      <TableCell>{row.oleh}</TableCell>
-                      <TableCell className="text-center">{row.fail}</TableCell>
-                      <TableCell className="text-center">
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                          <CheckCircle2 className="mr-1 h-3 w-3" />{row.berjaya}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-center">
-                        {row.ralat > 0 ? (
-                          <Badge variant="destructive">
-                            <AlertCircle className="mr-1 h-3 w-3" />{row.ralat}
-                          </Badge>
-                        ) : (
-                          <span className="text-muted-foreground text-sm">0</span>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <CollapsibleTrigger asChild>
-                            <Button variant="ghost" size="sm" className="h-7 text-xs">
-                              <Eye className="mr-1 h-3 w-3" />
-                              {expandedImport === row.id ? "Tutup" : "Butiran"}
-                            </Button>
-                          </CollapsibleTrigger>
-                          <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive" onClick={() => toast({ title: "Akan datang", description: "Ciri rollback sedang dalam pembangunan." })}>
-                            <RotateCcw className="mr-1 h-3 w-3" />
-                            Rollback
-                          </Button>
-                        </div>
-                      </TableCell>
+        {/* CARD 4 — Laporan Pengeluaran Harian */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Laporan Pengeluaran Harian</CardTitle>
+            <CardDescription>Log pengeluaran ubat harian merentas semua ubat</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-end gap-3">
+              <div className="flex-1">
+                <DatePickerField label="Tarikh" date={dailyDate} onSelect={(d) => d && setDailyDate(d)} />
+              </div>
+              <Button variant="secondary" onClick={comingSoon}>
+                <FileSpreadsheet className="mr-1 h-4 w-4" />
+                Export Excel
+              </Button>
+            </div>
+            <div className="overflow-auto max-h-[300px]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="text-xs">Ubat</TableHead>
+                    <TableHead className="text-xs">Pesakit</TableHead>
+                    <TableHead className="text-xs">IC</TableHead>
+                    <TableHead className="text-xs text-right">Qty</TableHead>
+                    <TableHead className="text-xs">Pegawai</TableHead>
+                    <TableHead className="text-xs">Masa</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {mockDailyDispensing.map((r, i) => (
+                    <TableRow key={i}>
+                      <TableCell className="text-xs font-medium">{r.drug}</TableCell>
+                      <TableCell className="text-xs">{r.pesakit}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{r.ic}</TableCell>
+                      <TableCell className="text-xs text-right font-semibold">{r.qty}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{r.pegawai}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{r.masa}</TableCell>
                     </TableRow>
-                    <CollapsibleContent asChild>
-                      <tr>
-                        <td colSpan={6} className="p-0">
-                          <div className="bg-muted/50 px-8 py-3">
-                            <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  <TableHead className="text-xs">Ubat</TableHead>
-                                  <TableHead className="text-xs text-right">Kuantiti</TableHead>
-                                  <TableHead className="text-xs">Status</TableHead>
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                                {row.details.map((d, i) => (
-                                  <TableRow key={i}>
-                                    <TableCell className="text-xs">{d.drug}</TableCell>
-                                    <TableCell className="text-xs text-right">{d.qty}</TableCell>
-                                    <TableCell className="text-xs">
-                                      {d.status === "Berjaya" ? (
-                                        <Badge variant="secondary" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 text-xs">{d.status}</Badge>
-                                      ) : (
-                                        <Badge variant="destructive" className="text-xs">{d.status}</Badge>
-                                      )}
-                                    </TableCell>
-                                  </TableRow>
-                                ))}
-                              </TableBody>
-                            </Table>
-                          </div>
-                        </td>
-                      </tr>
-                    </CollapsibleContent>
-                  </>
-                </Collapsible>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
