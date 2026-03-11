@@ -38,7 +38,7 @@ const App = () => (
               }
             />
             <Route
-              path="/upload-mingguan"
+              path="/upload"
               element={
                 <ProtectedRoute>
                   <AppLayout><UploadMingguan /></AppLayout>

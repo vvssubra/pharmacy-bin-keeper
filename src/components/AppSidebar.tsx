@@ -15,7 +15,7 @@ import {
 const items = [
   { title: "Dashboard", url: "/", icon: Home },
   { title: "Drug Master", url: "/drugs", icon: Pill },
-  { title: "Upload Mingguan", url: "/upload-mingguan", icon: Upload },
+  { title: "Upload Mingguan", url: "/upload", icon: Upload },
   { title: "Terimaan", url: "/terimaan", icon: PackagePlus },
   { title: "Laporan", url: "/laporan", icon: FileText },
 ];
