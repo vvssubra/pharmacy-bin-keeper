@@ -109,33 +109,54 @@ export type Database = {
       }
       transactions: {
         Row: {
+          catatan: string | null
           created_at: string
           created_by: string | null
           drug_id: string
+          harga_seunit: number | null
           id: string
           jenis: string
+          jenis_rujukan: string | null
+          jumlah_rm: number | null
           kuantiti: number
+          nama_pegawai: string | null
+          no_rujukan: string | null
           tarikh: string
+          terima_daripada: string | null
           updated_at: string
         }
         Insert: {
+          catatan?: string | null
           created_at?: string
           created_by?: string | null
           drug_id: string
+          harga_seunit?: number | null
           id?: string
           jenis: string
+          jenis_rujukan?: string | null
+          jumlah_rm?: number | null
           kuantiti: number
+          nama_pegawai?: string | null
+          no_rujukan?: string | null
           tarikh: string
+          terima_daripada?: string | null
           updated_at?: string
         }
         Update: {
+          catatan?: string | null
           created_at?: string
           created_by?: string | null
           drug_id?: string
+          harga_seunit?: number | null
           id?: string
           jenis?: string
+          jenis_rujukan?: string | null
+          jumlah_rm?: number | null
           kuantiti?: number
+          nama_pegawai?: string | null
+          no_rujukan?: string | null
           tarikh?: string
+          terima_daripada?: string | null
           updated_at?: string
         }
         Relationships: [
