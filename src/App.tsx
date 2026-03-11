@@ -11,6 +11,7 @@ import UploadMingguan from "@/pages/UploadMingguan";
 import Terimaan from "@/pages/Terimaan";
 import Laporan from "@/pages/Laporan";
 import DrugLedger from "@/pages/DrugLedger";
+import BinCard from "@/pages/BinCard";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
