@@ -178,7 +178,14 @@ export default function DrugMaster() {
                   const baki = bakiMap[drug.id];
                   return (
                     <TableRow key={drug.id} className={drug.is_active ? "" : "opacity-50"}>
-                      <TableCell className="font-medium">{drug.drug_name}</TableCell>
+                      <TableCell className="font-medium">
+                        <button
+                          className="text-left hover:text-primary hover:underline underline-offset-2 transition-colors"
+                          onClick={() => navigate(`/drugs/${drug.id}/bincard`)}
+                        >
+                          {drug.drug_name}
+                        </button>
+                      </TableCell>
                       <TableCell>{drug.no_kod}</TableCell>
                       <TableCell className="capitalize">{drug.unit_pengukuran}</TableCell>
                       <TableCell>{drug.kumpulan}</TableCell>
