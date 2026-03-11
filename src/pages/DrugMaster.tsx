@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen } from "lucide-react";
+import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
