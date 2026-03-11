@@ -10,6 +10,7 @@ import DrugMaster from "@/pages/DrugMaster";
 import UploadMingguan from "@/pages/UploadMingguan";
 import Terimaan from "@/pages/Terimaan";
 import Laporan from "@/pages/Laporan";
+import DrugLedger from "@/pages/DrugLedger";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AppLayout><DrugMaster /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/drugs/:id/ledger"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><DrugLedger /></AppLayout>
                 </ProtectedRoute>
               }
             />

@@ -5,7 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { FileText, Plus, Search, Pencil, Ban, RotateCcw } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -54,6 +55,7 @@ export default function DrugMaster() {
   const [balanceTarget, setBalanceTarget] = useState<Drug | null>(null);
   const { role } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const isAdmin = role === "admin";
 
   const { data: drugs = [], isLoading } = useQuery({
@@ -216,6 +218,9 @@ export default function DrugMaster() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/ledger`)} title="Lihat Lejar">
+                            <BookOpen className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(drug)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
