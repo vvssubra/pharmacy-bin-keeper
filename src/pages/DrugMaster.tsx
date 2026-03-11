@@ -55,6 +55,7 @@ export default function DrugMaster() {
   const [balanceTarget, setBalanceTarget] = useState<Drug | null>(null);
   const { role } = useAuth();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const isAdmin = role === "admin";
 
   const { data: drugs = [], isLoading } = useQuery({
