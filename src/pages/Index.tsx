@@ -346,29 +346,45 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Section 5 — Import Status */}
+        {/* Section 5 — Pengeluaran Terkini */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base font-semibold flex items-center gap-2">
-              <FileText className="h-4 w-4" /> Status Import
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Import Terakhir</span>
-                <span className="font-medium">4 Mac 2026</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Minggu Semasa</span>
-                <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700">
-                  Belum diupload
-                </Badge>
-              </div>
-            </div>
-            <Button className="w-full" variant="outline" onClick={() => navigate("/upload")}>
-              <Upload className="h-4 w-4 mr-2" /> Upload Sekarang
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base font-semibold">Pengeluaran Terkini</CardTitle>
+            <Button variant="link" size="sm" className="text-xs" onClick={() => navigate("/laporan")}>
+              Lihat Semua
             </Button>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-xs">Ubat</TableHead>
+                  <TableHead className="text-xs">Pesakit</TableHead>
+                  <TableHead className="text-xs">IC</TableHead>
+                  <TableHead className="text-xs text-right">Qty</TableHead>
+                  <TableHead className="text-xs">Pegawai</TableHead>
+                  <TableHead className="text-xs">Masa</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {[
+                  { drug: "Empagliflozin 25mg", pesakit: "AHMAD BIN HASSAN", ic: "720315-01-5533", qty: 30, pegawai: "Pn. Siti", masa: "10:30" },
+                  { drug: "Metformin 500mg", pesakit: "MARY LOO AH KENG", ic: "650822-01-6744", qty: 60, pegawai: "En. Ahmad", masa: "10:15" },
+                  { drug: "Amlodipine 5mg", pesakit: "MUTHU A/L RAJU", ic: "580114-01-4421", qty: 30, pegawai: "Dr. Lee", masa: "09:55" },
+                  { drug: "Losartan 50mg", pesakit: "NOR AZIZAH BINTI YUSOF", ic: "810607-01-5566", qty: 30, pegawai: "Pn. Siti", masa: "09:40" },
+                  { drug: "Omeprazole 20mg", pesakit: "TAN AH BENG", ic: "700430-01-3322", qty: 14, pegawai: "En. Ahmad", masa: "09:20" },
+                ].map((r, i) => (
+                  <TableRow key={i}>
+                    <TableCell className="text-xs font-medium truncate max-w-[120px]">{r.drug}</TableCell>
+                    <TableCell className="text-xs truncate max-w-[130px]">{r.pesakit}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{r.ic}</TableCell>
+                    <TableCell className="text-xs text-right font-semibold">{r.qty}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{r.pegawai}</TableCell>
+                    <TableCell className="text-xs text-muted-foreground">{r.masa}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </CardContent>
         </Card>
       </div>

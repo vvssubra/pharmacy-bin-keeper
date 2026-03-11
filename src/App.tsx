@@ -56,14 +56,6 @@ const App = () => (
               }
             />
             <Route
-              path="/upload"
-              element={
-                <ProtectedRoute>
-                  <AppLayout><UploadMingguan /></AppLayout>
-                </ProtectedRoute>
-              }
-            />
-            <Route
               path="/terimaan"
               element={
                 <ProtectedRoute>
