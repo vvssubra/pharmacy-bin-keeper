@@ -39,6 +39,14 @@ const App = () => (
               }
             />
             <Route
+              path="/drugs/:id/ledger"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><DrugLedger /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/upload"
               element={
                 <ProtectedRoute>

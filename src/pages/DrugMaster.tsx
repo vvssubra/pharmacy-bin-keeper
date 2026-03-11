@@ -218,6 +218,9 @@ export default function DrugMaster() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/ledger`)} title="Lihat Lejar">
+                            <BookOpen className="h-4 w-4" />
+                          </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(drug)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
