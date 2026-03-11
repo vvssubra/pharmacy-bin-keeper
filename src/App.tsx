@@ -7,7 +7,7 @@ import { AppLayout } from "@/components/AppLayout";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Index";
 import DrugMaster from "@/pages/DrugMaster";
-import UploadMingguan from "@/pages/UploadMingguan";
+
 import Terimaan from "@/pages/Terimaan";
 import Laporan from "@/pages/Laporan";
 import DrugLedger from "@/pages/DrugLedger";
