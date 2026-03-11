@@ -1,0 +1,172 @@
+
+import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+interface OpeningBalanceDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  drug: { id: string; drug_name: string; unit_pengukuran: string } | null;
+  existing: { id: string; kuantiti: number; tarikh: string } | null;
+}
+
+export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: OpeningBalanceDialogProps) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const [tarikh, setTarikh] = useState<Date | undefined>(
+    existing ? new Date(existing.tarikh) : undefined
+  );
+  const [kuantiti, setKuantiti] = useState(existing?.kuantiti?.toString() ?? "");
+  const [showEditWarning, setShowEditWarning] = useState(false);
+
+  // Reset form when dialog opens with new data
+  const handleOpenChange = (o: boolean) => {
+    if (o) {
+      setTarikh(existing ? new Date(existing.tarikh) : undefined);
+      setKuantiti(existing?.kuantiti?.toString() ?? "");
+    }
+    onOpenChange(o);
+  };
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!drug || !tarikh || !kuantiti) return;
+      const payload = {
+        drug_id: drug.id,
+        jenis: "baki_awal" as const,
+        kuantiti: parseInt(kuantiti),
+        tarikh: format(tarikh, "yyyy-MM-dd"),
+        created_by: user?.id,
+      };
+
+      if (existing) {
+        const { error } = await supabase
+          .from("transactions")
+          .update({ kuantiti: payload.kuantiti, tarikh: payload.tarikh })
+          .eq("id", existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("transactions").insert(payload);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["transactions-baki-awal"] });
+      toast.success("Baki awal berjaya disimpan");
+      onOpenChange(false);
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const handleSubmit = () => {
+    if (!tarikh || !kuantiti) {
+      toast.error("Sila lengkapkan semua medan");
+      return;
+    }
+    if (existing) {
+      setShowEditWarning(true);
+    } else {
+      mutation.mutate();
+    }
+  };
+
+  return (
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Tetapkan Baki Awal — {drug?.drug_name}</DialogTitle>
+            <DialogDescription>
+              Masukkan kuantiti stok semasa pada tarikh yang dipilih. Ini akan menjadi titik permulaan rekod pergerakan stok.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Tarikh Baki Awal</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !tarikh && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {tarikh ? format(tarikh, "dd/MM/yyyy") : "Pilih tarikh"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={tarikh}
+                    onSelect={setTarikh}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Kuantiti pada tarikh tersebut</Label>
+              <Input
+                type="number"
+                min={0}
+                placeholder="0"
+                value={kuantiti}
+                onChange={(e) => setKuantiti(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Batal
+            </Button>
+            <Button onClick={handleSubmit} disabled={mutation.isPending}>
+              Simpan
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showEditWarning} onOpenChange={setShowEditWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ubah baki awal?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Mengubah baki awal akan mengira semula semua baki. Teruskan?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setShowEditWarning(false); mutation.mutate(); }}>
+              Teruskan
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}
