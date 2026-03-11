@@ -10,6 +10,7 @@ import DrugMaster from "@/pages/DrugMaster";
 import UploadMingguan from "@/pages/UploadMingguan";
 import Terimaan from "@/pages/Terimaan";
 import Laporan from "@/pages/Laporan";
+import DrugLedger from "@/pages/DrugLedger";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
