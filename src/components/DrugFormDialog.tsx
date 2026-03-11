@@ -22,18 +22,18 @@ const units = ["tablet", "vial", "sachet", "capsule", "other"] as const;
 
 const drugSchema = z.object({
   drug_name: z.string().trim().min(1, "Nama ubat diperlukan").max(200),
-  no_kod: z.string().max(50).default(""),
-  unit_pengukuran: z.string().min(1),
-  kumpulan: z.string().max(50).default(""),
-  pergerakan: z.string().max(50).default(""),
-  gudang_seksyen: z.string().max(50).default(""),
-  baris: z.string().max(50).default(""),
-  rak: z.string().max(50).default(""),
-  tingkat: z.string().max(50).default(""),
-  petak: z.string().max(50).default(""),
-  stok_min: z.coerce.number().int().min(0).default(0),
-  stok_reorder: z.coerce.number().int().min(0).default(0),
-  stok_max: z.coerce.number().int().min(0).default(0),
+  no_kod: z.string().max(50).optional().default(""),
+  unit_pengukuran: z.string().min(1).default("tablet"),
+  kumpulan: z.string().max(50).optional().default(""),
+  pergerakan: z.string().max(50).optional().default(""),
+  gudang_seksyen: z.string().max(50).optional().default(""),
+  baris: z.string().max(50).optional().default(""),
+  rak: z.string().max(50).optional().default(""),
+  tingkat: z.string().max(50).optional().default(""),
+  petak: z.string().max(50).optional().default(""),
+  stok_min: z.coerce.number().int().min(0).optional().default(0),
+  stok_reorder: z.coerce.number().int().min(0).optional().default(0),
+  stok_max: z.coerce.number().int().min(0).optional().default(0),
 });
 
 type DrugFormValues = z.infer<typeof drugSchema>;
