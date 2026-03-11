@@ -14,6 +14,72 @@ export type Database = {
   }
   public: {
     Tables: {
+      drugs: {
+        Row: {
+          baris: string | null
+          created_at: string
+          created_by: string | null
+          drug_name: string
+          gudang_seksyen: string | null
+          id: string
+          is_active: boolean
+          kod_lokasi_penuh: string | null
+          kumpulan: string | null
+          no_kod: string | null
+          pergerakan: string | null
+          petak: string | null
+          rak: string | null
+          stok_max: number | null
+          stok_min: number | null
+          stok_reorder: number | null
+          tingkat: string | null
+          unit_pengukuran: string
+          updated_at: string
+        }
+        Insert: {
+          baris?: string | null
+          created_at?: string
+          created_by?: string | null
+          drug_name: string
+          gudang_seksyen?: string | null
+          id?: string
+          is_active?: boolean
+          kod_lokasi_penuh?: string | null
+          kumpulan?: string | null
+          no_kod?: string | null
+          pergerakan?: string | null
+          petak?: string | null
+          rak?: string | null
+          stok_max?: number | null
+          stok_min?: number | null
+          stok_reorder?: number | null
+          tingkat?: string | null
+          unit_pengukuran?: string
+          updated_at?: string
+        }
+        Update: {
+          baris?: string | null
+          created_at?: string
+          created_by?: string | null
+          drug_name?: string
+          gudang_seksyen?: string | null
+          id?: string
+          is_active?: boolean
+          kod_lokasi_penuh?: string | null
+          kumpulan?: string | null
+          no_kod?: string | null
+          pergerakan?: string | null
+          petak?: string | null
+          rak?: string | null
+          stok_max?: number | null
+          stok_min?: number | null
+          stok_reorder?: number | null
+          tingkat?: string | null
+          unit_pengukuran?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

@@ -30,7 +30,7 @@ const App = () => (
               }
             />
             <Route
-              path="/drug-master"
+              path="/drugs"
               element={
                 <ProtectedRoute>
                   <AppLayout><DrugMaster /></AppLayout>
