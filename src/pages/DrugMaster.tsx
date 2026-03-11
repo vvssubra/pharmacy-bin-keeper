@@ -2,7 +2,9 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { format } from "date-fns";
 import { FileText, Plus, Search, Pencil, Ban, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,6 +18,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { DrugFormDialog } from "@/components/DrugFormDialog";
+import { OpeningBalanceDialog } from "@/components/OpeningBalanceDialog";
 
 type Drug = {
   id: string;
@@ -36,12 +39,22 @@ type Drug = {
   is_active: boolean;
 };
 
+type BakiAwal = {
+  id: string;
+  drug_id: string;
+  kuantiti: number;
+  tarikh: string;
+};
+
 export default function DrugMaster() {
   const [search, setSearch] = useState("");
   const [formOpen, setFormOpen] = useState(false);
   const [editDrug, setEditDrug] = useState<Drug | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Drug | null>(null);
+  const [balanceTarget, setBalanceTarget] = useState<Drug | null>(null);
+  const { role } = useAuth();
   const queryClient = useQueryClient();
+  const isAdmin = role === "admin";
 
   const { data: drugs = [], isLoading } = useQuery({
     queryKey: ["drugs"],
@@ -52,6 +65,22 @@ export default function DrugMaster() {
         .order("drug_name");
       if (error) throw error;
       return data as Drug[];
+    },
+  });
+
+  const { data: bakiMap = {} } = useQuery({
+    queryKey: ["transactions-baki-awal"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("id, drug_id, kuantiti, tarikh")
+        .eq("jenis", "baki_awal");
+      if (error) throw error;
+      const map: Record<string, BakiAwal> = {};
+      (data ?? []).forEach((t) => {
+        map[t.drug_id] = t as BakiAwal;
+      });
+      return map;
     },
   });
 
@@ -67,9 +96,14 @@ export default function DrugMaster() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const filtered = drugs.filter((d) =>
-    d.drug_name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = drugs
+    .filter((d) => d.drug_name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      const aHas = !!bakiMap[a.id];
+      const bHas = !!bakiMap[b.id];
+      if (aHas !== bHas) return aHas ? 1 : -1;
+      return a.drug_name.localeCompare(b.drug_name);
+    });
 
   const handleEdit = (drug: Drug) => {
     setEditDrug(drug);
@@ -83,7 +117,6 @@ export default function DrugMaster() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Drug Master</h1>
@@ -94,7 +127,6 @@ export default function DrugMaster() {
         </Button>
       </div>
 
-      {/* Search */}
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
@@ -105,7 +137,6 @@ export default function DrugMaster() {
         />
       </div>
 
-      {/* Table */}
       <Card>
         <CardContent className="p-0">
           <Table>
@@ -117,6 +148,7 @@ export default function DrugMaster() {
                 <TableHead>Kumpulan</TableHead>
                 <TableHead>Storage Location</TableHead>
                 <TableHead>Paras Stok</TableHead>
+                <TableHead>Baki Awal</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -124,13 +156,13 @@ export default function DrugMaster() {
             <TableBody>
               {isLoading ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
                     Memuatkan...
                   </TableCell>
                 </TableRow>
               ) : filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8}>
+                  <TableCell colSpan={9}>
                     <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                       <FileText className="mb-2 h-8 w-8" />
                       <p className="text-sm">
@@ -140,51 +172,84 @@ export default function DrugMaster() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((drug) => (
-                  <TableRow key={drug.id} className={drug.is_active ? "" : "opacity-50"}>
-                    <TableCell className="font-medium">{drug.drug_name}</TableCell>
-                    <TableCell>{drug.no_kod}</TableCell>
-                    <TableCell className="capitalize">{drug.unit_pengukuran}</TableCell>
-                    <TableCell>{drug.kumpulan}</TableCell>
-                    <TableCell className="text-xs">{drug.kod_lokasi_penuh}</TableCell>
-                    <TableCell className="text-xs tabular-nums">
-                      {drug.stok_min} / {drug.stok_reorder} / {drug.stok_max}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={drug.is_active ? "default" : "secondary"}>
-                        {drug.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleEdit(drug)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            drug.is_active
-                              ? setDeactivateTarget(drug)
-                              : toggleMutation.mutate({ id: drug.id, is_active: true })
-                          }
-                        >
-                          {drug.is_active ? <Ban className="h-4 w-4" /> : <RotateCcw className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
+                filtered.map((drug) => {
+                  const baki = bakiMap[drug.id];
+                  return (
+                    <TableRow key={drug.id} className={drug.is_active ? "" : "opacity-50"}>
+                      <TableCell className="font-medium">{drug.drug_name}</TableCell>
+                      <TableCell>{drug.no_kod}</TableCell>
+                      <TableCell className="capitalize">{drug.unit_pengukuran}</TableCell>
+                      <TableCell>{drug.kumpulan}</TableCell>
+                      <TableCell className="text-xs">{drug.kod_lokasi_penuh}</TableCell>
+                      <TableCell className="text-xs tabular-nums">
+                        {drug.stok_min} / {drug.stok_reorder} / {drug.stok_max}
+                      </TableCell>
+                      <TableCell>
+                        {baki ? (
+                          <div className="flex items-center gap-1">
+                            <span className="text-xs text-green-600 dark:text-green-400">
+                              {baki.kuantiti} {drug.unit_pengukuran} — {format(new Date(baki.tarikh), "dd/MM/yyyy")}
+                            </span>
+                            {isAdmin && (
+                              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setBalanceTarget(drug)}>
+                                <Pencil className="h-3 w-3" />
+                              </Button>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1">
+                            <Badge variant="outline" className="border-yellow-500 text-yellow-600 dark:text-yellow-400 text-xs">
+                              Belum Ditetapkan
+                            </Badge>
+                            {isAdmin && (
+                              <Button variant="outline" size="sm" className="h-6 text-xs" onClick={() => setBalanceTarget(drug)}>
+                                Set Baki
+                              </Button>
+                            )}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant={drug.is_active ? "default" : "secondary"}>
+                          {drug.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" onClick={() => handleEdit(drug)}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              drug.is_active
+                                ? setDeactivateTarget(drug)
+                                : toggleMutation.mutate({ id: drug.id, is_active: true })
+                            }
+                          >
+                            {drug.is_active ? <Ban className="h-4 w-4" /> : <RotateCcw className="h-4 w-4" />}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
 
-      {/* Form Dialog */}
       <DrugFormDialog open={formOpen} onOpenChange={setFormOpen} drug={editDrug} />
 
-      {/* Deactivate Confirmation */}
+      <OpeningBalanceDialog
+        open={!!balanceTarget}
+        onOpenChange={(o) => !o && setBalanceTarget(null)}
+        drug={balanceTarget}
+        existing={balanceTarget ? bakiMap[balanceTarget.id] ?? null : null}
+      />
+
       <AlertDialog open={!!deactivateTarget} onOpenChange={(o) => !o && setDeactivateTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

@@ -107,6 +107,47 @@ export type Database = {
         }
         Relationships: []
       }
+      transactions: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          drug_id: string
+          id: string
+          jenis: string
+          kuantiti: number
+          tarikh: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          drug_id: string
+          id?: string
+          jenis: string
+          kuantiti: number
+          tarikh: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          drug_id?: string
+          id?: string
+          jenis?: string
+          kuantiti?: number
+          tarikh?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_drug_id_fkey"
+            columns: ["drug_id"]
+            isOneToOne: false
+            referencedRelation: "drugs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
