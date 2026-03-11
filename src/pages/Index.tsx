@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import {
   AlertTriangle, TrendingDown, CheckCircle, TrendingUp, X,
-  FileText, Upload, ExternalLink, Plus,
+  ExternalLink, Plus,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { ms } from "date-fns/locale";
