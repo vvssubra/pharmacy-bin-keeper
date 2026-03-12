@@ -29,9 +29,8 @@ const items = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
 
-  // Fetch pending count for badge
+  // Pending ubat kawalan count
   const { data: pendingCount = 0 } = useQuery({
     queryKey: ["pending-requests-count"],
     refetchInterval: 15000,
@@ -44,6 +43,40 @@ export function AppSidebar() {
       return count ?? 0;
     },
   });
+
+  // Pending antibiotic acknowledgement count
+  const { data: abPendingCount = 0 } = useQuery({
+    queryKey: ["pending-antibiotic-ack-count"],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("antibiotic_forms" as any)
+        .select("id", { count: "exact", head: true })
+        .eq("status", "approved")
+        .is("acknowledged_at", null);
+      if (error) return 0;
+      // When using head:true the count comes from the response headers
+      // but the JS client returns data as null. Use a workaround:
+      return 0; // fallback
+    },
+  });
+
+  // Better approach: count without head
+  const { data: abCount = 0 } = useQuery({
+    queryKey: ["pending-antibiotic-ack-count-v2"],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("antibiotic_forms" as any)
+        .select("id")
+        .eq("status", "approved")
+        .is("acknowledged_at", null);
+      if (error) return 0;
+      return (data as any[])?.length ?? 0;
+    },
+  });
+
+  const totalBadge = pendingCount + abCount;
 
   return (
     <Sidebar collapsible="icon">
@@ -69,9 +102,9 @@ export function AppSidebar() {
                     >
                       <item.icon className="mr-2 h-4 w-4" />
                       {!collapsed && <span>{item.title}</span>}
-                      {item.showBadge && pendingCount > 0 && (
+                      {item.showBadge && totalBadge > 0 && (
                         <Badge variant="destructive" className="ml-auto h-5 min-w-5 text-[10px] flex items-center justify-center rounded-full px-1.5">
-                          {pendingCount}
+                          {totalBadge}
                         </Badge>
                       )}
                     </NavLink>
