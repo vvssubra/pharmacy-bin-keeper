@@ -71,7 +71,7 @@ export function AntibioticFormReadOnly({ form }: AntibioticFormViewerProps) {
           </Section>
 
           <Section title="PHARYNGITIS (Centor Score)">
-            <div className="flex justify-between"><span className="text-muted-foreground">Temperature >38°C</span><span>{ph.temp ?? 0}</span></div>
+            <div className="flex justify-between"><span className="text-muted-foreground">{"Temperature >38°C"}</span><span>{ph.temp ?? 0}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Absence of Cough</span><span>{ph.no_cough ?? 0}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Cervical Adenopathy</span><span>{ph.adenopathy ?? 0}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground">Tonsilar Exudate</span><span>{ph.exudate ?? 0}</span></div>
