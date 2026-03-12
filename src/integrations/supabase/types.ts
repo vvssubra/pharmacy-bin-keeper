@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      antibiotic_forms: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          antibiotic_regimen: string | null
+          checklist_data: Json | null
+          created_at: string | null
+          diagnosis: string
+          drug_allergy: boolean | null
+          drug_allergy_detail: string | null
+          fms_code: string | null
+          health_ed_compliance: boolean | null
+          health_ed_sideeffect: boolean | null
+          health_ed_tca: boolean | null
+          id: string
+          patient_ic: string
+          patient_name: string
+          patient_weight_kg: number | null
+          prescriber_notes: string | null
+          prescription_unit: string | null
+          specialist_action_at: string | null
+          specialist_id: string | null
+          specialist_notes: string | null
+          status: string | null
+          submitted_by: string | null
+          tarikh: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          antibiotic_regimen?: string | null
+          checklist_data?: Json | null
+          created_at?: string | null
+          diagnosis: string
+          drug_allergy?: boolean | null
+          drug_allergy_detail?: string | null
+          fms_code?: string | null
+          health_ed_compliance?: boolean | null
+          health_ed_sideeffect?: boolean | null
+          health_ed_tca?: boolean | null
+          id?: string
+          patient_ic: string
+          patient_name: string
+          patient_weight_kg?: number | null
+          prescriber_notes?: string | null
+          prescription_unit?: string | null
+          specialist_action_at?: string | null
+          specialist_id?: string | null
+          specialist_notes?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          tarikh: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          antibiotic_regimen?: string | null
+          checklist_data?: Json | null
+          created_at?: string | null
+          diagnosis?: string
+          drug_allergy?: boolean | null
+          drug_allergy_detail?: string | null
+          fms_code?: string | null
+          health_ed_compliance?: boolean | null
+          health_ed_sideeffect?: boolean | null
+          health_ed_tca?: boolean | null
+          id?: string
+          patient_ic?: string
+          patient_name?: string
+          patient_weight_kg?: number | null
+          prescriber_notes?: string | null
+          prescription_unit?: string | null
+          specialist_action_at?: string | null
+          specialist_id?: string | null
+          specialist_notes?: string | null
+          status?: string | null
+          submitted_by?: string | null
+          tarikh?: string
+        }
+        Relationships: []
+      }
       dispensing_requests: {
         Row: {
           created_at: string
