@@ -4,14 +4,19 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
+import { DoctorLayout } from "@/components/DoctorLayout";
+import { SpecialistLayout } from "@/components/SpecialistLayout";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Index";
 import DrugMaster from "@/pages/DrugMaster";
-
 import Terimaan from "@/pages/Terimaan";
 import Laporan from "@/pages/Laporan";
 import DrugLedger from "@/pages/DrugLedger";
 import BinCard from "@/pages/BinCard";
+import DoctorRequest from "@/pages/DoctorRequest";
+import SpecialistDashboard from "@/pages/SpecialistDashboard";
+import PharmacistFulfilment from "@/pages/PharmacistFulfilment";
+import PatientRegistry from "@/pages/PatientRegistry";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +28,25 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            {/* Doctor route - no sidebar */}
+            <Route
+              path="/request"
+              element={
+                <ProtectedRoute>
+                  <DoctorLayout><DoctorRequest /></DoctorLayout>
+                </ProtectedRoute>
+              }
+            />
+            {/* Specialist route - no sidebar */}
+            <Route
+              path="/specialist"
+              element={
+                <ProtectedRoute>
+                  <SpecialistLayout><SpecialistDashboard /></SpecialistLayout>
+                </ProtectedRoute>
+              }
+            />
+            {/* Pharmacist + Admin routes - full sidebar */}
             <Route
               path="/"
               element={
@@ -60,6 +84,22 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <AppLayout><Terimaan /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fulfilment"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><PharmacistFulfilment /></AppLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/pesakit"
+              element={
+                <ProtectedRoute>
+                  <AppLayout><PatientRegistry /></AppLayout>
                 </ProtectedRoute>
               }
             />
