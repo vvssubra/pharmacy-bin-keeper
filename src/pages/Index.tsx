@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { Pill, FileCheck } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -250,6 +251,9 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Pending Requests Card */}
+      <PendingRequestsCard navigate={navigate} />
+
       {/* Section 3 — Drug Stock Table */}
       <Card>
         <CardHeader>
@@ -389,5 +393,64 @@ export default function Dashboard() {
         </Card>
       </div>
     </div>
+  );
+}
+
+function PendingRequestsCard({ navigate }: { navigate: (path: string) => void }) {
+  const { data: ubatCount = 0 } = useQuery({
+    queryKey: ["dashboard-pending-ubat"],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("dispensing_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending_pharmacy");
+      if (error) return 0;
+      return count ?? 0;
+    },
+  });
+
+  const { data: abCount = 0 } = useQuery({
+    queryKey: ["dashboard-pending-ab"],
+    refetchInterval: 15000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("antibiotic_forms" as any)
+        .select("id")
+        .eq("status", "approved")
+        .is("acknowledged_at", null);
+      if (error) return 0;
+      return (data as any[])?.length ?? 0;
+    },
+  });
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base font-semibold">Permintaan Menunggu</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Pill className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">Ubat Kawalan</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">{ubatCount} menunggu</Badge>
+            <Button variant="link" size="sm" className="text-xs h-auto p-0" onClick={() => navigate("/fulfilment")}>Proses →</Button>
+          </div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FileCheck className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm">Borang Antibiotik</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="text-xs">{abCount} perlu pengesahan</Badge>
+            <Button variant="link" size="sm" className="text-xs h-auto p-0" onClick={() => navigate("/fulfilment")}>Semak →</Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

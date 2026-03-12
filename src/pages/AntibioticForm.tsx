@@ -1,0 +1,454 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { ArrowLeft, ShieldCheck, CheckCircle } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
+
+function formatIC(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 12);
+  if (digits.length <= 6) return digits;
+  if (digits.length <= 8) return `${digits.slice(0, 6)}-${digits.slice(6)}`;
+  return `${digits.slice(0, 6)}-${digits.slice(6, 8)}-${digits.slice(8)}`;
+}
+
+function getAgeFromIC(ic: string): number | null {
+  const d = ic.replace(/\D/g, "");
+  if (d.length < 6) return null;
+  const yy = parseInt(d.slice(0, 2));
+  const mm = parseInt(d.slice(2, 4)) - 1;
+  const dd = parseInt(d.slice(4, 6));
+  const century = yy > 30 ? 1900 : 2000;
+  const dob = new Date(century + yy, mm, dd);
+  const now = new Date();
+  let age = now.getFullYear() - dob.getFullYear();
+  if (now < new Date(now.getFullYear(), dob.getMonth(), dob.getDate())) age--;
+  return age;
+}
+
+interface ChecklistState {
+  pneumonia: { acute_cough: boolean; tachycardia: boolean; tachypnoea: boolean; fever: boolean; hypoxemia: boolean; consolidation: boolean };
+  aom: { otalgia: boolean; urti: boolean; fever: boolean; poor_appetite: boolean; crying: boolean; vomiting: boolean; otoscopy_sign: string };
+  pharyngitis: { temp: number; no_cough: number; adenopathy: number; exudate: number; age_score: number };
+  rhinosinusitis: { nasal_obstruction: boolean; smell_loss: boolean; fever: boolean; discoloured_mucus: boolean; double_sickening: boolean; severe_pain: boolean; raised_esr: boolean };
+  ssti: { erythema: boolean; abscess_incision: boolean; inadequate_drainage: boolean; extensive_cellulitis: boolean; valvular_heart: boolean; diabetes: boolean; impetigo_localised: boolean; impetigo_generalised: boolean; cellulitis: boolean };
+  uti: { nit_positive: boolean; leu_positive: boolean; frequency: boolean; dysuria: boolean; hematuria: boolean; suprapubic: boolean; urgency: boolean; polyuria: boolean; pregnancy_culture: string };
+}
+
+const defaultChecklist: ChecklistState = {
+  pneumonia: { acute_cough: false, tachycardia: false, tachypnoea: false, fever: false, hypoxemia: false, consolidation: false },
+  aom: { otalgia: false, urti: false, fever: false, poor_appetite: false, crying: false, vomiting: false, otoscopy_sign: "" },
+  pharyngitis: { temp: 0, no_cough: 0, adenopathy: 0, exudate: 0, age_score: 0 },
+  rhinosinusitis: { nasal_obstruction: false, smell_loss: false, fever: false, discoloured_mucus: false, double_sickening: false, severe_pain: false, raised_esr: false },
+  ssti: { erythema: false, abscess_incision: false, inadequate_drainage: false, extensive_cellulitis: false, valvular_heart: false, diabetes: false, impetigo_localised: false, impetigo_generalised: false, cellulitis: false },
+  uti: { nit_positive: false, leu_positive: false, frequency: false, dysuria: false, hematuria: false, suprapubic: false, urgency: false, polyuria: false, pregnancy_culture: "" },
+};
+
+export default function AntibioticForm() {
+  const navigate = useNavigate();
+  const { user, profile } = useAuth();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState<{ patient_name: string; patient_ic: string; diagnosis: string } | null>(null);
+
+  // Bahagian 1
+  const [tarikh, setTarikh] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [patientName, setPatientName] = useState("");
+  const [patientIC, setPatientIC] = useState("");
+  const [patientWeight, setPatientWeight] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
+  const [prescriptionUnit, setPrescriptionUnit] = useState("");
+  const [drugAllergy, setDrugAllergy] = useState(false);
+  const [drugAllergyDetail, setDrugAllergyDetail] = useState("");
+  const [antibioticRegimen, setAntibioticRegimen] = useState("");
+  const [fmsCode, setFmsCode] = useState("");
+  const [healthEdCompliance, setHealthEdCompliance] = useState(false);
+  const [healthEdSideeffect, setHealthEdSideeffect] = useState(false);
+  const [healthEdTca, setHealthEdTca] = useState(false);
+  const [prescriberNotes, setPrescriberNotes] = useState("");
+
+  // Bahagian 2
+  const [checklist, setChecklist] = useState<ChecklistState>(defaultChecklist);
+
+  const age = getAgeFromIC(patientIC);
+  const showWeight = age !== null && age < 12;
+  const centorTotal = checklist.pharyngitis.temp + checklist.pharyngitis.no_cough + checklist.pharyngitis.adenopathy + checklist.pharyngitis.exudate + checklist.pharyngitis.age_score;
+
+  const updateChecklist = <S extends keyof ChecklistState>(section: S, field: keyof ChecklistState[S], value: any) => {
+    setChecklist(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }));
+  };
+
+  const handleSubmit = async () => {
+    if (!patientName || !patientIC || !diagnosis) {
+      toast.error("Sila lengkapkan Nama, IC dan Diagnosis");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.from("antibiotic_forms" as any).insert({
+        tarikh,
+        patient_name: patientName,
+        patient_ic: patientIC,
+        patient_weight_kg: showWeight && patientWeight ? parseFloat(patientWeight) : null,
+        diagnosis,
+        prescription_unit: prescriptionUnit || null,
+        drug_allergy: drugAllergy,
+        drug_allergy_detail: drugAllergy ? drugAllergyDetail : null,
+        antibiotic_regimen: antibioticRegimen || null,
+        fms_code: fmsCode || null,
+        health_ed_compliance: healthEdCompliance,
+        health_ed_sideeffect: healthEdSideeffect,
+        health_ed_tca: healthEdTca,
+        checklist_data: { ...checklist, pharyngitis: { ...checklist.pharyngitis, total_score: centorTotal } },
+        prescriber_notes: prescriberNotes || null,
+        status: "pending_specialist",
+        submitted_by: user?.id,
+      } as any);
+      if (error) throw error;
+      setSubmitted({ patient_name: patientName, patient_ic: patientIC, diagnosis });
+    } catch {
+      toast.error("Gagal menghantar borang");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div className="flex min-h-[80vh] items-center justify-center px-4">
+        <Card className="w-full max-w-lg text-center">
+          <CardContent className="space-y-6 py-10">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
+              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+            </div>
+            <h2 className="text-xl font-bold text-foreground">Borang Antibiotik Dihantar!</h2>
+            <div className="rounded-lg border p-4 text-left space-y-2 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Pesakit</span><span className="font-medium">{submitted.patient_name}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">IC</span><span className="font-medium">{submitted.patient_ic}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Diagnosis</span><span className="font-medium">{submitted.diagnosis}</span></div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Status</span>
+                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Menunggu Kelulusan Pakar</Badge>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Button onClick={() => { setSubmitted(null); setPatientName(""); setPatientIC(""); setDiagnosis(""); setChecklist(defaultChecklist); setAntibioticRegimen(""); setPrescriberNotes(""); }}>
+                Hantar Borang Baharu
+              </Button>
+              <Button variant="link" onClick={() => navigate("/request")}>Kembali ke Pilihan Permohonan</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto space-y-6 pb-12">
+      <Button variant="ghost" size="sm" onClick={() => navigate("/request")} className="gap-1">
+        <ArrowLeft className="h-4 w-4" /> Kembali
+      </Button>
+
+      {/* Header */}
+      <Card className="border-none text-primary-foreground" style={{ backgroundColor: "#1A3C6E" }}>
+        <CardHeader className="text-center">
+          <CardTitle className="text-lg">ANTIBIOTIC CHECKLIST (Based on Clinical Pathway NAG 2024)</CardTitle>
+          <p className="text-sm opacity-80">JK Kawalan Infeksi & Antibiotik PKD Johor Bahru — Versi Mac 2025</p>
+        </CardHeader>
+      </Card>
+
+      {/* BAHAGIAN 1 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">BAHAGIAN 1: Butiran Pesakit</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-4">
+              <p className="text-sm font-medium text-muted-foreground">Sila lengkapkan butiran pesakit</p>
+              <div className="space-y-2">
+                <Label>1. Tarikh</Label>
+                <Input type="date" value={tarikh} onChange={e => setTarikh(e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>2. Nama Pesakit *</Label>
+                <Input value={patientName} onChange={e => setPatientName(e.target.value.toUpperCase())} placeholder="Nama penuh" />
+              </div>
+              <div className="space-y-2">
+                <Label>3. No. IC Pesakit *</Label>
+                <Input value={patientIC} onChange={e => setPatientIC(formatIC(e.target.value))} placeholder="000000-00-0000" inputMode="numeric" />
+              </div>
+              {showWeight && (
+                <div className="space-y-2">
+                  <Label>4. Berat Badan (kg) <span className="text-xs text-muted-foreground">(Wajib jika pesakit &lt; 12 tahun)</span></Label>
+                  <Input type="number" value={patientWeight} onChange={e => setPatientWeight(e.target.value)} placeholder="kg" />
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>5. Diagnosis *</Label>
+                <Textarea value={diagnosis} onChange={e => setDiagnosis(e.target.value)} placeholder="Diagnosis" />
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>PRESCRIPTION FROM UNIT</Label>
+                <RadioGroup value={prescriptionUnit} onValueChange={setPrescriptionUnit} className="flex gap-4">
+                  {["OPD", "FEVER", "MCH"].map(u => (
+                    <div key={u} className="flex items-center gap-2">
+                      <RadioGroupItem value={u} id={`unit-${u}`} />
+                      <Label htmlFor={`unit-${u}`} className="cursor-pointer">{u}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+
+              <div className="space-y-2">
+                <Label>6. Any Drug Allergy?</Label>
+                <RadioGroup value={drugAllergy ? "yes" : "no"} onValueChange={v => setDrugAllergy(v === "yes")} className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="no" id="allergy-no" />
+                    <Label htmlFor="allergy-no" className="cursor-pointer">No / NKDA</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="yes" id="allergy-yes" />
+                    <Label htmlFor="allergy-yes" className="cursor-pointer">Yes</Label>
+                  </div>
+                </RadioGroup>
+                {drugAllergy && (
+                  <Input value={drugAllergyDetail} onChange={e => setDrugAllergyDetail(e.target.value)} placeholder="Please state allergy" />
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label>7. Antibiotic Regimen (Dose, frequency, duration)</Label>
+                <Textarea value={antibioticRegimen} onChange={e => setAntibioticRegimen(e.target.value)} placeholder="e.g. Amoxicillin 500mg TDS x 5 days" />
+                <Input value={fmsCode} onChange={e => setFmsCode(e.target.value)} placeholder="FMS Code (if A/KK item prescribed by MO)" />
+              </div>
+
+              <div className="space-y-2">
+                <Label>8. Health Education (tick if done)</Label>
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox checked={healthEdCompliance} onCheckedChange={v => setHealthEdCompliance(!!v)} /> Compliance
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox checked={healthEdSideeffect} onCheckedChange={v => setHealthEdSideeffect(!!v)} /> Side-effect
+                  </label>
+                  <label className="flex items-center gap-2 text-sm">
+                    <Checkbox checked={healthEdTca} onCheckedChange={v => setHealthEdTca(!!v)} /> TCA Stat if worsening
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <Separator />
+          <p className="text-sm text-muted-foreground text-center">
+            Sila lengkapkan semakan klinikal berdasarkan dapatan & diagnosis. Tanda (✓) jika YA.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* BAHAGIAN 2 */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* LEFT COLUMN */}
+        <div className="space-y-4">
+          {/* PNEUMONIA */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">PNEUMONIA</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <CBox label="1. ACUTE COUGH / SPUTUM" checked={checklist.pneumonia.acute_cough} onChange={v => updateChecklist("pneumonia", "acute_cough", v)} />
+              <p className="text-xs font-medium text-muted-foreground mt-2">VITAL SIGN ABNORMALITIES: IF ANY</p>
+              <CBox label="2. TACHYCARDIA (HR > 100 BPM)" checked={checklist.pneumonia.tachycardia} onChange={v => updateChecklist("pneumonia", "tachycardia", v)} />
+              <CBox label="TACHYPNOEA (RR > 24 BPM)" checked={checklist.pneumonia.tachypnoea} onChange={v => updateChecklist("pneumonia", "tachypnoea", v)} />
+              <CBox label="FEVER (>38°C)" checked={checklist.pneumonia.fever} onChange={v => updateChecklist("pneumonia", "fever", v)} />
+              <CBox label="HYPOXEMIA (SPO2 <95)" checked={checklist.pneumonia.hypoxemia} onChange={v => updateChecklist("pneumonia", "hypoxemia", v)} />
+              <CBox label="3. LUNG / CXR: CONSOLIDATION / PLEURAL EFFUSION" checked={checklist.pneumonia.consolidation} onChange={v => updateChecklist("pneumonia", "consolidation", v)} />
+            </CardContent>
+          </Card>
+
+          {/* ACUTE OTITIS MEDIA */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">ACUTE OTITIS MEDIA</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">1. PRESENCE OF SYMPTOM:</p>
+              <div className="grid grid-cols-2 gap-2">
+                <CBox label="OTALGIA" checked={checklist.aom.otalgia} onChange={v => updateChecklist("aom", "otalgia", v)} />
+                <CBox label="URTI SYMPTOMS" checked={checklist.aom.urti} onChange={v => updateChecklist("aom", "urti", v)} />
+                <CBox label="FEVER >38" checked={checklist.aom.fever} onChange={v => updateChecklist("aom", "fever", v)} />
+                <CBox label="POOR APPETITE" checked={checklist.aom.poor_appetite} onChange={v => updateChecklist("aom", "poor_appetite", v)} />
+                <CBox label="CRYING/IRRITABLE" checked={checklist.aom.crying} onChange={v => updateChecklist("aom", "crying", v)} />
+                <CBox label="VOMITTING/DIARRHEA" checked={checklist.aom.vomiting} onChange={v => updateChecklist("aom", "vomiting", v)} />
+              </div>
+              <div className="space-y-2 mt-2">
+                <Label className="text-xs">2. OTOSCOPY FINDING: SIGN OF AOM?</Label>
+                <RadioGroup value={checklist.aom.otoscopy_sign} onValueChange={v => updateChecklist("aom", "otoscopy_sign", v)} className="flex gap-4">
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="yes" id="oto-yes" />
+                    <Label htmlFor="oto-yes" className="text-xs cursor-pointer">YES</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <RadioGroupItem value="no" id="oto-no" />
+                    <Label htmlFor="oto-no" className="text-xs cursor-pointer">NO</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* PHARYNGITIS */}
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">PHARYNGITIS</CardTitle>
+              <p className="text-xs text-muted-foreground">(Strep Score / Centor Score ≥3 to start antibiotic)</p>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {[
+                { label: "1. TEMPERATURE (>38°C)", field: "temp" as const },
+                { label: "2. ABSENCE OF COUGH", field: "no_cough" as const },
+                { label: "3. TENDER/ANTERIOR CERVICAL ADENOPATHY", field: "adenopathy" as const },
+                { label: "4. TONSILAR EXUDATE OR SWELLING", field: "exudate" as const },
+              ].map(item => (
+                <div key={item.field} className="flex items-center justify-between text-sm">
+                  <span className="text-xs">{item.label}</span>
+                  <RadioGroup value={String(checklist.pharyngitis[item.field])} onValueChange={v => updateChecklist("pharyngitis", item.field, parseInt(v))} className="flex gap-2">
+                    <div className="flex items-center gap-1">
+                      <RadioGroupItem value="1" id={`${item.field}-1`} />
+                      <Label htmlFor={`${item.field}-1`} className="text-xs cursor-pointer">1</Label>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <RadioGroupItem value="0" id={`${item.field}-0`} />
+                      <Label htmlFor={`${item.field}-0`} className="text-xs cursor-pointer">0</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
+              ))}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-xs">5. PATIENT AGE</span>
+                <RadioGroup value={String(checklist.pharyngitis.age_score)} onValueChange={v => updateChecklist("pharyngitis", "age_score", parseInt(v))} className="flex gap-2">
+                  <div className="flex items-center gap-1">
+                    <RadioGroupItem value="1" id="age-1" />
+                    <Label htmlFor="age-1" className="text-xs cursor-pointer">3-14 (+1)</Label>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <RadioGroupItem value="0" id="age-0" />
+                    <Label htmlFor="age-0" className="text-xs cursor-pointer">15-44 (0)</Label>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <RadioGroupItem value="-1" id="age--1" />
+                    <Label htmlFor="age--1" className="text-xs cursor-pointer">&gt;45 (-1)</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+              <Separator />
+              <div className="flex items-center justify-between font-bold text-sm">
+                <span>TOTAL STREP/CENTOR SCORE</span>
+                <span className="text-lg">{centorTotal}</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* RHINOSINUSITIS */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">RHINOSINUSITIS</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <CBox label="1. SUDDEN ONSET NASAL OBSTRUCTION / DISCHARGE" checked={checklist.rhinosinusitis.nasal_obstruction} onChange={v => updateChecklist("rhinosinusitis", "nasal_obstruction", v)} />
+              <CBox label="± REDUCTION / LOSS OF SMELL" checked={checklist.rhinosinusitis.smell_loss} onChange={v => updateChecklist("rhinosinusitis", "smell_loss", v)} />
+              <p className="text-xs font-medium text-muted-foreground mt-2">2. CHECK FOR LIKELY ABRS (≥ 3 SYMPTOMS):</p>
+              <CBox label="FEVER >38°C" checked={checklist.rhinosinusitis.fever} onChange={v => updateChecklist("rhinosinusitis", "fever", v)} />
+              <CBox label="DISCOLOURED MUCUS" checked={checklist.rhinosinusitis.discoloured_mucus} onChange={v => updateChecklist("rhinosinusitis", "discoloured_mucus", v)} />
+              <CBox label="DOUBLE SICKENING" checked={checklist.rhinosinusitis.double_sickening} onChange={v => updateChecklist("rhinosinusitis", "double_sickening", v)} />
+              <CBox label="SEVERE LOCAL PAIN" checked={checklist.rhinosinusitis.severe_pain} onChange={v => updateChecklist("rhinosinusitis", "severe_pain", v)} />
+              <CBox label="RAISED ESR/CRP" checked={checklist.rhinosinusitis.raised_esr} onChange={v => updateChecklist("rhinosinusitis", "raised_esr", v)} />
+              <p className="text-xs text-muted-foreground italic mt-2">3. IF ≥ 3 EPISODES OF ABRS PER YEAR: REFER TO ENT</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* RIGHT COLUMN */}
+        <div className="space-y-4">
+          {/* SSTI */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">SKIN AND SOFT TISSUE INFECTION (SSTI)</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <CBox label="1. ERYTHEMA/SWELLING/TEMP/PAIN/TENDER/FEVER" checked={checklist.ssti.erythema} onChange={v => updateChecklist("ssti", "erythema", v)} />
+              <p className="text-xs font-medium text-muted-foreground mt-2">2. ABSCESS: <span className="italic">(Take pus for C&S before starting antibiotic)</span></p>
+              <CBox label="INCISION AND DRAINAGE DONE?" checked={checklist.ssti.abscess_incision} onChange={v => updateChecklist("ssti", "abscess_incision", v)} />
+              <CBox label="INADEQUATE DRAINAGE" checked={checklist.ssti.inadequate_drainage} onChange={v => updateChecklist("ssti", "inadequate_drainage", v)} />
+              <CBox label="EXTENSIVE SURROUNDING CELLULITIS" checked={checklist.ssti.extensive_cellulitis} onChange={v => updateChecklist("ssti", "extensive_cellulitis", v)} />
+              <CBox label="VALVULAR HEART DISEASE" checked={checklist.ssti.valvular_heart} onChange={v => updateChecklist("ssti", "valvular_heart", v)} />
+              <CBox label="DIABETES MELLITUS" checked={checklist.ssti.diabetes} onChange={v => updateChecklist("ssti", "diabetes", v)} />
+              <p className="text-xs font-medium text-muted-foreground mt-2">3. IMPETIGO:</p>
+              <CBox label="LOCALISED" checked={checklist.ssti.impetigo_localised} onChange={v => updateChecklist("ssti", "impetigo_localised", v)} />
+              <CBox label="GENERALISED" checked={checklist.ssti.impetigo_generalised} onChange={v => updateChecklist("ssti", "impetigo_generalised", v)} />
+              <CBox label="4. CELLULITIS" checked={checklist.ssti.cellulitis} onChange={v => updateChecklist("ssti", "cellulitis", v)} />
+            </CardContent>
+          </Card>
+
+          {/* UTI */}
+          <Card>
+            <CardHeader className="pb-2"><CardTitle className="text-sm">URINARY TRACT INFECTION (UTI)</CardTitle></CardHeader>
+            <CardContent className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground">1. URINALYSIS DONE:</p>
+              <CBox label="a) Nit +ve (can initiate abx)" checked={checklist.uti.nit_positive} onChange={v => updateChecklist("uti", "nit_positive", v)} />
+              <p className="text-xs text-muted-foreground mt-2">2. b) Nit -ve, Leu +ve:</p>
+              <p className="text-xs text-muted-foreground italic">*Symptoms &gt;3 for suggestive UTI · *Symptoms &lt;3 send urine culture & TCA</p>
+              <div className="grid grid-cols-2 gap-2">
+                <CBox label="FREQUENCY" checked={checklist.uti.frequency} onChange={v => updateChecklist("uti", "frequency", v)} />
+                <CBox label="DYSURIA" checked={checklist.uti.dysuria} onChange={v => updateChecklist("uti", "dysuria", v)} />
+                <CBox label="HEMATURIA" checked={checklist.uti.hematuria} onChange={v => updateChecklist("uti", "hematuria", v)} />
+                <CBox label="SUPRAPUBIC PAIN" checked={checklist.uti.suprapubic} onChange={v => updateChecklist("uti", "suprapubic", v)} />
+                <CBox label="URGENCY" checked={checklist.uti.urgency} onChange={v => updateChecklist("uti", "urgency", v)} />
+                <CBox label="POLYURIA" checked={checklist.uti.polyuria} onChange={v => updateChecklist("uti", "polyuria", v)} />
+              </div>
+              <div className="space-y-2 mt-2">
+                <Label className="text-xs">3. ASYMPTOMATIC BACTERIURIA IN PREGNANCY:</Label>
+                <Input value={checklist.uti.pregnancy_culture} onChange={e => updateChecklist("uti", "pregnancy_culture", e.target.value)} placeholder="Urine C&S Result — Please state" />
+              </div>
+              <p className="text-xs text-muted-foreground italic mt-2">4. SUSPECTED PYELONEPHRITIS: High grade fever / nausea / vomiting / flank pain / leukocytosis / costovertebral</p>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* PRESCRIBER'S NOTES */}
+      <Card>
+        <CardContent className="pt-6 space-y-2">
+          <Label>Prescriber's Notes (if any)</Label>
+          <Textarea value={prescriberNotes} onChange={e => setPrescriberNotes(e.target.value)} placeholder="Nota tambahan" />
+        </CardContent>
+      </Card>
+
+      {/* SUBMIT */}
+      <div className="space-y-3">
+        <p className="text-xs text-muted-foreground text-center">
+          Sila lampirkan borang ini bersama preskripsi atau dokumen pesakit untuk rujukan farmasi.
+        </p>
+        <Button className="w-full gap-2" style={{ backgroundColor: "#1A3C6E" }} onClick={handleSubmit} disabled={submitting}>
+          <ShieldCheck className="h-4 w-4" />
+          {submitting ? "Menghantar..." : "Hantar untuk Kelulusan Pakar"}
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function CBox({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
+  return (
+    <label className="flex items-center gap-2 text-sm cursor-pointer">
+      <Checkbox checked={checked} onCheckedChange={v => onChange(!!v)} />
+      <span className="text-xs">{label}</span>
+    </label>
+  );
+}
