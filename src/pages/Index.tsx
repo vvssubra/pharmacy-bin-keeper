@@ -251,6 +251,9 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {/* Pending Requests Card */}
+      <PendingRequestsCard navigate={navigate} />
+
       {/* Section 3 — Drug Stock Table */}
       <Card>
         <CardHeader>
