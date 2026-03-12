@@ -28,21 +28,21 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            {/* Doctor route - no sidebar */}
+            {/* Doctor route - with sidebar for now */}
             <Route
               path="/request"
               element={
                 <ProtectedRoute>
-                  <DoctorLayout><DoctorRequest /></DoctorLayout>
+                  <AppLayout><DoctorRequest /></AppLayout>
                 </ProtectedRoute>
               }
             />
-            {/* Specialist route - no sidebar */}
+            {/* Specialist route - with sidebar for now */}
             <Route
               path="/specialist"
               element={
                 <ProtectedRoute>
-                  <SpecialistLayout><SpecialistDashboard /></SpecialistLayout>
+                  <AppLayout><SpecialistDashboard /></AppLayout>
                 </ProtectedRoute>
               }
             />

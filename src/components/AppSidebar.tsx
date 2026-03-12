@@ -1,4 +1,4 @@
-import { Home, Pill, PackagePlus, FileText, Bell, Users } from "lucide-react";
+import { Home, Pill, PackagePlus, FileText, Bell, Users, Stethoscope, ShieldCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -22,6 +22,8 @@ const items = [
   { title: "Terimaan", url: "/terimaan", icon: PackagePlus },
   { title: "Pesakit", url: "/pesakit", icon: Users },
   { title: "Laporan", url: "/laporan", icon: FileText },
+  { title: "Doctor Request", url: "/request", icon: Stethoscope },
+  { title: "Specialist", url: "/specialist", icon: ShieldCheck },
 ];
 
 export function AppSidebar() {
