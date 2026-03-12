@@ -8,8 +8,16 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+function getRoleRedirect(role: string | null): string {
+  switch (role) {
+    case "doctor": return "/request";
+    case "specialist": return "/specialist";
+    default: return "/";
+  }
+}
+
 export default function Login() {
-  const { user, loading } = useAuth();
+  const { user, role, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
@@ -24,7 +32,7 @@ export default function Login() {
     );
   }
 
-  if (user) return <Navigate to="/" replace />;
+  if (user) return <Navigate to={getRoleRedirect(role)} replace />;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

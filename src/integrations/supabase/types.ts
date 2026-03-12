@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      dispensing_requests: {
+        Row: {
+          created_at: string
+          deferred_date: string | null
+          drug_id: string
+          fulfilled_at: string | null
+          fulfilled_by: string | null
+          id: string
+          no_ic: string
+          patient_name: string
+          prescriber_name: string
+          quantity: number
+          rejection_reason: string | null
+          specialist_action_at: string | null
+          specialist_id: string | null
+          specialist_notes: string | null
+          status: string
+          submitted_by: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deferred_date?: string | null
+          drug_id: string
+          fulfilled_at?: string | null
+          fulfilled_by?: string | null
+          id?: string
+          no_ic: string
+          patient_name: string
+          prescriber_name: string
+          quantity: number
+          rejection_reason?: string | null
+          specialist_action_at?: string | null
+          specialist_id?: string | null
+          specialist_notes?: string | null
+          status?: string
+          submitted_by?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deferred_date?: string | null
+          drug_id?: string
+          fulfilled_at?: string | null
+          fulfilled_by?: string | null
+          id?: string
+          no_ic?: string
+          patient_name?: string
+          prescriber_name?: string
+          quantity?: number
+          rejection_reason?: string | null
+          specialist_action_at?: string | null
+          specialist_id?: string | null
+          specialist_notes?: string | null
+          status?: string
+          submitted_by?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispensing_requests_drug_id_fkey"
+            columns: ["drug_id"]
+            isOneToOne: false
+            referencedRelation: "drugs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drugs: {
         Row: {
           baris: string | null
@@ -27,6 +95,7 @@ export type Database = {
           kumpulan: string | null
           no_kod: string | null
           pergerakan: string | null
+          perlu_kelulusan_pakar: boolean
           petak: string | null
           rak: string | null
           stok_max: number | null
@@ -48,6 +117,7 @@ export type Database = {
           kumpulan?: string | null
           no_kod?: string | null
           pergerakan?: string | null
+          perlu_kelulusan_pakar?: boolean
           petak?: string | null
           rak?: string | null
           stok_max?: number | null
@@ -69,6 +139,7 @@ export type Database = {
           kumpulan?: string | null
           no_kod?: string | null
           pergerakan?: string | null
+          perlu_kelulusan_pakar?: boolean
           petak?: string | null
           rak?: string | null
           stok_max?: number | null
@@ -76,6 +147,81 @@ export type Database = {
           stok_reorder?: number | null
           tingkat?: string | null
           unit_pengukuran?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      patient_drug_history: {
+        Row: {
+          created_at: string
+          dispensed_at: string
+          drug_id: string
+          id: string
+          method: string
+          officer_name: string | null
+          patient_id: string
+          quantity: number
+          stock_after: number | null
+        }
+        Insert: {
+          created_at?: string
+          dispensed_at?: string
+          drug_id: string
+          id?: string
+          method?: string
+          officer_name?: string | null
+          patient_id: string
+          quantity: number
+          stock_after?: number | null
+        }
+        Update: {
+          created_at?: string
+          dispensed_at?: string
+          drug_id?: string
+          id?: string
+          method?: string
+          officer_name?: string | null
+          patient_id?: string
+          quantity?: number
+          stock_after?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "patient_drug_history_drug_id_fkey"
+            columns: ["drug_id"]
+            isOneToOne: false
+            referencedRelation: "drugs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "patient_drug_history_patient_id_fkey"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "patient_registry"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      patient_registry: {
+        Row: {
+          created_at: string
+          id: string
+          no_ic: string
+          patient_name: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          no_ic: string
+          patient_name: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          no_ic?: string
+          patient_name?: string
           updated_at?: string
         }
         Relationships: []
@@ -120,7 +266,10 @@ export type Database = {
           jumlah_rm: number | null
           kuantiti: number
           nama_pegawai: string | null
+          nama_pesakit: string | null
+          no_ic: string | null
           no_rujukan: string | null
+          sumber: string | null
           tarikh: string
           terima_daripada: string | null
           updated_at: string
@@ -137,7 +286,10 @@ export type Database = {
           jumlah_rm?: number | null
           kuantiti: number
           nama_pegawai?: string | null
+          nama_pesakit?: string | null
+          no_ic?: string | null
           no_rujukan?: string | null
+          sumber?: string | null
           tarikh: string
           terima_daripada?: string | null
           updated_at?: string
@@ -154,7 +306,10 @@ export type Database = {
           jumlah_rm?: number | null
           kuantiti?: number
           nama_pegawai?: string | null
+          nama_pesakit?: string | null
+          no_ic?: string | null
           no_rujukan?: string | null
+          sumber?: string | null
           tarikh?: string
           terima_daripada?: string | null
           updated_at?: string
@@ -201,7 +356,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "pharmacist" | "staff"
+      app_role: "admin" | "pharmacist" | "staff" | "doctor" | "specialist"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -329,7 +484,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "pharmacist", "staff"],
+      app_role: ["admin", "pharmacist", "staff", "doctor", "specialist"],
     },
   },
 } as const
