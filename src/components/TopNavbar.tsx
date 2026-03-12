@@ -12,7 +12,7 @@ export function TopNavbar() {
       <div className="flex items-center gap-3">
         <SidebarTrigger />
         <div className="hidden sm:block">
-          <p className="text-sm font-semibold text-foreground">Digital Bin Card</p>
+          <p className="text-sm font-semibold text-foreground">Digital Drug Control </p>
           <p className="text-xs text-muted-foreground">
             {profile?.facility ?? "Klinik Kesihatan Kempas"}
           </p>
@@ -20,22 +20,22 @@ export function TopNavbar() {
       </div>
 
       <div className="flex items-center gap-3">
-        {profile && (
-          <div className="flex items-center gap-2">
+        {profile &&
+        <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-foreground">
               {profile.full_name || "User"}
             </span>
-            {role && (
-              <Badge variant="secondary" className="text-xs capitalize">
+            {role &&
+          <Badge variant="secondary" className="text-xs capitalize">
                 {role}
               </Badge>
-            )}
+          }
           </div>
-        )}
+        }
         <Button variant="ghost" size="icon" onClick={signOut} aria-label="Log out">
           <LogOut className="h-4 w-4" />
         </Button>
       </div>
-    </header>
-  );
+    </header>);
+
 }
