@@ -1,5 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { AppLayout } from "@/components/AppLayout";
+import { NoPermission } from "@/components/NoPermission";
 
 const SPECIALIST_ROLES = ["specialist"];
 const PHARMACIST_ROUTES = ["/fulfilment"];
@@ -23,11 +25,11 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (pathname === "/specialist" && role && !SPECIALIST_ROLES.includes(role)) {
-    return <Navigate to="/" replace />;
+    return <AppLayout><NoPermission /></AppLayout>;
   }
 
   if (PHARMACIST_ROUTES.some((r) => pathname.startsWith(r)) && role && !PHARMACIST_ROLES.includes(role)) {
-    return <Navigate to="/" replace />;
+    return <AppLayout><NoPermission /></AppLayout>;
   }
 
   return <>{children}</>;
