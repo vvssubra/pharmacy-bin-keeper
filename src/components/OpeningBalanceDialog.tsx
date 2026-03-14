@@ -102,10 +102,11 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
 
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label>Tarikh Baki Awal</Label>
+              <Label htmlFor="opening-balance-date">Tarikh Baki Awal</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
+                    id="opening-balance-date"
                     variant="outline"
                     className={cn(
                       "w-full justify-start text-left font-normal",
@@ -129,8 +130,9 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
             </div>
 
             <div className="space-y-2">
-              <Label>Kuantiti pada tarikh tersebut</Label>
+              <Label htmlFor="opening-balance-qty">Kuantiti pada tarikh tersebut</Label>
               <Input
+                id="opening-balance-qty"
                 type="number"
                 min={0}
                 placeholder="0"
@@ -145,7 +147,7 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
               Batal
             </Button>
             <Button onClick={handleSubmit} disabled={mutation.isPending}>
-              Simpan
+              {mutation.isPending ? "Menyimpan..." : "Simpan"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -180,7 +180,8 @@ export default function DrugMaster() {
                     <TableRow key={drug.id} className={drug.is_active ? "" : "opacity-50"}>
                       <TableCell className="font-medium">
                         <button
-                          className="text-left hover:text-primary hover:underline underline-offset-2 transition-colors"
+                          type="button"
+                          className="text-left cursor-pointer hover:text-primary hover:underline underline-offset-2 transition-colors min-h-[44px] flex items-center"
                           onClick={() => navigate(`/drugs/${drug.id}/bincard`)}
                         >
                           {drug.drug_name}

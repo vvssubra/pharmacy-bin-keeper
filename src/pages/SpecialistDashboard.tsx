@@ -366,7 +366,7 @@ export default function SpecialistDashboard() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setApproveTarget(null)}>Batal</Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => approveMutation.mutate()} disabled={approveMutation.isPending}>Sahkan Kelulusan</Button>
+            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => approveMutation.mutate()} disabled={approveMutation.isPending}>{approveMutation.isPending ? "Memproses..." : "Sahkan Kelulusan"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -389,7 +389,7 @@ export default function SpecialistDashboard() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setRejectTarget(null)}>Batal</Button>
-            <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={rejectMutation.isPending || rejectReason.length < 10}>Sahkan Penolakan</Button>
+            <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={rejectMutation.isPending || rejectReason.length < 10}>{rejectMutation.isPending ? "Memproses..." : "Sahkan Penolakan"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -409,7 +409,7 @@ export default function SpecialistDashboard() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setAbApproveTarget(null)}>Batal</Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => abApproveMutation.mutate()} disabled={abApproveMutation.isPending}>Lulus Borang</Button>
+            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => abApproveMutation.mutate()} disabled={abApproveMutation.isPending}>{abApproveMutation.isPending ? "Memproses..." : "Lulus Borang"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -432,7 +432,7 @@ export default function SpecialistDashboard() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setAbRejectTarget(null)}>Batal</Button>
-            <Button variant="destructive" onClick={() => abRejectMutation.mutate()} disabled={abRejectMutation.isPending || abRejectReason.length < 10}>Sahkan Penolakan</Button>
+            <Button variant="destructive" onClick={() => abRejectMutation.mutate()} disabled={abRejectMutation.isPending || abRejectReason.length < 10}>{abRejectMutation.isPending ? "Memproses..." : "Sahkan Penolakan"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

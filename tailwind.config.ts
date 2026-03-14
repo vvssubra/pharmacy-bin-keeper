@@ -16,6 +16,9 @@ export default {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
       },
+      lineHeight: {
+        relaxed: "1.6",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

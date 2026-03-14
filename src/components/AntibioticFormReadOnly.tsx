@@ -1,3 +1,4 @@
+import { Check, Minus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 
@@ -5,10 +6,12 @@ interface AntibioticFormViewerProps {
   form: any;
 }
 
-function Check({ checked }: { checked: boolean }) {
-  return <span className={checked ? "text-green-600 font-bold" : "text-muted-foreground"}>
-    {checked ? "✓" : "—"}
-  </span>;
+function CheckDisplay({ checked }: { checked: boolean }) {
+  return (
+    <span className={checked ? "text-green-600 inline-flex" : "text-muted-foreground inline-flex"}>
+      {checked ? <Check className="h-4 w-4" aria-hidden /> : <Minus className="h-4 w-4" aria-hidden />}
+    </span>
+  );
 }
 
 export function AntibioticFormReadOnly({ form }: AntibioticFormViewerProps) {
@@ -38,9 +41,9 @@ export function AntibioticFormReadOnly({ form }: AntibioticFormViewerProps) {
         {form.fms_code && <Field label="FMS Code" value={form.fms_code} />}
         <div className="flex gap-4">
           <span className="text-muted-foreground">Health Ed:</span>
-          <span>Compliance <Check checked={form.health_ed_compliance} /></span>
-          <span>Side-effect <Check checked={form.health_ed_sideeffect} /></span>
-          <span>TCA <Check checked={form.health_ed_tca} /></span>
+          <span>Compliance <CheckDisplay checked={form.health_ed_compliance} /></span>
+          <span>Side-effect <CheckDisplay checked={form.health_ed_sideeffect} /></span>
+          <span>TCA <CheckDisplay checked={form.health_ed_tca} /></span>
         </div>
       </div>
 
@@ -140,7 +143,7 @@ function Row({ label, checked }: { label: string; checked: boolean }) {
   return (
     <div className="flex justify-between">
       <span className="text-muted-foreground">{label}</span>
-      <Check checked={checked} />
+      <CheckDisplay checked={checked} />
     </div>
   );
 }

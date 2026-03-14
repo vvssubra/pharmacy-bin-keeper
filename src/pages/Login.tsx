@@ -82,8 +82,12 @@ export default function Login() {
                   <Label htmlFor="login-password">Kata laluan</Label>
                   <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
                 </div>
-                {error && <p className="text-sm text-destructive">{error}</p>}
-                <Button type="submit" className="w-full" disabled={submitting}>
+                {error && (
+                  <p id="login-error" role="alert" aria-live="polite" className="text-sm text-destructive">
+                    {error}
+                  </p>
+                )}
+                <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "login-error" : undefined}>
                   {submitting ? "Logging in…" : "Log Masuk"}
                 </Button>
               </form>
@@ -93,7 +97,7 @@ export default function Login() {
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="signup-name">Nama Penuh</Label>
-                  <Input id="signup-name" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
+                  <Input id="signup-name" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required autoComplete="name" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="signup-email">Email</Label>
@@ -103,8 +107,12 @@ export default function Login() {
                   <Label htmlFor="signup-password">Kata laluan</Label>
                   <Input id="signup-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
                 </div>
-                {error && <p className="text-sm text-destructive">{error}</p>}
-                <Button type="submit" className="w-full" disabled={submitting}>
+                {error && (
+                  <p id="signup-error" role="alert" aria-live="polite" className="text-sm text-destructive">
+                    {error}
+                  </p>
+                )}
+                <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "signup-error" : undefined}>
                   {submitting ? "Mendaftar…" : "Daftar Akaun"}
                 </Button>
               </form>

@@ -227,7 +227,7 @@ export default function Dashboard() {
           <AlertDescription>
             {counts.KRITIKAL} ubat memerlukan perhatian segera — stok di bawah paras minimum
           </AlertDescription>
-          <button onClick={() => setAlertDismissed(true)} className="absolute right-3 top-3 text-destructive hover:text-destructive/80">
+          <button type="button" onClick={() => setAlertDismissed(true)} className="absolute right-3 top-3 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer text-destructive hover:text-destructive/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded" aria-label="Tutup amaran">
             <X className="h-4 w-4" />
           </button>
         </Alert>

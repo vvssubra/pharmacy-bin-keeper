@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design system: healthcare / pharmacy dashboard — professional, readable, trustworthy */
 @layer base {
   :root {
     --background: 0 0% 98%;
@@ -23,7 +24,8 @@
     --secondary-foreground: 216 62% 27%;
 
     --muted: 214 20% 94%;
-    --muted-foreground: 215 16% 47%;
+    /* Muted text: ≥4.5:1 contrast on background (HSL lightness ~40% or below) */
+    --muted-foreground: 215 22% 40%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
@@ -58,5 +60,17 @@
 
   body {
     @apply bg-background text-foreground font-sans;
+    line-height: 1.6;
+  }
+}
+
+/* Respect user motion preference (a11y) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

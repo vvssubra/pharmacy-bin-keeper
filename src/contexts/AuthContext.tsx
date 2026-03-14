@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, useRef, type ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
@@ -18,49 +18,61 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+async function loadProfileAndRole(
+  userId: string,
+  setProfile: (p: Profile | null) => void,
+  setRole: (r: string | null) => void,
+  setLoading: (v: boolean) => void
+) {
+  const { data: profileData } = await supabase
+    .from("profiles")
+    .select("full_name, facility")
+    .eq("user_id", userId)
+    .single();
+
+  if (profileData) setProfile(profileData);
+
+  const { data: roleData } = await supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", userId)
+    .single();
+
+  if (roleData) setRole(roleData.role);
+  setLoading(false);
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const loadingForUser = useRef<string | null>(null);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-
-        if (session?.user) {
-          // Fetch profile and role with setTimeout to avoid deadlock
-          setTimeout(async () => {
-            const { data: profileData } = await supabase
-              .from("profiles")
-              .select("full_name, facility")
-              .eq("user_id", session.user.id)
-              .single();
-
-            if (profileData) setProfile(profileData);
-
-            const { data: roleData } = await supabase
-              .from("user_roles")
-              .select("role")
-              .eq("user_id", session.user.id)
-              .single();
-
-            if (roleData) setRole(roleData.role);
-            setLoading(false);
-          }, 0);
-        } else {
-          setProfile(null);
-          setRole(null);
-          setLoading(false);
-        }
+    function handleSession(sess: Session | null) {
+      setSession(sess);
+      setUser(sess?.user ?? null);
+      if (!sess?.user) {
+        setProfile(null);
+        setRole(null);
+        setLoading(false);
+        loadingForUser.current = null;
+        return;
       }
-    );
+      const uid = sess.user.id;
+      if (loadingForUser.current === uid) return;
+      loadingForUser.current = uid;
+      loadProfileAndRole(uid, setProfile, setRole, setLoading);
+    }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) setLoading(false);
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      handleSession(initialSession);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      handleSession(session);
     });
 
     return () => subscription.unsubscribe();

@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow, startOfDay, format } from "date-fns";
 import { ms } from "date-fns/locale";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Check } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -221,7 +221,7 @@ export default function PharmacistFulfilment() {
                       <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(req.created_at), { addSuffix: true, locale: ms })}</span>
                     </div>
                     <div className="flex gap-1">
-                      {isSpecialistApproved && <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px]">Diluluskan Pakar ✓</Badge>}
+                      {isSpecialistApproved && <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px] inline-flex items-center gap-1"><Check className="h-3 w-3" /> Diluluskan Pakar</Badge>}
                       {isDeferred && <Badge variant="secondary" className="text-[10px]">Ditangguh</Badge>}
                     </div>
                   </div>
@@ -306,7 +306,7 @@ export default function PharmacistFulfilment() {
                         <CardTitle className="text-base">{f.patient_name}</CardTitle>
                         <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true, locale: ms })}</span>
                       </div>
-                      <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px]">Diluluskan Pakar ✓</Badge>
+                      <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px] inline-flex items-center gap-1"><Check className="h-3 w-3" /> Diluluskan Pakar</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
