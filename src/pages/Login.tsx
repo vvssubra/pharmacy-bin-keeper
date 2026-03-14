@@ -23,6 +23,7 @@ export default function Login() {
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   if (loading) {
     return (
@@ -58,6 +59,17 @@ export default function Login() {
     setSubmitting(false);
   };
 
+  const handleGoogleLogin = async () => {
+    setError(null);
+    setGoogleLoading(true);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/` },
+    });
+    if (error) setError(error.message);
+    setGoogleLoading(false);
+  };
+
   return (
     <div className="flex min-h-screen items-start justify-center bg-background pt-24 px-4">
       <Card className="w-full max-w-sm">
@@ -89,6 +101,23 @@ export default function Login() {
                 )}
                 <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "login-error" : undefined}>
                   {submitting ? "Logging in…" : "Log Masuk"}
+                </Button>
+                <div className="relative my-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase text-muted-foreground">
+                    <span className="bg-card px-2">atau log masuk dengan</span>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  disabled={googleLoading || submitting}
+                  onClick={handleGoogleLogin}
+                >
+                  {googleLoading ? "Memproses…" : "Log masuk dengan Google"}
                 </Button>
               </form>
             </TabsContent>
