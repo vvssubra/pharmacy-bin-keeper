@@ -23,25 +23,31 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 async function loadProfileAndRole(
   userId: string,
   setProfile: (p: Profile | null) => void,
-  setRole: (r: string | null) => void,
+  setRole: (r: AppRole | null) => void,
   setLoading: (v: boolean) => void
 ) {
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("full_name, facility")
-    .eq("user_id", userId)
-    .single();
+  try {
+    const { data: profileData } = await supabase
+      .from("profiles")
+      .select("full_name, facility")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-  if (profileData) setProfile(profileData);
+    if (profileData) setProfile(profileData);
 
-  const { data: roleData } = await supabase
-    .from("user_roles")
-    .select("role")
-    .eq("user_id", userId)
-    .single();
+    const { data: roleData, error: roleError } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-  if (roleData) setRole(roleData.role as AppRole);
-  setLoading(false);
+    if (roleError) console.error("[Auth] role query error:", roleError);
+    if (roleData) setRole(roleData.role as AppRole);
+  } catch (err) {
+    console.error("[Auth] loadProfileAndRole failed:", err);
+  } finally {
+    setLoading(false);
+  }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -66,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const uid = sess.user.id;
       if (loadingForUser.current === uid) return;
       loadingForUser.current = uid;
+      setLoading(true);
       loadProfileAndRole(uid, setProfile, setRole, setLoading);
     }
 
