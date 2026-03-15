@@ -1,3 +1,19 @@
+---
+gsd_state_version: 1.0
+milestone: v2.0
+milestone_name: English UI & Admin Features
+status: planning
+stopped_at: Completed 01-english-ui/01-01-PLAN.md — 4 RED test files created
+last_updated: "2026-03-15T22:35:49.030Z"
+last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
+progress:
+  total_phases: 4
+  completed_phases: 0
+  total_plans: 6
+  completed_plans: 1
+  percent: 17
+---
+
 # Project State
 
 ## Project Reference
@@ -14,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-03-16 — Roadmap created for v2.0 milestone
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██░░░░░░░░] 17%
 
 ## Performance Metrics
 
@@ -34,6 +50,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 01-english-ui P01 | 2m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -46,6 +63,8 @@ Recent decisions affecting current work:
 - [Roadmap]: Drug sync before PDF — 3-6 line fix with highest clinical value; no deployment risk
 - [Roadmap]: User management last — only feature requiring new infrastructure (Edge Function); highest security risk
 - [Roadmap]: Service role key must never appear in browser bundle or VITE_ env vars — use Edge Function as proxy
+- [Phase 01-english-ui]: useSidebar mocked from ui/sidebar to avoid SidebarProvider requirement — pattern for downstream sidebar tests
+- [Phase 01-english-ui]: date-fns locale ms must NOT be mocked — real locale object required for format() preprocessor property
 
 ### Pending Todos
 
@@ -59,6 +78,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16
-Stopped at: Roadmap written, STATE.md initialised — ready to plan Phase 1
+Last session: 2026-03-15T22:35:49.029Z
+Stopped at: Completed 01-english-ui/01-01-PLAN.md — 4 RED test files created
 Resume file: None

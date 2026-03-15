@@ -84,7 +84,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. English UI | v2.0 | 0/6 | Not started | - |
+| 1. English UI | 1/6 | In Progress|  | - |
 | 2. Drug-Request Sync | v2.0 | 0/? | Not started | - |
 | 3. Antibiotic PDF | v2.0 | 0/? | Not started | - |
 | 4. Admin User Management | v2.0 | 0/? | Not started | - |

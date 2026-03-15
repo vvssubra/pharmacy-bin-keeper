@@ -9,10 +9,10 @@ Requirements for v2.0 milestone.
 
 ### English UI
 
-- [ ] **ENGL-01**: All page titles and sidebar navigation labels are displayed in English
-- [ ] **ENGL-02**: All form field labels, placeholders, and button text are in English
-- [ ] **ENGL-03**: All status badges and status values are displayed in English
-- [ ] **ENGL-04**: All toast notifications and error messages are in English
+- [x] **ENGL-01**: All page titles and sidebar navigation labels are displayed in English
+- [x] **ENGL-02**: All form field labels, placeholders, and button text are in English
+- [x] **ENGL-03**: All status badges and status values are displayed in English
+- [x] **ENGL-04**: All toast notifications and error messages are in English
 - [ ] **ENGL-05**: All table column headers and data labels are in English
 
 ### User Management
@@ -55,10 +55,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENGL-01 | Phase 1 | Pending |
-| ENGL-02 | Phase 1 | Pending |
-| ENGL-03 | Phase 1 | Pending |
-| ENGL-04 | Phase 1 | Pending |
+| ENGL-01 | Phase 1 | Complete |
+| ENGL-02 | Phase 1 | Complete |
+| ENGL-03 | Phase 1 | Complete |
+| ENGL-04 | Phase 1 | Complete |
 | ENGL-05 | Phase 1 | Pending |
 | SYNC-01 | Phase 2 | Pending |
 | PDF-01 | Phase 3 | Pending |
