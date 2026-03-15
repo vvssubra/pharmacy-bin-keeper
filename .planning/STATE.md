@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
 status: planning
-stopped_at: Completed 01-english-ui/01-02-PLAN.md — 7 files translated, AppSidebar.test and DrugFormDialog.test GREEN
-last_updated: "2026-03-15T22:45:07.143Z"
+stopped_at: Completed 01-english-ui/01-03-PLAN.md — 4 files translated, Index.test.tsx GREEN
+last_updated: "2026-03-15T22:55:27.631Z"
 last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 6
-  completed_plans: 2
+  completed_plans: 3
   percent: 17
 ---
 
@@ -52,6 +52,7 @@ Progress: [██░░░░░░░░] 17%
 *Updated after each plan completion*
 | Phase 01-english-ui P01 | 2m | 2 tasks | 4 files |
 | Phase 01-english-ui P02 | 8m | 2 tasks | 9 files |
+| Phase 01-english-ui P03 | 8m | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 01-english-ui]: date-fns locale ms must NOT be mocked — real locale object required for format() preprocessor property
 - [Phase 01-english-ui]: Sidebar component mock: mocking useSidebar export alone is insufficient — Sidebar component uses internal closure over React context; full component replacement needed in tests
 - [Phase 01-english-ui]: ProtectedRoute.test updated to No Permission — NoPermission.tsx translation requires test assertions to use English heading text
+- [Phase 01-english-ui]: StockStatus type values changed to English (CRITICAL/LOW/EXCESS/NO LEVEL) — type, STATUS_CONFIG, STATUS_ORDER, and getStatus() all updated together
+- [Phase 01-english-ui]: date-fns ms locale removed from Index.tsx — format() defaults to English without locale option
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T22:45:07.142Z
-Stopped at: Completed 01-english-ui/01-02-PLAN.md — 7 files translated, AppSidebar.test and DrugFormDialog.test GREEN
+Last session: 2026-03-15T22:55:27.629Z
+Stopped at: Completed 01-english-ui/01-03-PLAN.md — 4 files translated, Index.test.tsx GREEN
 Resume file: None
