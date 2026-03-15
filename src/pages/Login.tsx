@@ -80,8 +80,8 @@ export default function Login() {
         <CardContent>
           <Tabs defaultValue="login" onValueChange={() => setError(null)}>
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="login">Log Masuk</TabsTrigger>
-              <TabsTrigger value="signup">Daftar</TabsTrigger>
+              <TabsTrigger value="login">Log In</TabsTrigger>
+              <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
 
             <TabsContent value="login">
@@ -91,7 +91,7 @@ export default function Login() {
                   <Input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Kata laluan</Label>
+                  <Label htmlFor="login-password">Password</Label>
                   <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
                 </div>
                 {error && (
@@ -100,14 +100,14 @@ export default function Login() {
                   </p>
                 )}
                 <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "login-error" : undefined}>
-                  {submitting ? "Logging in…" : "Log Masuk"}
+                  {submitting ? "Logging in…" : "Log In"}
                 </Button>
                 <div className="relative my-4">
                   <div className="absolute inset-0 flex items-center">
                     <span className="w-full border-t border-border" />
                   </div>
                   <div className="relative flex justify-center text-xs uppercase text-muted-foreground">
-                    <span className="bg-card px-2">atau log masuk dengan</span>
+                    <span className="bg-card px-2">or log in with</span>
                   </div>
                 </div>
                 <Button
@@ -117,7 +117,7 @@ export default function Login() {
                   disabled={googleLoading || submitting}
                   onClick={handleGoogleLogin}
                 >
-                  {googleLoading ? "Memproses…" : "Log masuk dengan Google"}
+                  {googleLoading ? "Processing…" : "Log in with Google"}
                 </Button>
               </form>
             </TabsContent>
@@ -125,7 +125,7 @@ export default function Login() {
             <TabsContent value="signup">
               <form onSubmit={handleSignup} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Nama Penuh</Label>
+                  <Label htmlFor="signup-name">Full Name</Label>
                   <Input id="signup-name" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required autoComplete="name" />
                 </div>
                 <div className="space-y-2">
@@ -133,7 +133,7 @@ export default function Login() {
                   <Input id="signup-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Kata laluan</Label>
+                  <Label htmlFor="signup-password">Password</Label>
                   <Input id="signup-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
                 </div>
                 {error && (
@@ -142,7 +142,7 @@ export default function Login() {
                   </p>
                 )}
                 <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "signup-error" : undefined}>
-                  {submitting ? "Mendaftar…" : "Daftar Akaun"}
+                  {submitting ? "Signing up…" : "Create Account"}
                 </Button>
               </form>
             </TabsContent>

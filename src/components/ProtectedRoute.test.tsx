@@ -47,15 +47,15 @@ describe("ProtectedRoute", () => {
   describe("unassigned user (role = null)", () => {
     it("shows NoPermission on /specialist", () => {
       renderWithRouter("/specialist", { user: { id: "1" }, role: null, loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("shows NoPermission on /drugs", () => {
       renderWithRouter("/drugs", { user: { id: "1" }, role: null, loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("shows NoPermission on /request", () => {
       renderWithRouter("/request", { user: { id: "1" }, role: null, loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
   });
 
@@ -66,15 +66,15 @@ describe("ProtectedRoute", () => {
     });
     it("blocks access to /drugs", () => {
       renderWithRouter("/drugs", { user: { id: "1" }, role: "doctor", loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("blocks access to /fulfilment", () => {
       renderWithRouter("/fulfilment", { user: { id: "1" }, role: "doctor", loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("blocks access to /role-management", () => {
       renderWithRouter("/role-management", { user: { id: "1" }, role: "doctor", loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
   });
 
@@ -85,11 +85,11 @@ describe("ProtectedRoute", () => {
     });
     it("blocks access to /drugs", () => {
       renderWithRouter("/drugs", { user: { id: "1" }, role: "specialist", loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("blocks access to /role-management", () => {
       renderWithRouter("/role-management", { user: { id: "1" }, role: "specialist", loading: false });
-      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
   });
 

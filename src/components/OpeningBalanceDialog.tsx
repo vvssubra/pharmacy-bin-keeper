@@ -71,7 +71,7 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["transactions-baki-awal"] });
-      toast.success("Baki awal berjaya disimpan");
+      toast.success("Opening balance saved");
       onOpenChange(false);
     },
     onError: (err: Error) => toast.error(err.message),
@@ -79,7 +79,7 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
 
   const handleSubmit = () => {
     if (!tarikh || !kuantiti) {
-      toast.error("Sila lengkapkan semua medan");
+      toast.error("Please complete all fields");
       return;
     }
     if (existing) {
@@ -94,15 +94,15 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Tetapkan Baki Awal — {drug?.drug_name}</DialogTitle>
+            <DialogTitle>Set Opening Balance — {drug?.drug_name}</DialogTitle>
             <DialogDescription>
-              Masukkan kuantiti stok semasa pada tarikh yang dipilih. Ini akan menjadi titik permulaan rekod pergerakan stok.
+              Enter the current stock quantity on the selected date. This will be the starting point for stock movement records.
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
             <div className="space-y-2">
-              <Label htmlFor="opening-balance-date">Tarikh Baki Awal</Label>
+              <Label htmlFor="opening-balance-date">Opening Balance Date</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -114,7 +114,7 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {tarikh ? format(tarikh, "dd/MM/yyyy") : "Pilih tarikh"}
+                    {tarikh ? format(tarikh, "dd/MM/yyyy") : "Select date"}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
@@ -130,7 +130,7 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="opening-balance-qty">Kuantiti pada tarikh tersebut</Label>
+              <Label htmlFor="opening-balance-qty">Quantity on that date</Label>
               <Input
                 id="opening-balance-qty"
                 type="number"
@@ -144,10 +144,10 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
 
           <DialogFooter>
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Batal
+              Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={mutation.isPending}>
-              {mutation.isPending ? "Menyimpan..." : "Simpan"}
+              {mutation.isPending ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -156,15 +156,15 @@ export function OpeningBalanceDialog({ open, onOpenChange, drug, existing }: Ope
       <AlertDialog open={showEditWarning} onOpenChange={setShowEditWarning}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Ubah baki awal?</AlertDialogTitle>
+            <AlertDialogTitle>Change opening balance?</AlertDialogTitle>
             <AlertDialogDescription>
-              Mengubah baki awal akan mengira semula semua baki. Teruskan?
+              Changing the opening balance will recalculate all balances. Continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={() => { setShowEditWarning(false); mutation.mutate(); }}>
-              Teruskan
+              Continue
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

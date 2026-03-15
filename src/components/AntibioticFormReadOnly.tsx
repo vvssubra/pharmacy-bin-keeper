@@ -27,12 +27,12 @@ export function AntibioticFormReadOnly({ form }: AntibioticFormViewerProps) {
     <div className="space-y-4 text-sm max-h-[60vh] overflow-y-auto pr-2">
       {/* Bahagian 1 */}
       <div className="space-y-2">
-        <h4 className="font-semibold text-foreground">BAHAGIAN 1: Butiran Pesakit</h4>
+        <h4 className="font-semibold text-foreground">SECTION 1: Patient Details</h4>
         <div className="grid grid-cols-2 gap-2">
-          <Field label="Tarikh" value={form.tarikh} />
-          <Field label="Nama" value={form.patient_name} />
+          <Field label="Date" value={form.tarikh} />
+          <Field label="Name" value={form.patient_name} />
           <Field label="IC" value={form.patient_ic} />
-          {form.patient_weight_kg && <Field label="Berat (kg)" value={form.patient_weight_kg} />}
+          {form.patient_weight_kg && <Field label="Weight (kg)" value={form.patient_weight_kg} />}
           <Field label="Diagnosis" value={form.diagnosis} />
           <Field label="Unit" value={form.prescription_unit || "—"} />
         </div>
@@ -50,7 +50,7 @@ export function AntibioticFormReadOnly({ form }: AntibioticFormViewerProps) {
       <Separator />
 
       {/* Bahagian 2 */}
-      <h4 className="font-semibold text-foreground">BAHAGIAN 2: Semakan Klinikal</h4>
+      <h4 className="font-semibold text-foreground">SECTION 2: Clinical Review</h4>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-3">

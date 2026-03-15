@@ -8,12 +8,12 @@ export function NoPermission() {
         <CardHeader>
           <div className="flex items-center gap-2">
             <ShieldX className="h-5 w-5 text-muted-foreground" />
-            <CardTitle className="text-lg">Tiada Kebenaran</CardTitle>
+            <CardTitle className="text-lg">No Permission</CardTitle>
           </div>
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>Anda tidak mempunyai kebenaran untuk halaman ini.</p>
-          <p>Hubungi jurufarmasit untuk diberikan peranan yang sesuai (doktor, pakar, atau jurufarmasit).</p>
+          <p>You do not have permission to access this page.</p>
+          <p>Contact the pharmacist to be assigned an appropriate role (doctor, specialist, or pharmacist).</p>
         </CardContent>
       </Card>
     </div>

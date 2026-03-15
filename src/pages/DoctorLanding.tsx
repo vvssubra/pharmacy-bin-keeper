@@ -6,17 +6,17 @@ import { Badge } from "@/components/ui/badge";
 const services = [
   {
     icon: Pill,
-    title: "Permintaan Ubat Kawalan",
-    description: "Borang pengeluaran ubat terkawal yang memerlukan kelulusan farmasis",
-    badge: "Perlu Kelulusan Farmasis",
+    title: "Controlled Drug Request",
+    description: "Controlled drug dispensing form requiring pharmacist approval",
+    badge: "Requires Pharmacist Approval",
     badgeClass: "bg-blue-100 text-blue-700 border-blue-300",
     to: "/request/ubat",
   },
   {
     icon: ShieldPlus,
-    title: "Borang Antibiotik",
-    description: "Borang semakan klinikal antibiotik berdasarkan Clinical Pathway NAG 2024",
-    badge: "Perlu Kelulusan Pakar",
+    title: "Antibiotic Form",
+    description: "Antibiotic clinical review form based on Clinical Pathway NAG 2024",
+    badge: "Requires Specialist Approval",
     badgeClass: "bg-yellow-100 text-yellow-700 border-yellow-300",
     to: "/request/antibiotik",
   },
@@ -29,8 +29,8 @@ export default function DoctorLanding() {
     <div className="flex min-h-[80vh] items-center justify-center px-4">
       <div className="w-full max-w-[700px] space-y-6">
         <div className="text-center space-y-1">
-          <h1 className="text-2xl font-bold text-foreground">Pilih Jenis Permohonan</h1>
-          <p className="text-sm text-muted-foreground">Pilih borang yang sesuai dengan keperluan pesakit</p>
+          <h1 className="text-2xl font-bold text-foreground">Select Request Type</h1>
+          <p className="text-sm text-muted-foreground">Choose the form appropriate for the patient's needs</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
