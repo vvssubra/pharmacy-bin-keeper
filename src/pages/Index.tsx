@@ -16,9 +16,8 @@ import {
   ExternalLink, Plus,
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
-import { ms } from "date-fns/locale";
 
-type StockStatus = "KRITIKAL" | "RENDAH" | "NORMAL" | "LEBIHAN" | "TIADA PARAS";
+type StockStatus = "CRITICAL" | "LOW" | "NORMAL" | "EXCESS" | "NO LEVEL";
 
 interface DrugStock {
   id: string;
@@ -53,9 +52,9 @@ function generateMockDrugs(): DrugStock[] {
     const max = reorder + 100;
     // distribute statuses
     let baki: number;
-    if (i % 10 === 0) baki = Math.floor(min * 0.5); // KRITIKAL
-    else if (i % 7 === 0) baki = min + Math.floor((reorder - min) * 0.3); // RENDAH
-    else if (i % 13 === 0) baki = max + 20; // LEBIHAN
+    if (i % 10 === 0) baki = Math.floor(min * 0.5); // CRITICAL
+    else if (i % 7 === 0) baki = min + Math.floor((reorder - min) * 0.3); // LOW
+    else if (i % 13 === 0) baki = max + 20; // EXCESS
     else baki = reorder + Math.floor(Math.random() * (max - reorder));
 
     const status = getStatus(baki, min, reorder, max);
@@ -77,23 +76,23 @@ function generateMockDrugs(): DrugStock[] {
 }
 
 function getStatus(baki: number, min: number, reorder: number, max: number): StockStatus {
-  if (!min && !max) return "TIADA PARAS";
-  if (baki < min) return "KRITIKAL";
-  if (baki < reorder) return "RENDAH";
-  if (baki > max) return "LEBIHAN";
+  if (!min && !max) return "NO LEVEL";
+  if (baki < min) return "CRITICAL";
+  if (baki < reorder) return "LOW";
+  if (baki > max) return "EXCESS";
   return "NORMAL";
 }
 
 const STATUS_CONFIG: Record<StockStatus, { color: string; badgeClass: string }> = {
-  KRITIKAL: { color: "text-destructive", badgeClass: "bg-destructive/15 text-destructive border-destructive/30" },
-  RENDAH: { color: "text-warning", badgeClass: "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700" },
+  CRITICAL: { color: "text-destructive", badgeClass: "bg-destructive/15 text-destructive border-destructive/30" },
+  LOW: { color: "text-warning", badgeClass: "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700" },
   NORMAL: { color: "text-green-600", badgeClass: "bg-green-100 text-green-700 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700" },
-  LEBIHAN: { color: "text-blue-600", badgeClass: "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700" },
-  "TIADA PARAS": { color: "text-muted-foreground", badgeClass: "bg-muted text-muted-foreground border-border" },
+  EXCESS: { color: "text-blue-600", badgeClass: "bg-blue-100 text-blue-700 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700" },
+  "NO LEVEL": { color: "text-muted-foreground", badgeClass: "bg-muted text-muted-foreground border-border" },
 };
 
 const STATUS_ORDER: Record<StockStatus, number> = {
-  KRITIKAL: 0, RENDAH: 1, NORMAL: 2, LEBIHAN: 3, "TIADA PARAS": 4,
+  CRITICAL: 0, LOW: 1, NORMAL: 2, EXCESS: 3, "NO LEVEL": 4,
 };
 
 // ---------- mock activity ----------
@@ -195,20 +194,23 @@ export default function Dashboard() {
 
   // Counts
   const counts = useMemo(() => {
-    const c = { KRITIKAL: 0, RENDAH: 0, NORMAL: 0, LEBIHAN: 0 };
+    const c = { CRITICAL: 0, LOW: 0, NORMAL: 0, EXCESS: 0 };
     for (const d of drugStocks) {
-      if (d.status in c) c[d.status as keyof typeof c]++;
+      if (d.status === "CRITICAL") c.CRITICAL++;
+      else if (d.status === "LOW") c.LOW++;
+      else if (d.status === "NORMAL") c.NORMAL++;
+      else if (d.status === "EXCESS") c.EXCESS++;
     }
     return c;
   }, [drugStocks]);
 
-  const today = format(new Date(), "d MMMM yyyy", { locale: ms });
+  const today = format(new Date(), "d MMMM yyyy");
 
   const statCards = [
-    { label: "Kritikal", count: counts.KRITIKAL, icon: AlertTriangle, color: "text-destructive", bg: "bg-destructive/10" },
-    { label: "Rendah", count: counts.RENDAH, icon: TrendingDown, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-100 dark:bg-orange-900/20" },
+    { label: "Critical", count: counts.CRITICAL, icon: AlertTriangle, color: "text-destructive", bg: "bg-destructive/10" },
+    { label: "Low", count: counts.LOW, icon: TrendingDown, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-100 dark:bg-orange-900/20" },
     { label: "Normal", count: counts.NORMAL, icon: CheckCircle, color: "text-green-600 dark:text-green-400", bg: "bg-green-100 dark:bg-green-900/20" },
-    { label: "Lebihan", count: counts.LEBIHAN, icon: TrendingUp, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/20" },
+    { label: "Excess", count: counts.EXCESS, icon: TrendingUp, color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-100 dark:bg-blue-900/20" },
   ];
 
   return (
@@ -216,18 +218,18 @@ export default function Dashboard() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-semibold text-foreground">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Gambaran keseluruhan stok semasa — {today}</p>
+        <p className="text-sm text-muted-foreground">Current stock overview — {today}</p>
       </div>
 
       {/* Section 2 — Alert Banner */}
-      {counts.KRITIKAL > 0 && !alertDismissed && (
+      {counts.CRITICAL > 0 && !alertDismissed && (
         <Alert variant="destructive" className="relative">
           <AlertTriangle className="h-4 w-4" />
-          <AlertTitle>Amaran Stok Kritikal</AlertTitle>
+          <AlertTitle>Critical Stock Alert</AlertTitle>
           <AlertDescription>
-            {counts.KRITIKAL} ubat memerlukan perhatian segera — stok di bawah paras minimum
+            {counts.CRITICAL} drug(s) require immediate attention — stock below minimum level
           </AlertDescription>
-          <button type="button" onClick={() => setAlertDismissed(true)} className="absolute right-3 top-3 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer text-destructive hover:text-destructive/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded" aria-label="Tutup amaran">
+          <button type="button" onClick={() => setAlertDismissed(true)} className="absolute right-3 top-3 min-h-[44px] min-w-[44px] flex items-center justify-center cursor-pointer text-destructive hover:text-destructive/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded" aria-label="Dismiss alert">
             <X className="h-4 w-4" />
           </button>
         </Alert>
@@ -245,7 +247,7 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <p className="text-3xl font-bold text-foreground">{s.count}</p>
-              <p className="text-xs text-muted-foreground mt-1">ubat</p>
+              <p className="text-xs text-muted-foreground mt-1">drug(s)</p>
             </CardContent>
           </Card>
         ))}
@@ -257,22 +259,22 @@ export default function Dashboard() {
       {/* Section 3 — Drug Stock Table */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base font-semibold">Status Stok Ubat</CardTitle>
+          <CardTitle className="text-base font-semibold">Drug Stock Status</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nama Ubat</TableHead>
+                <TableHead>Drug Name</TableHead>
                 <TableHead>Unit</TableHead>
-                <TableHead className="text-right">Baki</TableHead>
+                <TableHead className="text-right">Balance</TableHead>
                 <TableHead className="text-right">Min</TableHead>
                 <TableHead className="text-right">Reorder</TableHead>
                 <TableHead className="text-right">Max</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-[120px]">% Max</TableHead>
-                <TableHead>Kemaskini</TableHead>
-                <TableHead>Tindakan</TableHead>
+                <TableHead>Last Updated</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -294,15 +296,15 @@ export default function Dashboard() {
                       <Progress value={pct} className="h-2" />
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground whitespace-nowrap">
-                      {d.lastUpdated ? formatDistanceToNow(new Date(d.lastUpdated), { addSuffix: true, locale: ms }) : "—"}
+                      {d.lastUpdated ? formatDistanceToNow(new Date(d.lastUpdated), { addSuffix: true }) : "—"}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">
                         <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => navigate(`/drugs/${d.id}/ledger`)}>
-                          <ExternalLink className="h-3 w-3 mr-1" /> Lejar
+                          <ExternalLink className="h-3 w-3 mr-1" /> Ledger
                         </Button>
                         <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => navigate(`/terimaan?drug=${d.id}`)}>
-                          <Plus className="h-3 w-3 mr-1" /> Terima
+                          <Plus className="h-3 w-3 mr-1" /> Receive
                         </Button>
                       </div>
                     </TableCell>
@@ -319,9 +321,9 @@ export default function Dashboard() {
         {/* Section 4 — Recent Activity */}
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-semibold">Aktiviti Terkini</CardTitle>
+            <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
             <Button variant="link" size="sm" className="text-xs" onClick={() => navigate("/terimaan")}>
-              Lihat Semua
+              View All
             </Button>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -336,38 +338,38 @@ export default function Dashboard() {
                         : "bg-orange-100 text-orange-700 border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700"
                     }
                   >
-                    {a.jenis === "terimaan" ? "Terimaan" : "Keluaran"}
+                    {a.jenis === "terimaan" ? "Receipt" : "Dispensed"}
                   </Badge>
                   <span className="font-medium truncate">{a.drug_name}</span>
                   <span className="text-muted-foreground">×{a.kuantiti}</span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0 text-muted-foreground text-xs">
                   <span>{a.nama_pegawai}</span>
-                  <span>{formatDistanceToNow(new Date(a.created_at), { addSuffix: true, locale: ms })}</span>
+                  <span>{formatDistanceToNow(new Date(a.created_at), { addSuffix: true })}</span>
                 </div>
               </div>
             ))}
           </CardContent>
         </Card>
 
-        {/* Section 5 — Pengeluaran Terkini */}
+        {/* Section 5 — Recent Dispensing */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-semibold">Pengeluaran Terkini</CardTitle>
+            <CardTitle className="text-base font-semibold">Recent Dispensing</CardTitle>
             <Button variant="link" size="sm" className="text-xs" onClick={() => navigate("/laporan")}>
-              Lihat Semua
+              View All
             </Button>
           </CardHeader>
           <CardContent className="p-0">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs">Ubat</TableHead>
-                  <TableHead className="text-xs">Pesakit</TableHead>
+                  <TableHead className="text-xs">Drug</TableHead>
+                  <TableHead className="text-xs">Patient</TableHead>
                   <TableHead className="text-xs">IC</TableHead>
                   <TableHead className="text-xs text-right">Qty</TableHead>
-                  <TableHead className="text-xs">Pegawai</TableHead>
-                  <TableHead className="text-xs">Masa</TableHead>
+                  <TableHead className="text-xs">Officer</TableHead>
+                  <TableHead className="text-xs">Time</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -427,27 +429,27 @@ function PendingRequestsCard({ navigate }: { navigate: (path: string) => void })
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Permintaan Menunggu</CardTitle>
+        <CardTitle className="text-base font-semibold">Pending Requests</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Pill className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">Ubat Kawalan</span>
+            <span className="text-sm">Controlled Drug</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">{ubatCount} menunggu</Badge>
-            <Button variant="link" size="sm" className="text-xs h-auto p-0" onClick={() => navigate("/fulfilment")}>Proses →</Button>
+            <Badge variant="outline" className="text-xs">{ubatCount} pending</Badge>
+            <Button variant="link" size="sm" className="text-xs h-auto p-0" onClick={() => navigate("/fulfilment")}>Process →</Button>
           </div>
         </div>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <FileCheck className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm">Borang Antibiotik</span>
+            <span className="text-sm">Antibiotic Form</span>
           </div>
           <div className="flex items-center gap-2">
-            <Badge variant="outline" className="text-xs">{abCount} perlu pengesahan</Badge>
-            <Button variant="link" size="sm" className="text-xs h-auto p-0" onClick={() => navigate("/fulfilment")}>Semak →</Button>
+            <Badge variant="outline" className="text-xs">{abCount} awaiting confirmation</Badge>
+            <Button variant="link" size="sm" className="text-xs h-auto p-0" onClick={() => navigate("/fulfilment")}>Review →</Button>
           </div>
         </div>
       </CardContent>
