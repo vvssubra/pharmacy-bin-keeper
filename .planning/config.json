@@ -1,0 +1,15 @@
+{
+  "workflow": {
+    "mode": "interactive",
+    "research": true,
+    "plan_checker": true,
+    "verifier": true
+  },
+  "models": {
+    "profile": "balanced"
+  },
+  "planning": {
+    "commit_docs": true,
+    "search_gitignored": false
+  }
+}
