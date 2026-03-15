@@ -26,12 +26,12 @@ type NavItem = {
 
 const items: NavItem[] = [
   { title: "Dashboard",           url: "/",               icon: Home,        roles: ["pharmacist"] },
-  { title: "Permintaan Baharu",   url: "/fulfilment",     icon: Bell,        showBadge: true, roles: ["pharmacist"] },
+  { title: "New Requests",        url: "/fulfilment",     icon: Bell,        showBadge: true, roles: ["pharmacist"] },
   { title: "Drug Master",         url: "/drugs",          icon: Pill,        roles: ["pharmacist"] },
   { title: "Terimaan",            url: "/terimaan",       icon: PackagePlus, roles: ["pharmacist"] },
-  { title: "Pesakit",             url: "/pesakit",        icon: Users,       roles: ["pharmacist"] },
-  { title: "Laporan",             url: "/laporan",        icon: FileText,    roles: ["pharmacist"] },
-  { title: "Pengurusan Peranan",  url: "/role-management",icon: UserCog,     roles: ["pharmacist"] },
+  { title: "Patients",            url: "/pesakit",        icon: Users,       roles: ["pharmacist"] },
+  { title: "Reports",             url: "/laporan",        icon: FileText,    roles: ["pharmacist"] },
+  { title: "Role Management",     url: "/role-management",icon: UserCog,     roles: ["pharmacist"] },
   { title: "Doctor Request",      url: "/request",        icon: Stethoscope, roles: ["doctor", "pharmacist"] },
   { title: "Specialist",          url: "/specialist",     icon: ShieldCheck, roles: ["specialist", "pharmacist"] },
 ];
@@ -84,7 +84,7 @@ export function AppSidebar() {
         </div>
         {!collapsed && (
           <span className="text-sm font-semibold tracking-tight text-sidebar-primary leading-tight">
-            Kawalan Ubat<br />
+            Drug Control<br />
             <span className="text-xs font-normal text-sidebar-foreground/70">KK Kempas</span>
           </span>
         )}

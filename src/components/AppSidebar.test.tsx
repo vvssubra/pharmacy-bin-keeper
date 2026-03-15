@@ -1,3 +1,4 @@
+import React from "react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -28,14 +29,19 @@ vi.mock("@/contexts/AuthContext", () => ({
   useAuth: vi.fn(),
 }));
 
-// Mock sidebar context so useSidebar doesn't blow up
-vi.mock("@/components/ui/sidebar", async () => {
-  const actual = await vi.importActual<typeof import("@/components/ui/sidebar")>("@/components/ui/sidebar");
-  return {
-    ...actual,
-    useSidebar: vi.fn(() => ({ state: "expanded", open: true, setOpen: vi.fn(), openMobile: false, setOpenMobile: vi.fn(), isMobile: false, toggleSidebar: vi.fn() })),
-  };
-});
+// Mock entire sidebar module — Sidebar component uses a local useSidebar closure tied to
+// React context, so mocking only the export is insufficient. Replacing with simple wrappers
+// avoids SidebarProvider requirement while still rendering nav item children.
+vi.mock("@/components/ui/sidebar", () => ({
+  useSidebar: vi.fn(() => ({ state: "expanded", open: true, setOpen: vi.fn(), openMobile: false, setOpenMobile: vi.fn(), isMobile: false, toggleSidebar: vi.fn() })),
+  Sidebar: ({ children }: { children: React.ReactNode }) => <div data-testid="sidebar">{children}</div>,
+  SidebarContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SidebarGroup: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SidebarGroupContent: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SidebarMenu: ({ children }: { children: React.ReactNode }) => <ul>{children}</ul>,
+  SidebarMenuItem: ({ children }: { children: React.ReactNode }) => <li>{children}</li>,
+  SidebarMenuButton: ({ children, asChild }: { children: React.ReactNode; asChild?: boolean }) => <div>{children}</div>,
+}));
 
 const { useAuth } = await import("@/contexts/AuthContext");
 

@@ -21,7 +21,7 @@ import {
 const units = ["tablet", "vial", "sachet", "capsule", "other"] as const;
 
 const drugSchema = z.object({
-  drug_name: z.string().trim().min(1, "Nama ubat diperlukan").max(200),
+  drug_name: z.string().trim().min(1, "Drug name is required").max(200),
   no_kod: z.string().max(50).optional().default(""),
   unit_pengukuran: z.string().min(1).default("tablet"),
   kumpulan: z.string().max(50).optional().default(""),
@@ -142,12 +142,12 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drugs"] });
-      toast.success(isEdit ? "Ubat dikemaskini" : "Ubat ditambah");
+      toast.success(isEdit ? "Drug updated" : "Drug added");
       onOpenChange(false);
     },
     onError: (err: Error) => {
       if (err.message === "DUPLICATE") {
-        form.setError("drug_name", { message: "Nama ubat sudah wujud" });
+        form.setError("drug_name", { message: "Drug name already exists" });
       } else {
         toast.error("Ralat: " + err.message);
       }
@@ -158,9 +158,9 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit Ubat" : "Tambah Ubat"}</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit Drug" : "Add Drug"}</DialogTitle>
           <DialogDescription>
-            {isEdit ? "Kemaskini maklumat ubat." : "Isi maklumat ubat baharu."}
+            {isEdit ? "Update drug information." : "Fill in new drug details."}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -169,20 +169,20 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
             <div className="grid grid-cols-2 gap-4">
               <FormField control={form.control} name="drug_name" render={({ field }) => (
                 <FormItem className="col-span-2">
-                  <FormLabel>Nama Ubat *</FormLabel>
+                  <FormLabel>Drug Name *</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
               <FormField control={form.control} name="no_kod" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>No. Kod</FormLabel>
+                  <FormLabel>Code No.</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={form.control} name="unit_pengukuran" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Unit Pengukuran</FormLabel>
+                  <FormLabel>Unit of Measure</FormLabel>
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger><SelectValue /></SelectTrigger>
@@ -197,13 +197,13 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
               )} />
               <FormField control={form.control} name="kumpulan" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kumpulan</FormLabel>
-                  <FormControl><Input placeholder="cth: A/KK" {...field} /></FormControl>
+                  <FormLabel>Group</FormLabel>
+                  <FormControl><Input placeholder="e.g. A/KK" {...field} /></FormControl>
                 </FormItem>
               )} />
               <FormField control={form.control} name="pergerakan" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pergerakan</FormLabel>
+                  <FormLabel>Movement</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                 </FormItem>
               )} />
@@ -211,26 +211,26 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
 
             {/* Storage Location */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-foreground">Lokasi Penyimpanan</h4>
+              <h4 className="text-sm font-medium text-foreground">Storage Location</h4>
               <div className="grid grid-cols-5 gap-2">
                 {(["gudang_seksyen", "baris", "rak", "tingkat", "petak"] as const).map((name) => (
                   <FormField key={name} control={form.control} name={name} render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xs capitalize">{name === "gudang_seksyen" ? "Gudang/Seksyen" : name}</FormLabel>
+                      <FormLabel className="text-xs capitalize">{name === "gudang_seksyen" ? "Warehouse/Section" : name}</FormLabel>
                       <FormControl><Input {...field} /></FormControl>
                     </FormItem>
                   )} />
                 ))}
               </div>
               <div>
-                <FormLabel className="text-xs">Kod Lokasi Penuh</FormLabel>
+                <FormLabel className="text-xs">Full Location Code</FormLabel>
                 <Input value={kodLokasi} readOnly className="bg-muted" />
               </div>
             </div>
 
             {/* Stock levels */}
             <div className="space-y-3">
-              <h4 className="text-sm font-medium text-foreground">Paras Stok (Tahun Semasa)</h4>
+              <h4 className="text-sm font-medium text-foreground">Stock Levels (Current Year)</h4>
               <div className="grid grid-cols-3 gap-4">
                 <FormField control={form.control} name="stok_min" render={({ field }) => (
                   <FormItem>
@@ -240,13 +240,13 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
                 )} />
                 <FormField control={form.control} name="stok_reorder" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Menokok/Reorder</FormLabel>
+                    <FormLabel className="text-xs">Reorder</FormLabel>
                     <FormControl><Input type="number" {...field} /></FormControl>
                   </FormItem>
                 )} />
                 <FormField control={form.control} name="stok_max" render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs">Maksimum</FormLabel>
+                    <FormLabel className="text-xs">Maximum</FormLabel>
                     <FormControl><Input type="number" {...field} /></FormControl>
                   </FormItem>
                 )} />
@@ -254,9 +254,9 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Batal</Button>
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
               <Button type="submit" disabled={mutation.isPending}>
-                {mutation.isPending ? "Menyimpan..." : "Simpan"}
+                {mutation.isPending ? "Saving..." : "Save"}
               </Button>
             </DialogFooter>
           </form>
