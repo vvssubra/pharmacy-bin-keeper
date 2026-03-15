@@ -57,7 +57,7 @@ function generateMockData(): MockTx[] {
 
   // Row 1: Baki Awal
   rows.push({
-    id: id++, tarikh: "2026-01-01", jenis: "baki_awal", no_rujukan: "", nama: "BAKI DIBAWA KE HADAPAN", subtext: "",
+    id: id++, tarikh: "2026-01-01", jenis: "baki_awal", no_rujukan: "", nama: "BALANCE BROUGHT FORWARD", subtext: "",
     terimaan_qty: null, terimaan_seunit: null, terimaan_jumlah: null,
     keluaran_qty: null, keluaran_jumlah: null,
     baki_qty: baki, baki_jumlah: baki * unitPrice, nama_pegawai: "",
@@ -205,23 +205,23 @@ export default function BinCard() {
 
   const getBakiStatus = () => {
     if (!drug) return { label: "—", color: "bg-muted text-muted-foreground" };
-    if (currentBaki < (drug.stok_min ?? 0)) return { label: "KRITIKAL", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
-    if (currentBaki <= (drug.stok_reorder ?? 0)) return { label: "RENDAH", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" };
-    if (currentBaki > (drug.stok_max ?? Infinity)) return { label: "LEBIHAN", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" };
+    if (currentBaki < (drug.stok_min ?? 0)) return { label: "CRITICAL", color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" };
+    if (currentBaki <= (drug.stok_reorder ?? 0)) return { label: "LOW", color: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400" };
+    if (currentBaki > (drug.stok_max ?? Infinity)) return { label: "EXCESS", color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" };
     return { label: "NORMAL", color: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400" };
   };
 
   const status = getBakiStatus();
 
   if (isLoading) {
-    return <div className="flex items-center justify-center py-24 text-muted-foreground">Memuatkan...</div>;
+    return <div className="flex items-center justify-center py-24 text-muted-foreground">Loading...</div>;
   }
 
   if (!drug) {
     return (
       <div className="space-y-4">
-        <Button variant="ghost" onClick={() => navigate("/drugs")}><ArrowLeft className="mr-1 h-4 w-4" /> Senarai Ubat</Button>
-        <p className="text-muted-foreground">Ubat tidak ditemui.</p>
+        <Button variant="ghost" onClick={() => navigate("/drugs")}><ArrowLeft className="mr-1 h-4 w-4" /> Drug List</Button>
+        <p className="text-muted-foreground">Drug not found.</p>
       </div>
     );
   }
@@ -231,14 +231,14 @@ export default function BinCard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <Button variant="ghost" onClick={() => navigate("/drugs")}>
-          <ArrowLeft className="mr-1 h-4 w-4" /> Senarai Ubat
+          <ArrowLeft className="mr-1 h-4 w-4" /> Drug List
         </Button>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={() => toast.info("Akan datang")}>
-            <FileDown className="mr-1 h-4 w-4" /> Jana PDF
+          <Button variant="outline" onClick={() => toast.info("Coming soon")}>
+            <FileDown className="mr-1 h-4 w-4" /> Generate PDF
           </Button>
           <Button onClick={() => navigate("/terimaan")}>
-            <PackagePlus className="mr-1 h-4 w-4" /> Tambah Terimaan
+            <PackagePlus className="mr-1 h-4 w-4" /> Add Receipt
           </Button>
         </div>
       </div>
@@ -255,36 +255,36 @@ export default function BinCard() {
           {/* Drug info grid */}
           <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
             <div className="col-span-2 md:col-span-2">
-              <p className="text-xs text-muted-foreground">Perihal Stok</p>
+              <p className="text-xs text-muted-foreground">Stock Description</p>
               <p className="mt-1 rounded bg-blue-50 px-3 py-2 text-lg font-bold text-foreground dark:bg-blue-900/20">{drug.drug_name}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">No. Kod</p>
+              <p className="text-xs text-muted-foreground">Code No.</p>
               <p className="mt-1 font-medium">{drug.no_kod || "—"}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Unit Pengukuran</p>
+              <p className="text-xs text-muted-foreground">Unit of Measure</p>
               <p className="mt-1 font-medium capitalize">{drug.unit_pengukuran}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground">Kumpulan</p>
+              <p className="text-xs text-muted-foreground">Group</p>
               <p className="mt-1 font-medium">{drug.kumpulan || "—"}</p>
             </div>
           </div>
 
           {/* Lokasi */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Lokasi Penyimpanan Stok</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stock Storage Location</p>
             <div className="overflow-auto rounded border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Gudang / Seksyen</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Baris</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Rak</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tingkat</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Petak</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Kod Lokasi Penuh</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Warehouse / Section</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Row</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Shelf</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Level</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Compartment</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Full Location Code</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -303,15 +303,15 @@ export default function BinCard() {
 
           {/* Paras Stok */}
           <div>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Paras Stok</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Stock Levels</p>
             <div className="overflow-auto rounded border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b bg-muted/50">
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Tahun</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Maksimum (Kuantiti)</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Menokok (Kuantiti)</th>
-                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Minimum (Kuantiti)</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Year</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Maximum (Quantity)</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Reorder (Quantity)</th>
+                    <th className="px-3 py-2 text-left font-medium text-muted-foreground">Minimum (Quantity)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -326,9 +326,9 @@ export default function BinCard() {
             </div>
           </div>
 
-          {/* Baki Semasa strip */}
+          {/* Current Balance strip */}
           <div className={cn("flex items-center gap-3 rounded-lg px-4 py-3", status.color)}>
-            <span className="text-sm font-semibold">Baki Semasa: {currentBaki} {drug.unit_pengukuran}</span>
+            <span className="text-sm font-semibold">Current Balance: {currentBaki} {drug.unit_pengukuran}</span>
             <Badge variant="outline" className={cn("border-current text-xs font-bold", status.color)}>
               {status.label}
             </Badge>
@@ -339,12 +339,12 @@ export default function BinCard() {
       {/* FILTER BAR */}
       <div className="flex flex-wrap items-end gap-3">
         <div>
-          <label className="mb-1 block text-xs text-muted-foreground">Dari</label>
+          <label className="mb-1 block text-xs text-muted-foreground">From</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left text-sm", !dateFrom && "text-muted-foreground")}>
                 <CalendarIcon className="mr-1 h-3.5 w-3.5" />
-                {dateFrom ? format(dateFrom, "dd/MM/yyyy") : "Pilih tarikh"}
+                {dateFrom ? format(dateFrom, "dd/MM/yyyy") : "Select date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -353,12 +353,12 @@ export default function BinCard() {
           </Popover>
         </div>
         <div>
-          <label className="mb-1 block text-xs text-muted-foreground">Hingga</label>
+          <label className="mb-1 block text-xs text-muted-foreground">To</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left text-sm", !dateTo && "text-muted-foreground")}>
                 <CalendarIcon className="mr-1 h-3.5 w-3.5" />
-                {dateTo ? format(dateTo, "dd/MM/yyyy") : "Pilih tarikh"}
+                {dateTo ? format(dateTo, "dd/MM/yyyy") : "Select date"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -367,18 +367,18 @@ export default function BinCard() {
           </Popover>
         </div>
         <div>
-          <label className="mb-1 block text-xs text-muted-foreground">Jenis</label>
+          <label className="mb-1 block text-xs text-muted-foreground">Type</label>
           <Select value={jenisFilter} onValueChange={(v) => { setJenisFilter(v); setPage(1); }}>
             <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="semua">Semua</SelectItem>
-              <SelectItem value="terimaan">Terimaan</SelectItem>
-              <SelectItem value="keluaran">Keluaran</SelectItem>
+              <SelectItem value="semua">All</SelectItem>
+              <SelectItem value="terimaan">Receipt</SelectItem>
+              <SelectItem value="keluaran">Dispensed</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="relative">
-          <label className="mb-1 block text-xs text-muted-foreground">Cari</label>
+          <label className="mb-1 block text-xs text-muted-foreground">Search</label>
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -395,29 +395,29 @@ export default function BinCard() {
       {/* BAHAGIAN B */}
       <Card>
         <div className="px-6 py-3 border-b">
-          <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Bahagian B — Transaksi Stok</h2>
+          <h2 className="text-sm font-bold uppercase tracking-wide text-muted-foreground">Section B — Stock Transactions</h2>
         </div>
         <CardContent className="p-0">
           <div className="overflow-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b bg-muted/50">
-                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom border-r">Tarikh</th>
-                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom border-r">No. Rujukan</th>
-                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom border-r min-w-[180px]">Nama Pesakit / Terima Daripada</th>
-                  <th colSpan={3} className="px-3 py-1 text-center font-semibold text-muted-foreground border-b border-r">TERIMAAN</th>
-                  <th colSpan={2} className="px-3 py-1 text-center font-semibold text-muted-foreground border-b border-r">KELUARAN</th>
-                  <th colSpan={2} className="px-3 py-1 text-center font-semibold text-muted-foreground border-b border-r">BAKI</th>
-                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom">Nama Pegawai</th>
+                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom border-r">Date</th>
+                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom border-r">Ref. No.</th>
+                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom border-r min-w-[180px]">Patient Name / Received From</th>
+                  <th colSpan={3} className="px-3 py-1 text-center font-semibold text-muted-foreground border-b border-r">RECEIPTS</th>
+                  <th colSpan={2} className="px-3 py-1 text-center font-semibold text-muted-foreground border-b border-r">DISPENSED</th>
+                  <th colSpan={2} className="px-3 py-1 text-center font-semibold text-muted-foreground border-b border-r">BALANCE</th>
+                  <th rowSpan={2} className="px-3 py-2 text-left font-medium text-muted-foreground align-bottom">Officer Name</th>
                 </tr>
                 <tr className="border-b bg-muted/50">
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Kuantiti</th>
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Seunit (RM)</th>
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Jumlah (RM)</th>
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Kuantiti</th>
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Jumlah (RM)</th>
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Kuantiti</th>
-                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Jumlah (RM)</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Quantity</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Unit Price (RM)</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Total (RM)</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Quantity</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Total (RM)</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Quantity</th>
+                  <th className="px-3 py-1 text-right text-xs font-medium text-muted-foreground border-r">Total (RM)</th>
                 </tr>
               </thead>
               <tbody>
@@ -479,7 +479,7 @@ export default function BinCard() {
               </tbody>
               <tfoot>
                 <tr className="bg-muted/70 font-bold border-t-2">
-                  <td colSpan={3} className="px-3 py-2 border-r">JUMLAH</td>
+                  <td colSpan={3} className="px-3 py-2 border-r">TOTAL</td>
                   <td className="px-3 py-2 text-right tabular-nums border-r">{sumTerimaan}</td>
                   <td className="px-3 py-2 border-r">—</td>
                   <td className="px-3 py-2 border-r">—</td>
@@ -497,11 +497,11 @@ export default function BinCard() {
           {totalPages > 1 && (
             <div className="flex items-center justify-between px-4 py-3 border-t">
               <p className="text-xs text-muted-foreground">
-                Halaman {page} daripada {totalPages} ({filtered.length} rekod)
+                Page {page} of {totalPages} ({filtered.length} records)
               </p>
               <div className="flex gap-1">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>Sebelumnya</Button>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Seterusnya</Button>
+                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>Previous</Button>
+                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>Next</Button>
               </div>
             </div>
           )}

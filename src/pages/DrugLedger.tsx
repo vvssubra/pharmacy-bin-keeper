@@ -55,9 +55,9 @@ const MOCK_ROWS: MockRow[] = [
 ];
 
 function getBakiLevel(qty: number, min: number, max: number) {
-  if (qty <= 0 || qty < min * 0.5) return { label: "KRITIKAL", className: "bg-destructive text-destructive-foreground" };
-  if (qty < min) return { label: "RENDAH", className: "bg-orange-500 text-white" };
-  if (qty > max) return { label: "LEBIHAN", className: "bg-blue-500 text-white" };
+  if (qty <= 0 || qty < min * 0.5) return { label: "CRITICAL", className: "bg-destructive text-destructive-foreground" };
+  if (qty < min) return { label: "LOW", className: "bg-orange-500 text-white" };
+  if (qty > max) return { label: "EXCESS", className: "bg-blue-500 text-white" };
   return { label: "NORMAL", className: "bg-green-600 text-white" };
 }
 
@@ -154,7 +154,7 @@ export default function DrugLedger() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-24 text-muted-foreground">
-        Memuatkan...
+        Loading...
       </div>
     );
   }
@@ -163,9 +163,9 @@ export default function DrugLedger() {
     return (
       <div className="space-y-4">
         <Button variant="ghost" onClick={() => navigate("/drugs")}>
-          <ArrowLeft className="mr-1 h-4 w-4" /> Kembali
+          <ArrowLeft className="mr-1 h-4 w-4" /> Back
         </Button>
-        <p className="text-muted-foreground">Ubat tidak dijumpai.</p>
+        <p className="text-muted-foreground">Drug not found.</p>
       </div>
     );
   }
@@ -181,11 +181,11 @@ export default function DrugLedger() {
         </Button>
         <h1 className="text-2xl font-bold text-foreground">{drug.drug_name}</h1>
         <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
-          <span>No. Kod: <strong className="text-foreground">{drug.no_kod || "-"}</strong></span>
+          <span>Code No.: <strong className="text-foreground">{drug.no_kod || "-"}</strong></span>
           <span>Unit: <strong className="text-foreground capitalize">{drug.unit_pengukuran}</strong></span>
-          <span>Kumpulan: <strong className="text-foreground">{drug.kumpulan || "-"}</strong></span>
-          <span>Lokasi: <strong className="text-foreground">{drug.kod_lokasi_penuh || "-"}</strong></span>
-          <span>Paras Stok: <strong className="text-foreground">{drug.stok_min}/{drug.stok_reorder}/{drug.stok_max}</strong></span>
+          <span>Group: <strong className="text-foreground">{drug.kumpulan || "-"}</strong></span>
+          <span>Location: <strong className="text-foreground">{drug.kod_lokasi_penuh || "-"}</strong></span>
+          <span>Stock Levels: <strong className="text-foreground">{drug.stok_min}/{drug.stok_reorder}/{drug.stok_max}</strong></span>
         </div>
       </div>
 
@@ -193,7 +193,7 @@ export default function DrugLedger() {
       <Card>
         <CardContent className="flex items-center gap-4 p-4">
           <div>
-            <p className="text-sm text-muted-foreground">Baki Semasa</p>
+            <p className="text-sm text-muted-foreground">Current Balance</p>
             <p className="text-3xl font-bold tabular-nums text-foreground">
               {currentBaki} <span className="text-base font-normal text-muted-foreground">{drug.unit_pengukuran}</span>
             </p>
@@ -205,12 +205,12 @@ export default function DrugLedger() {
       {/* Filter Bar */}
       <div className="flex flex-wrap items-end gap-3">
         <div>
-          <label className="text-xs text-muted-foreground mb-1 block">Dari</label>
+          <label className="text-xs text-muted-foreground mb-1 block">From</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !startDate && "text-muted-foreground")}>
                 <CalendarIcon className="mr-1 h-4 w-4" />
-                {startDate ? format(startDate, "dd/MM/yyyy") : "Mula"}
+                {startDate ? format(startDate, "dd/MM/yyyy") : "Start"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -219,12 +219,12 @@ export default function DrugLedger() {
           </Popover>
         </div>
         <div>
-          <label className="text-xs text-muted-foreground mb-1 block">Hingga</label>
+          <label className="text-xs text-muted-foreground mb-1 block">To</label>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" className={cn("w-[150px] justify-start text-left font-normal", !endDate && "text-muted-foreground")}>
                 <CalendarIcon className="mr-1 h-4 w-4" />
-                {endDate ? format(endDate, "dd/MM/yyyy") : "Akhir"}
+                {endDate ? format(endDate, "dd/MM/yyyy") : "End"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -233,20 +233,20 @@ export default function DrugLedger() {
           </Popover>
         </div>
         <div>
-          <label className="text-xs text-muted-foreground mb-1 block">Jenis</label>
+          <label className="text-xs text-muted-foreground mb-1 block">Type</label>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-[140px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="semua">Semua</SelectItem>
-              <SelectItem value="terimaan">Terimaan</SelectItem>
-              <SelectItem value="keluaran">Keluaran</SelectItem>
+              <SelectItem value="semua">All</SelectItem>
+              <SelectItem value="terimaan">Receipt</SelectItem>
+              <SelectItem value="keluaran">Dispensed</SelectItem>
             </SelectContent>
           </Select>
         </div>
         <div className="relative">
-          <label className="text-xs text-muted-foreground mb-1 block">Carian</label>
+          <label className="text-xs text-muted-foreground mb-1 block">Search</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
@@ -271,23 +271,23 @@ export default function DrugLedger() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead rowSpan={2} className="align-bottom border-r">Tarikh</TableHead>
-                <TableHead rowSpan={2} className="align-bottom border-r">No. Rujukan</TableHead>
-                <TableHead rowSpan={2} className="align-bottom border-r">Terima / Keluar Kepada</TableHead>
-                <TableHead colSpan={3} className="text-center border-b border-r">Terimaan</TableHead>
-                <TableHead colSpan={2} className="text-center border-b border-r">Keluaran</TableHead>
-                <TableHead colSpan={2} className="text-center border-b border-r">Baki</TableHead>
-                <TableHead rowSpan={2} className="align-bottom border-r">Pegawai</TableHead>
-                <TableHead rowSpan={2} className="align-bottom">Sumber</TableHead>
+                <TableHead rowSpan={2} className="align-bottom border-r">Date</TableHead>
+                <TableHead rowSpan={2} className="align-bottom border-r">Ref. No.</TableHead>
+                <TableHead rowSpan={2} className="align-bottom border-r">Received / Dispensed To</TableHead>
+                <TableHead colSpan={3} className="text-center border-b border-r">Receipts</TableHead>
+                <TableHead colSpan={2} className="text-center border-b border-r">Dispensed</TableHead>
+                <TableHead colSpan={2} className="text-center border-b border-r">Balance</TableHead>
+                <TableHead rowSpan={2} className="align-bottom border-r">Officer</TableHead>
+                <TableHead rowSpan={2} className="align-bottom">Source</TableHead>
               </TableRow>
               <TableRow>
-                <TableHead className="text-center text-xs border-r">Kuantiti</TableHead>
-                <TableHead className="text-center text-xs border-r">Seunit (RM)</TableHead>
-                <TableHead className="text-center text-xs border-r">Jumlah (RM)</TableHead>
-                <TableHead className="text-center text-xs border-r">Kuantiti</TableHead>
-                <TableHead className="text-center text-xs border-r">Jumlah (RM)</TableHead>
-                <TableHead className="text-center text-xs border-r">Kuantiti</TableHead>
-                <TableHead className="text-center text-xs">Jumlah (RM)</TableHead>
+                <TableHead className="text-center text-xs border-r">Quantity</TableHead>
+                <TableHead className="text-center text-xs border-r">Unit Price (RM)</TableHead>
+                <TableHead className="text-center text-xs border-r">Total (RM)</TableHead>
+                <TableHead className="text-center text-xs border-r">Quantity</TableHead>
+                <TableHead className="text-center text-xs border-r">Total (RM)</TableHead>
+                <TableHead className="text-center text-xs border-r">Quantity</TableHead>
+                <TableHead className="text-center text-xs">Total (RM)</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -296,9 +296,9 @@ export default function DrugLedger() {
                   <TableCell colSpan={12}>
                     <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
                       <FileText className="mb-2 h-8 w-8" />
-                      <p className="text-sm font-medium">Tiada transaksi dijumpai</p>
+                      <p className="text-sm font-medium">No transactions found</p>
                       <Button variant="link" size="sm" className="mt-1" onClick={() => navigate("/drugs")}>
-                        Mulakan dengan menetapkan baki awal
+                        Start by setting an opening balance
                       </Button>
                     </div>
                   </TableCell>
@@ -360,7 +360,7 @@ export default function DrugLedger() {
       {/* Pagination info */}
       {rowsWithBaki.length > 0 && (
         <p className="text-xs text-muted-foreground">
-          Menunjukkan 1-{rowsWithBaki.length} daripada {rowsWithBaki.length} transaksi
+          Showing 1-{rowsWithBaki.length} of {rowsWithBaki.length} transactions
         </p>
       )}
     </div>

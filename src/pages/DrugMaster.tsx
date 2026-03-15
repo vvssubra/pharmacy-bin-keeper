@@ -93,7 +93,7 @@ export default function DrugMaster() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drugs"] });
-      toast.success("Status dikemaskini");
+      toast.success("Status updated");
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -122,17 +122,17 @@ export default function DrugMaster() {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-foreground">Drug Master</h1>
-          <p className="text-sm text-muted-foreground">Senarai ubat yang dipantau (KEW.PS-3)</p>
+          <p className="text-sm text-muted-foreground">Monitored drug list (KEW.PS-3)</p>
         </div>
         <Button onClick={handleAdd}>
-          <Plus className="mr-1 h-4 w-4" /> Tambah Ubat
+          <Plus className="mr-1 h-4 w-4" /> Add Drug
         </Button>
       </div>
 
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Cari ubat..."
+          placeholder="Search drugs..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="pl-9"
@@ -147,10 +147,10 @@ export default function DrugMaster() {
                 <TableHead>Drug Name</TableHead>
                 <TableHead>No. Kod</TableHead>
                 <TableHead>Unit</TableHead>
-                <TableHead>Kumpulan</TableHead>
+                <TableHead>Group</TableHead>
                 <TableHead>Storage Location</TableHead>
-                <TableHead>Paras Stok</TableHead>
-                <TableHead>Baki Awal</TableHead>
+                <TableHead>Stock Levels</TableHead>
+                <TableHead>Opening Balance</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -159,7 +159,7 @@ export default function DrugMaster() {
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={9} className="text-center py-12 text-muted-foreground">
-                    Memuatkan...
+                    Loading...
                   </TableCell>
                 </TableRow>
               ) : filtered.length === 0 ? (
@@ -168,7 +168,7 @@ export default function DrugMaster() {
                     <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                       <FileText className="mb-2 h-8 w-8" />
                       <p className="text-sm">
-                        {search ? "Tiada ubat ditemui." : "Klik 'Tambah Ubat' untuk mula."}
+                        {search ? "No drugs found." : "Click 'Add Drug' to start."}
                       </p>
                     </div>
                   </TableCell>
@@ -209,11 +209,11 @@ export default function DrugMaster() {
                         ) : (
                           <div className="flex items-center gap-1">
                             <Badge variant="outline" className="border-yellow-500 text-yellow-600 dark:text-yellow-400 text-xs">
-                              Belum Ditetapkan
+                              Not Set
                             </Badge>
                             {isAdmin && (
                               <Button variant="outline" size="sm" className="h-6 text-xs" onClick={() => setBalanceTarget(drug)}>
-                                Set Baki
+                                Set Balance
                               </Button>
                             )}
                           </div>
@@ -226,10 +226,10 @@ export default function DrugMaster() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
-                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/bincard`)} title="Lihat Kad">
+                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/bincard`)} title="View Card">
                             <CreditCard className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/ledger`)} title="Lihat Lejar">
+                          <Button variant="ghost" size="icon" onClick={() => navigate(`/drugs/${drug.id}/ledger`)} title="View Ledger">
                             <BookOpen className="h-4 w-4" />
                           </Button>
                           <Button variant="ghost" size="icon" onClick={() => handleEdit(drug)}>
@@ -269,13 +269,13 @@ export default function DrugMaster() {
       <AlertDialog open={!!deactivateTarget} onOpenChange={(o) => !o && setDeactivateTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Nyahaktif ubat ini?</AlertDialogTitle>
+            <AlertDialogTitle>Deactivate this drug?</AlertDialogTitle>
             <AlertDialogDescription>
-              Ubat <strong>{deactivateTarget?.drug_name}</strong> akan dinyahaktifkan. Ia masih boleh diaktifkan semula.
+              Drug <strong>{deactivateTarget?.drug_name}</strong> will be deactivated. It can still be reactivated.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
                 if (deactivateTarget) {
@@ -284,7 +284,7 @@ export default function DrugMaster() {
                 }
               }}
             >
-              Nyahaktif
+              Deactivate
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
