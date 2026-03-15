@@ -1,17 +1,35 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import type { AppRole } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
 import { NoPermission } from "@/components/NoPermission";
 import { PageSkeleton } from "@/components/PageSkeleton";
 
-const SPECIALIST_ROLES = ["specialist"];
-const PHARMACIST_ROUTES = ["/fulfilment"];
-const PHARMACIST_ROLES = ["admin", "pharmacist"];
+/** Declares which roles can access each route prefix. */
+const ROUTE_PERMISSIONS: Array<{ prefix: string; roles: AppRole[] }> = [
+  { prefix: "/request",         roles: ["doctor", "pharmacist"] },
+  { prefix: "/specialist",      roles: ["specialist", "pharmacist"] },
+  { prefix: "/role-management", roles: ["pharmacist"] },
+  { prefix: "/fulfilment",      roles: ["pharmacist"] },
+  { prefix: "/drugs",           roles: ["pharmacist"] },
+  { prefix: "/terimaan",        roles: ["pharmacist"] },
+  { prefix: "/pesakit",         roles: ["pharmacist"] },
+  { prefix: "/laporan",         roles: ["pharmacist"] },
+  { prefix: "/",                roles: ["pharmacist"] },
+];
+
+function getAllowedRoles(pathname: string): AppRole[] {
+  for (const { prefix, roles } of ROUTE_PERMISSIONS) {
+    if (pathname === prefix || pathname.startsWith(prefix === "/" ? "/?" : prefix)) {
+      return roles;
+    }
+  }
+  return ["pharmacist"];
+}
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, role, loading } = useAuth();
   const location = useLocation();
-  const pathname = location.pathname;
 
   if (loading) {
     return (
@@ -25,11 +43,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (pathname === "/specialist" && role && !SPECIALIST_ROLES.includes(role)) {
-    return <AppLayout><NoPermission /></AppLayout>;
-  }
+  const allowedRoles = getAllowedRoles(location.pathname);
 
-  if (PHARMACIST_ROUTES.some((r) => pathname.startsWith(r)) && role && !PHARMACIST_ROLES.includes(role)) {
+  if (!role || !allowedRoles.includes(role)) {
     return <AppLayout><NoPermission /></AppLayout>;
   }
 

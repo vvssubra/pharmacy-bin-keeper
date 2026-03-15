@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, useRef, type ReactNode 
 import { supabase } from "@/integrations/supabase/client";
 import type { User, Session } from "@supabase/supabase-js";
 
+export type AppRole = "pharmacist" | "doctor" | "specialist";
+
 interface Profile {
   full_name: string;
   facility: string;
@@ -11,7 +13,7 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   profile: Profile | null;
-  role: string | null;
+  role: AppRole | null;
   loading: boolean;
   signOut: () => Promise<void>;
 }
@@ -38,7 +40,7 @@ async function loadProfileAndRole(
     .eq("user_id", userId)
     .single();
 
-  if (roleData) setRole(roleData.role);
+  if (roleData) setRole(roleData.role as AppRole);
   setLoading(false);
 }
 
@@ -46,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [role, setRole] = useState<AppRole | null>(null);
   const [loading, setLoading] = useState(true);
   const loadingForUser = useRef<string | null>(null);
 

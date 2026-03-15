@@ -13,7 +13,7 @@ export function NoPermission() {
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>Anda tidak mempunyai kebenaran untuk halaman ini.</p>
-          <p>Hubungi pentadbir untuk diberikan peranan yang sesuai (contoh: specialist, pharmacist, admin).</p>
+          <p>Hubungi jurufarmasit untuk diberikan peranan yang sesuai (doktor, pakar, atau jurufarmasit).</p>
         </CardContent>
       </Card>
     </div>

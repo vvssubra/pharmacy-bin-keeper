@@ -2,58 +2,124 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "./ProtectedRoute";
+import type { AppRole } from "@/contexts/AuthContext";
 
 vi.mock("@/contexts/AuthContext", () => ({ useAuth: vi.fn() }));
-vi.mock("@/components/AppLayout", () => ({ AppLayout: ({ children }: { children: React.ReactNode }) => <>{children}</> }));
+vi.mock("@/components/AppLayout", () => ({
+  AppLayout: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+vi.mock("@/components/PageSkeleton", () => ({
+  PageSkeleton: () => <div>Loading skeleton</div>,
+}));
 
 const { useAuth } = await import("@/contexts/AuthContext");
 
 function renderWithRouter(
   path: string,
-  auth: { user: object | null; role: string | null; loading: boolean }
+  auth: { user: object | null; role: AppRole | null; loading: boolean }
 ) {
   (useAuth as ReturnType<typeof vi.fn>).mockReturnValue(auth);
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
-        <Route path="/specialist" element={<ProtectedRoute><div>Specialist page</div></ProtectedRoute>} />
-        <Route path="/fulfilment" element={<ProtectedRoute><div>Permintaan Baharu page</div></ProtectedRoute>} />
-        <Route path="/" element={<div>Dashboard</div>} />
+        <Route path="/specialist"      element={<ProtectedRoute><div>Specialist page</div></ProtectedRoute>} />
+        <Route path="/fulfilment"      element={<ProtectedRoute><div>Permintaan Baharu page</div></ProtectedRoute>} />
+        <Route path="/request"         element={<ProtectedRoute><div>Doctor Request page</div></ProtectedRoute>} />
+        <Route path="/role-management" element={<ProtectedRoute><div>Role Management page</div></ProtectedRoute>} />
+        <Route path="/drugs"           element={<ProtectedRoute><div>Drugs page</div></ProtectedRoute>} />
+        <Route path="/"                element={<div>Dashboard</div>} />
+        <Route path="/login"           element={<div>Login page</div>} />
       </Routes>
     </MemoryRouter>
   );
 }
 
 describe("ProtectedRoute", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+  beforeEach(() => vi.clearAllMocks());
+
+  describe("unauthenticated user", () => {
+    it("redirects to /login when no user", () => {
+      renderWithRouter("/drugs", { user: null, role: null, loading: false });
+      expect(screen.getByText("Login page")).toBeInTheDocument();
+    });
   });
 
-  describe("role-based access", () => {
-    it("shows no-permission view for staff on /specialist instead of redirecting", () => {
-      renderWithRouter("/specialist", { user: { id: "1" }, role: "staff", loading: false });
+  describe("unassigned user (role = null)", () => {
+    it("shows NoPermission on /specialist", () => {
+      renderWithRouter("/specialist", { user: { id: "1" }, role: null, loading: false });
       expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
-      expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
-      expect(screen.queryByText("Specialist page")).not.toBeInTheDocument();
     });
-
-    it("shows no-permission view for staff on /fulfilment instead of redirecting", () => {
-      renderWithRouter("/fulfilment", { user: { id: "1" }, role: "staff", loading: false });
+    it("shows NoPermission on /drugs", () => {
+      renderWithRouter("/drugs", { user: { id: "1" }, role: null, loading: false });
       expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
-      expect(screen.queryByText("Dashboard")).not.toBeInTheDocument();
-      expect(screen.queryByText("Permintaan Baharu page")).not.toBeInTheDocument();
     });
+    it("shows NoPermission on /request", () => {
+      renderWithRouter("/request", { user: { id: "1" }, role: null, loading: false });
+      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+    });
+  });
 
-    it("allows specialist role to see /specialist page", () => {
+  describe("doctor role", () => {
+    it("allows access to /request", () => {
+      renderWithRouter("/request", { user: { id: "1" }, role: "doctor", loading: false });
+      expect(screen.getByText("Doctor Request page")).toBeInTheDocument();
+    });
+    it("blocks access to /drugs", () => {
+      renderWithRouter("/drugs", { user: { id: "1" }, role: "doctor", loading: false });
+      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+    });
+    it("blocks access to /fulfilment", () => {
+      renderWithRouter("/fulfilment", { user: { id: "1" }, role: "doctor", loading: false });
+      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+    });
+    it("blocks access to /role-management", () => {
+      renderWithRouter("/role-management", { user: { id: "1" }, role: "doctor", loading: false });
+      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+    });
+  });
+
+  describe("specialist role", () => {
+    it("allows access to /specialist", () => {
       renderWithRouter("/specialist", { user: { id: "1" }, role: "specialist", loading: false });
       expect(screen.getByText("Specialist page")).toBeInTheDocument();
-      expect(screen.queryByText(/Tiada Kebenaran/i)).not.toBeInTheDocument();
     });
+    it("blocks access to /drugs", () => {
+      renderWithRouter("/drugs", { user: { id: "1" }, role: "specialist", loading: false });
+      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+    });
+    it("blocks access to /role-management", () => {
+      renderWithRouter("/role-management", { user: { id: "1" }, role: "specialist", loading: false });
+      expect(screen.getByRole("heading", { name: /Tiada Kebenaran/i })).toBeInTheDocument();
+    });
+  });
 
-    it("allows pharmacist role to see /fulfilment page", () => {
+  describe("pharmacist role", () => {
+    it("allows access to /fulfilment", () => {
       renderWithRouter("/fulfilment", { user: { id: "1" }, role: "pharmacist", loading: false });
       expect(screen.getByText("Permintaan Baharu page")).toBeInTheDocument();
-      expect(screen.queryByText(/Tiada Kebenaran/i)).not.toBeInTheDocument();
+    });
+    it("allows access to /specialist", () => {
+      renderWithRouter("/specialist", { user: { id: "1" }, role: "pharmacist", loading: false });
+      expect(screen.getByText("Specialist page")).toBeInTheDocument();
+    });
+    it("allows access to /request", () => {
+      renderWithRouter("/request", { user: { id: "1" }, role: "pharmacist", loading: false });
+      expect(screen.getByText("Doctor Request page")).toBeInTheDocument();
+    });
+    it("allows access to /role-management", () => {
+      renderWithRouter("/role-management", { user: { id: "1" }, role: "pharmacist", loading: false });
+      expect(screen.getByText("Role Management page")).toBeInTheDocument();
+    });
+    it("allows access to /drugs", () => {
+      renderWithRouter("/drugs", { user: { id: "1" }, role: "pharmacist", loading: false });
+      expect(screen.getByText("Drugs page")).toBeInTheDocument();
+    });
+  });
+
+  describe("loading state", () => {
+    it("shows skeleton while loading", () => {
+      renderWithRouter("/drugs", { user: null, role: null, loading: true });
+      expect(screen.getByText("Loading skeleton")).toBeInTheDocument();
     });
   });
 });

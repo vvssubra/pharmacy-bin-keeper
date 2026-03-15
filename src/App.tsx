@@ -17,6 +17,7 @@ import AntibioticForm from "@/pages/AntibioticForm";
 import SpecialistDashboard from "@/pages/SpecialistDashboard";
 import PharmacistFulfilment from "@/pages/PharmacistFulfilment";
 import PatientRegistry from "@/pages/PatientRegistry";
+import RoleManagement from "@/pages/RoleManagement";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/fulfilment" element={<ProtectedRoute><AppLayout><PharmacistFulfilment /></AppLayout></ProtectedRoute>} />
             <Route path="/pesakit" element={<ProtectedRoute><AppLayout><PatientRegistry /></AppLayout></ProtectedRoute>} />
             <Route path="/laporan" element={<ProtectedRoute><AppLayout><Laporan /></AppLayout></ProtectedRoute>} />
+            <Route path="/role-management" element={<ProtectedRoute><AppLayout><RoleManagement /></AppLayout></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
