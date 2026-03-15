@@ -35,7 +35,15 @@ Built organically before GSD planning was introduced. Shipped: role-based access
   3. Every status badge value (e.g. "Pending", "Approved", "Fulfilled") displays in English
   4. Every toast notification and inline error message appears in English, including Zod validation messages
   5. Every table column header and data label is in English; running `grep -r "Ubat\|Pesakit\|Doktor\|berjaya\|gagal\|Pilih\|Cari\|Kemaskini\|Tambah" src/` returns zero matches
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Write failing test scaffolds for ENGL-01 through ENGL-04 (Wave 0 / TDD RED)
+- [ ] 01-02-PLAN.md — Translate shared components: AppSidebar, DrugFormDialog, OpeningBalanceDialog, NoPermission, AntibioticFormReadOnly, Login, DoctorLanding
+- [ ] 01-03-PLAN.md — Translate core pages set A: Index (Dashboard), DrugMaster, BinCard, DrugLedger
+- [ ] 01-04-PLAN.md — Translate pharmacist pages: Terimaan, PharmacistFulfilment, Laporan
+- [ ] 01-05-PLAN.md — Translate remaining pages: SpecialistDashboard, PatientRegistry, DoctorRequest, AntibioticForm, RoleManagement
+- [ ] 01-06-PLAN.md — Final grep verification + human visual sign-off checkpoint
 
 ### Phase 2: Drug-Request Sync
 **Goal**: Doctors see all drugs from the master list the moment they open the drug request form — newly added drugs appear immediately without any manual refresh
@@ -76,7 +84,7 @@ Built organically before GSD planning was introduced. Shipped: role-based access
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. English UI | v2.0 | 0/? | Not started | - |
+| 1. English UI | v2.0 | 0/6 | Not started | - |
 | 2. Drug-Request Sync | v2.0 | 0/? | Not started | - |
 | 3. Antibiotic PDF | v2.0 | 0/? | Not started | - |
 | 4. Admin User Management | v2.0 | 0/? | Not started | - |
@@ -84,3 +92,4 @@ Built organically before GSD planning was introduced. Shipped: role-based access
 ---
 *Roadmap created: 2026-03-16*
 *Milestone: v2.0 English UI & Admin Features*
+*Phase 1 plans created: 2026-03-16*
