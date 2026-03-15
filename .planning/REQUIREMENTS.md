@@ -60,11 +60,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENGL-03 | Phase 1 | Pending |
 | ENGL-04 | Phase 1 | Pending |
 | ENGL-05 | Phase 1 | Pending |
-| USR-01 | Phase 2 | Pending |
-| USR-02 | Phase 2 | Pending |
-| USR-03 | Phase 2 | Pending |
-| SYNC-01 | Phase 3 | Pending |
+| SYNC-01 | Phase 2 | Pending |
 | PDF-01 | Phase 3 | Pending |
+| USR-01 | Phase 4 | Pending |
+| USR-02 | Phase 4 | Pending |
+| USR-03 | Phase 4 | Pending |
 
 **Coverage:**
 - v2 requirements: 10 total
@@ -73,4 +73,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-03-16*
-*Last updated: 2026-03-16 after initial v2.0 definition*
+*Last updated: 2026-03-16 — traceability updated after roadmap creation (phase assignments corrected to match research-ordered phases: SYNC-01→Phase 2, PDF-01→Phase 3, USR-01/02/03→Phase 4)*
