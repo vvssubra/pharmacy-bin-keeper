@@ -36,13 +36,13 @@ import {
 } from "@/components/ui/dialog";
 
 const formSchema = z.object({
-  drug_id: z.string().min(1, "Sila pilih ubat"),
-  tarikh: z.date({ required_error: "Tarikh diperlukan" }),
+  drug_id: z.string().min(1, "Please select a drug"),
+  tarikh: z.date({ required_error: "Date is required" }),
   jenis_rujukan: z.string().optional(),
-  no_rujukan: z.string().min(1, "No. Rujukan diperlukan"),
+  no_rujukan: z.string().min(1, "Reference number is required"),
   terima_daripada: z.string().optional(),
-  kuantiti: z.coerce.number().int().min(1, "Kuantiti mestilah sekurang-kurangnya 1"),
-  harga_seunit: z.coerce.number().min(0, "Harga mestilah >= 0").default(0),
+  kuantiti: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  harga_seunit: z.coerce.number().min(0, "Price must be >= 0").default(0),
   nama_pegawai: z.string().optional(),
   catatan: z.string().optional(),
 });
@@ -170,7 +170,7 @@ export default function Terimaan() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Terimaan berjaya disimpan");
+      toast.success("Receipt saved successfully");
       form.reset({
         drug_id: "",
         tarikh: new Date(),
@@ -185,7 +185,7 @@ export default function Terimaan() {
       queryClient.invalidateQueries({ queryKey: ["terimaan-recent"] });
       queryClient.invalidateQueries({ queryKey: ["drug-baki"] });
     },
-    onError: () => toast.error("Gagal menyimpan terimaan"),
+    onError: () => toast.error("Failed to save receipt"),
   });
 
   // Update mutation
@@ -209,12 +209,12 @@ export default function Terimaan() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Terimaan berjaya dikemaskini");
+      toast.success("Receipt updated successfully");
       setEditingTx(null);
       queryClient.invalidateQueries({ queryKey: ["terimaan-recent"] });
       queryClient.invalidateQueries({ queryKey: ["drug-baki"] });
     },
-    onError: () => toast.error("Gagal mengemaskini terimaan"),
+    onError: () => toast.error("Failed to update receipt"),
   });
 
   const onSubmit = (values: FormValues) => insertMutation.mutate(values);
@@ -258,16 +258,16 @@ export default function Terimaan() {
           className={cn("w-full justify-between", !fieldValue && "text-muted-foreground")}
         >
           {fieldValue
-            ? drugs.find((d) => d.id === fieldValue)?.drug_name ?? "Pilih ubat..."
-            : "Pilih ubat..."}
+            ? drugs.find((d) => d.id === fieldValue)?.drug_name ?? "Select drug..."
+            : "Select drug..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
         <Command>
-          <CommandInput placeholder="Cari ubat..." />
+          <CommandInput placeholder="Search drugs..." />
           <CommandList>
-            <CommandEmpty>Tiada ubat dijumpai.</CommandEmpty>
+            <CommandEmpty>No drugs found.</CommandEmpty>
             <CommandGroup>
               {drugs.map((d) => (
                 <CommandItem
@@ -301,7 +301,7 @@ export default function Terimaan() {
         name="drug_id"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Ubat *</FormLabel>
+            <FormLabel>Drug *</FormLabel>
             <FormControl>
               {renderDrugCombobox(field.value, field.onChange, drugOpen, setDrugOpen)}
             </FormControl>
@@ -315,7 +315,7 @@ export default function Terimaan() {
         name="tarikh"
         render={({ field }) => (
           <FormItem className="flex flex-col">
-            <FormLabel>Tarikh Terima *</FormLabel>
+            <FormLabel>Receipt Date *</FormLabel>
             <Popover>
               <PopoverTrigger asChild>
                 <FormControl>
@@ -323,7 +323,7 @@ export default function Terimaan() {
                     variant="outline"
                     className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
                   >
-                    {field.value ? format(field.value, "dd/MM/yyyy") : "Pilih tarikh"}
+                    {field.value ? format(field.value, "dd/MM/yyyy") : "Select date"}
                     <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                   </Button>
                 </FormControl>
@@ -349,11 +349,11 @@ export default function Terimaan() {
           name="jenis_rujukan"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Jenis Rujukan</FormLabel>
+              <FormLabel>Reference Type</FormLabel>
               <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Pilih jenis" />
+                    <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -372,9 +372,9 @@ export default function Terimaan() {
           name="no_rujukan"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>No. Rujukan *</FormLabel>
+              <FormLabel>Reference No. *</FormLabel>
               <FormControl>
-                <Input placeholder="Masukkan nombor rujukan dokumen" {...field} />
+                <Input placeholder="Enter document reference number" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -387,7 +387,7 @@ export default function Terimaan() {
         name="terima_daripada"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Terima Daripada</FormLabel>
+            <FormLabel>Received From</FormLabel>
             <FormControl>
               <Input placeholder="e.g. Stor Utama, Hospital Sultanah Aminah" {...field} />
             </FormControl>
@@ -402,7 +402,7 @@ export default function Terimaan() {
           name="kuantiti"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Kuantiti *</FormLabel>
+              <FormLabel>Quantity *</FormLabel>
               <FormControl>
                 <Input type="number" min={1} {...field} />
               </FormControl>
@@ -416,7 +416,7 @@ export default function Terimaan() {
           name="harga_seunit"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Harga Seunit (RM)</FormLabel>
+              <FormLabel>Unit Price (RM)</FormLabel>
               <FormControl>
                 <Input type="number" step="0.0001" min={0} placeholder="0.0000" {...field} />
               </FormControl>
@@ -426,7 +426,7 @@ export default function Terimaan() {
         />
 
         <FormItem>
-          <FormLabel>Jumlah (RM)</FormLabel>
+          <FormLabel>Total (RM)</FormLabel>
           <Input
             readOnly
             value={jumlah.toFixed(2)}
@@ -440,7 +440,7 @@ export default function Terimaan() {
         name="nama_pegawai"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Nama Pegawai</FormLabel>
+            <FormLabel>Officer Name</FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -454,9 +454,9 @@ export default function Terimaan() {
         name="catatan"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Catatan</FormLabel>
+            <FormLabel>Notes</FormLabel>
             <FormControl>
-              <Textarea placeholder="Catatan tambahan (pilihan)" {...field} />
+              <Textarea placeholder="Additional notes (optional)" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -468,8 +468,8 @@ export default function Terimaan() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Terimaan Stok</h1>
-        <p className="text-sm text-muted-foreground">Rekod penerimaan stok baru dari stor</p>
+        <h1 className="text-2xl font-semibold text-foreground">Stock Receipt</h1>
+        <p className="text-sm text-muted-foreground">Record new stock receipts from the store</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -477,7 +477,7 @@ export default function Terimaan() {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-base">Tambah Terimaan Baru</CardTitle>
+              <CardTitle className="text-base">Add New Receipt</CardTitle>
             </CardHeader>
             <CardContent>
               <Form {...form}>
@@ -486,7 +486,7 @@ export default function Terimaan() {
 
                   <div className="flex gap-2 pt-2">
                     <Button type="submit" disabled={insertMutation.isPending}>
-                      {insertMutation.isPending ? "Menyimpan..." : "Simpan Terimaan"}
+                      {insertMutation.isPending ? "Saving..." : "Save Receipt"}
                     </Button>
                     <Button
                       type="button"
@@ -518,10 +518,10 @@ export default function Terimaan() {
             <Card className="border-primary/30 bg-primary/5">
               <CardContent className="pt-4 pb-4">
                 <p className="text-sm text-muted-foreground">
-                  Selepas simpan, baki{" "}
+                  After saving, balance of{" "}
                   <span className="font-semibold text-foreground">{selectedDrug.drug_name}</span>{" "}
-                  akan berubah dari{" "}
-                  <span className="font-semibold text-foreground">{currentBaki}</span> kepada{" "}
+                  will change from{" "}
+                  <span className="font-semibold text-foreground">{currentBaki}</span> to{" "}
                   <span className="font-semibold text-primary">{currentBaki + watchKuantiti}</span>{" "}
                   {selectedDrug.unit_pengukuran}
                 </p>
@@ -533,25 +533,25 @@ export default function Terimaan() {
         {/* RIGHT — Recent Log */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Terimaan Terkini</CardTitle>
+            <CardTitle className="text-base">Recent Receipts</CardTitle>
           </CardHeader>
           <CardContent>
             {recentTerimaan.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
                 <FileText className="mb-2 h-8 w-8" />
-                <p className="text-sm">Belum ada rekod terimaan.</p>
+                <p className="text-sm">No receipt records yet.</p>
               </div>
             ) : (
               <div className="overflow-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Tarikh</TableHead>
-                      <TableHead>Ubat</TableHead>
-                      <TableHead className="text-right">Kuantiti</TableHead>
-                      <TableHead className="text-right">Jumlah (RM)</TableHead>
-                      <TableHead>No. Rujukan</TableHead>
-                      <TableHead>Pegawai</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Drug</TableHead>
+                      <TableHead className="text-right">Quantity</TableHead>
+                      <TableHead className="text-right">Total (RM)</TableHead>
+                      <TableHead>Reference No.</TableHead>
+                      <TableHead>Officer</TableHead>
                       <TableHead className="w-10"></TableHead>
                     </TableRow>
                   </TableHeader>
@@ -601,17 +601,17 @@ export default function Terimaan() {
       <Dialog open={!!editingTx} onOpenChange={(open) => !open && setEditingTx(null)}>
         <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Terimaan</DialogTitle>
+            <DialogTitle>Edit Receipt</DialogTitle>
           </DialogHeader>
           <Form {...editForm}>
             <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-4">
               {renderFormFields(editForm, editJumlahRm, editDrugPopoverOpen, setEditDrugPopoverOpen)}
               <div className="flex gap-2 pt-2">
                 <Button type="submit" disabled={updateMutation.isPending}>
-                  {updateMutation.isPending ? "Mengemaskini..." : "Kemaskini"}
+                  {updateMutation.isPending ? "Updating..." : "Update"}
                 </Button>
                 <Button type="button" variant="secondary" onClick={() => setEditingTx(null)}>
-                  Batal
+                  Cancel
                 </Button>
               </div>
             </form>
