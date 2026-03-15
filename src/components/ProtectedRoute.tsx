@@ -2,6 +2,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
 import { NoPermission } from "@/components/NoPermission";
+import { PageSkeleton } from "@/components/PageSkeleton";
 
 const SPECIALIST_ROLES = ["specialist"];
 const PHARMACIST_ROUTES = ["/fulfilment"];
@@ -14,9 +15,9 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="text-muted-foreground">Loading…</p>
-      </div>
+      <AppLayout>
+        <PageSkeleton />
+      </AppLayout>
     );
   }
 

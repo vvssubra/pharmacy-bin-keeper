@@ -81,11 +81,15 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <div className="flex h-14 items-center gap-2 border-b border-sidebar-border px-4">
-        {!collapsed &&
-        <span className="text-sm font-bold tracking-tight text-sidebar-primary">
-            Kawalan Ubat KK Kempas   
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-sidebar-primary/20">
+          <Pill className="h-4 w-4 text-sidebar-primary" />
+        </div>
+        {!collapsed && (
+          <span className="text-sm font-semibold tracking-tight text-sidebar-primary leading-tight">
+            Kawalan Ubat<br />
+            <span className="text-xs font-normal text-sidebar-foreground/70">KK Kempas</span>
           </span>
-        }
+        )}
       </div>
       <SidebarContent>
         <SidebarGroup>
@@ -100,8 +104,8 @@ export function AppSidebar() {
                     className="hover:bg-sidebar-accent"
                     activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
                     
-                      <item.icon className="mr-2 h-4 w-4" />
-                      {!collapsed && <span>{item.title}</span>}
+                      <item.icon className="h-4 w-4 shrink-0" />
+                      {!collapsed && <span className="ml-2 truncate">{item.title}</span>}
                       {item.showBadge && totalBadge > 0 &&
                     <Badge variant="destructive" className="ml-auto h-5 min-w-5 text-[10px] flex items-center justify-center rounded-full px-1.5">
                           {totalBadge}
