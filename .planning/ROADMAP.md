@@ -18,7 +18,7 @@ Built organically before GSD planning was introduced. Shipped: role-based access
 
 **Milestone Goal:** Switch all UI text to English, fix the drug-request sync bug, add antibiotic PDF download for pharmacists, and give admins full control over user account lifecycle.
 
-- [ ] **Phase 1: English UI** - Replace all Malay text across pages, nav, forms, status badges, toasts, and Zod validation messages with English
+- [x] **Phase 1: English UI** - Replace all Malay text across pages, nav, forms, status badges, toasts, and Zod validation messages with English (completed 2026-03-16)
 - [ ] **Phase 2: Drug-Request Sync** - Fix the filter bug that hides newly added drugs from the doctor's request form
 - [ ] **Phase 3: Antibiotic PDF** - Add a "Download PDF" button on approved antibiotic forms in pharmacist fulfilment
 - [ ] **Phase 4: Admin User Management** - Enable admins to create, edit, and deactivate user accounts via a Supabase Edge Function
@@ -84,7 +84,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. English UI | 5/6 | In Progress|  | - |
+| 1. English UI | 6/6 | Complete   | 2026-03-16 | - |
 | 2. Drug-Request Sync | v2.0 | 0/? | Not started | - |
 | 3. Antibiotic PDF | v2.0 | 0/? | Not started | - |
 | 4. Admin User Management | v2.0 | 0/? | Not started | - |

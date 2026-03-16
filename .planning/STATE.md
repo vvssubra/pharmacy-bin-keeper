@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
 status: planning
-stopped_at: Completed 01-english-ui/01-05-PLAN.md — 5 files translated (SpecialistDashboard, PatientRegistry, DoctorRequest, AntibioticForm, RoleManagement), all 37 tests GREEN
-last_updated: "2026-03-16T12:21:32.080Z"
+stopped_at: "Completed 01-english-ui/01-06-PLAN.md — Phase 1 English UI fully verified: zero Malay strings, 37 tests GREEN, human approved"
+last_updated: "2026-03-16T22:16:32.973Z"
 last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
-  completed_plans: 5
+  completed_plans: 6
   percent: 33
 ---
 
@@ -55,6 +55,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-english-ui P03 | 8m | 2 tasks | 4 files |
 | Phase 01-english-ui P04 | 15m | 2 tasks | 3 files |
 | Phase 01-english-ui P05 | 53m | 2 tasks | 5 files |
+| Phase 01-english-ui P06 | 15m | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase 01-english-ui P04]: date-fns ms locale removal pattern — remove import and strip { locale: ms } from all formatDistanceToNow() call sites; no replacement needed, English is default
 - [Phase 01-english-ui P04]: JSX code comments with Malay UI labels also translated — grep-based acceptance criteria catches comments as well as rendered strings
 - [Phase 01-english-ui]: RHF submit button onClick pattern: adding onClick handler with form.handleSubmit() alongside type=submit ensures fireEvent.click in JSDOM triggers Zod validation in tests
+- [Phase 01-english-ui]: Grep-first verification gate: primary ENGL-05 pattern must return zero matches before any human checkpoint — enforces completeness objectively and caught 9 files missed by Plans 01-05
+- [Phase 01-english-ui]: TypeScript variable names derived from Malay DB column names (currentBaki, tarikh, isBakiAwal) are NOT display strings — they match DB schema identifiers and are excluded from translation scope
 
 ### Pending Todos
 
@@ -89,6 +92,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T12:21:32.078Z
-Stopped at: Completed 01-english-ui/01-05-PLAN.md — 5 files translated (SpecialistDashboard, PatientRegistry, DoctorRequest, AntibioticForm, RoleManagement), all 37 tests GREEN
+Last session: 2026-03-16T22:16:32.971Z
+Stopped at: Completed 01-english-ui/01-06-PLAN.md — Phase 1 English UI fully verified: zero Malay strings, 37 tests GREEN, human approved
 Resume file: None
