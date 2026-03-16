@@ -1,11 +1,13 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLayout } from "@/components/AppLayout";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Index";
+import FmsDashboard from "@/pages/FmsDashboard";
+import MoDashboard from "@/pages/MoDashboard";
 import DrugMaster from "@/pages/DrugMaster";
 import Terimaan from "@/pages/Terimaan";
 import Laporan from "@/pages/Laporan";
@@ -22,6 +24,14 @@ import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
+/** Sends fms → /fms and mo → /mo; everyone else sees the admin/pharmacist dashboard. */
+function RoleRedirect() {
+  const { role } = useAuth();
+  if (role === "fms") return <Navigate to="/fms" replace />;
+  if (role === "mo") return <Navigate to="/mo" replace />;
+  return <Dashboard />;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -29,14 +39,16 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
-            {/* Doctor routes */}
+            {/* MO routes */}
             <Route path="/request" element={<ProtectedRoute><AppLayout><DoctorLanding /></AppLayout></ProtectedRoute>} />
             <Route path="/request/ubat" element={<ProtectedRoute><AppLayout><DoctorRequest /></AppLayout></ProtectedRoute>} />
             <Route path="/request/antibiotik" element={<ProtectedRoute><AppLayout><AntibioticForm /></AppLayout></ProtectedRoute>} />
-            {/* Specialist */}
+            <Route path="/mo" element={<ProtectedRoute><AppLayout><MoDashboard /></AppLayout></ProtectedRoute>} />
+            {/* FMS + Approvals */}
+            <Route path="/fms" element={<ProtectedRoute><AppLayout><FmsDashboard /></AppLayout></ProtectedRoute>} />
             <Route path="/specialist" element={<ProtectedRoute><AppLayout><SpecialistDashboard /></AppLayout></ProtectedRoute>} />
-            {/* Pharmacist + Admin routes */}
-            <Route path="/" element={<ProtectedRoute><AppLayout><Dashboard /></AppLayout></ProtectedRoute>} />
+            {/* Admin + Pharmacist routes */}
+            <Route path="/" element={<ProtectedRoute><AppLayout><RoleRedirect /></AppLayout></ProtectedRoute>} />
             <Route path="/drugs" element={<ProtectedRoute><AppLayout><DrugMaster /></AppLayout></ProtectedRoute>} />
             <Route path="/drugs/:id/ledger" element={<ProtectedRoute><AppLayout><DrugLedger /></AppLayout></ProtectedRoute>} />
             <Route path="/drugs/:id/bincard" element={<ProtectedRoute><AppLayout><BinCard /></AppLayout></ProtectedRoute>} />

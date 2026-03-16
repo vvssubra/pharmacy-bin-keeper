@@ -1,23 +1,16 @@
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { UserCog, UserPlus, UserMinus, Users, Stethoscope, ShieldCheck } from "lucide-react";
+import { UserCog, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 
 type UserWithRole = {
   user_id: string;
@@ -28,14 +21,25 @@ type UserWithRole = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
+  admin: "Admin",
+  fms: "FMS",
+  mo: "Medical Officer",
   pharmacist: "Pharmacist",
-  doctor: "Doctor",
-  specialist: "Specialist",
+};
+
+const ASSIGNABLE_ROLES = ["admin", "fms", "mo", "pharmacist"] as const;
+
+const ROLE_BADGE_CLASSES: Record<string, string> = {
+  admin:      "bg-purple-100 text-purple-700 border-purple-300",
+  fms:        "bg-blue-100 text-blue-700 border-blue-300",
+  mo:         "bg-teal-100 text-teal-700 border-teal-300",
+  pharmacist: "bg-green-100 text-green-700 border-green-300",
 };
 
 export default function RoleManagement() {
   const { user: currentUser } = useAuth();
   const queryClient = useQueryClient();
+  const [pendingRole, setPendingRole] = useState<Record<string, string>>({});
 
   const { data: users = [], isLoading } = useQuery<UserWithRole[]>({
     queryKey: ["all-users-with-roles"],
@@ -48,39 +52,25 @@ export default function RoleManagement() {
 
   const assignRole = useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      // Upsert: insert or update role
-      const { error } = await supabase
-        .from("user_roles")
-        .upsert({ user_id: userId, role }, { onConflict: "user_id" });
-      if (error) throw error;
+      if (role === "unassigned") {
+        const { error } = await supabase.from("user_roles").delete().eq("user_id", userId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase
+          .from("user_roles")
+          .upsert({ user_id: userId, role }, { onConflict: "user_id" });
+        if (error) throw error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: (_data, { userId }) => {
       queryClient.invalidateQueries({ queryKey: ["all-users-with-roles"] });
+      setPendingRole(prev => { const next = { ...prev }; delete next[userId]; return next; });
       toast.success("Role updated successfully.");
     },
     onError: () => toast.error("Failed to update role."),
   });
 
-  const removeRole = useMutation({
-    mutationFn: async (userId: string) => {
-      const { error } = await supabase
-        .from("user_roles")
-        .delete()
-        .eq("user_id", userId);
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["all-users-with-roles"] });
-      toast.success("Role removed successfully.");
-    },
-    onError: () => toast.error("Failed to remove role."),
-  });
-
   const isSelf = (userId: string) => userId === currentUser?.id;
-
-  const doctors      = users.filter((u) => u.role === "doctor");
-  const specialists  = users.filter((u) => u.role === "specialist");
-  const unassigned   = users.filter((u) => !u.role);
 
   return (
     <div className="space-y-6">
@@ -90,180 +80,95 @@ export default function RoleManagement() {
           Role Management
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Assign roles to registered users.
+          Assign roles to registered users. Only admins can access this page.
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Doctors group */}
-        <RoleGroup
-          title="Doctor"
-          icon={<Stethoscope className="h-4 w-4" />}
-          users={doctors}
-          isLoading={isLoading}
-          emptyMessage="No doctors assigned."
-          onRemove={(userId) => removeRole.mutate(userId)}
-          onChangeTo={(userId) => assignRole.mutate({ userId, role: "specialist" })}
-          changeToLabel="Make Specialist"
-          isSelf={isSelf}
-        />
-
-        {/* Specialists group */}
-        <RoleGroup
-          title="Specialist"
-          icon={<ShieldCheck className="h-4 w-4" />}
-          users={specialists}
-          isLoading={isLoading}
-          emptyMessage="No specialists assigned."
-          onRemove={(userId) => removeRole.mutate(userId)}
-          onChangeTo={(userId) => assignRole.mutate({ userId, role: "doctor" })}
-          changeToLabel="Make Doctor"
-          isSelf={isSelf}
-        />
-      </div>
-
-      {/* Unassigned users */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Users className="h-4 w-4 text-muted-foreground" />
-            Unassigned Users
-            {unassigned.length > 0 && (
-              <Badge variant="secondary" className="ml-1">{unassigned.length}</Badge>
+            All Users
+            {!isLoading && (
+              <Badge variant="secondary" className="ml-1">{users.length}</Badge>
             )}
           </CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="space-y-3">
-              {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full rounded-md" />)}
+              {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-14 w-full rounded-md" />)}
             </div>
-          ) : unassigned.length === 0 ? (
-            <p className="text-sm text-muted-foreground">All users have been assigned a role.</p>
+          ) : users.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No users found.</p>
           ) : (
             <div className="divide-y">
-              {unassigned.map((u) => (
-                <div key={u.user_id} className="flex items-center justify-between py-3 gap-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{u.full_name || "—"}</p>
-                    <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+              {users.map((u) => {
+                const selectedRole = pendingRole[u.user_id] ?? u.role ?? "unassigned";
+                const hasChange = pendingRole[u.user_id] !== undefined &&
+                  pendingRole[u.user_id] !== (u.role ?? "unassigned");
+
+                return (
+                  <div key={u.user_id} className="flex items-center justify-between py-3 gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium truncate">{u.full_name || "—"}</p>
+                      <p className="text-xs text-muted-foreground truncate">{u.email}</p>
+                      {u.facility && (
+                        <p className="text-xs text-muted-foreground">{u.facility}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-3 shrink-0">
+                      {u.role && ROLE_BADGE_CLASSES[u.role] && (
+                        <Badge variant="outline" className={`text-[11px] ${ROLE_BADGE_CLASSES[u.role]}`}>
+                          {ROLE_LABELS[u.role] ?? u.role}
+                        </Badge>
+                      )}
+
+                      <Select
+                        value={selectedRole}
+                        onValueChange={(val) =>
+                          setPendingRole(prev => ({ ...prev, [u.user_id]: val }))
+                        }
+                        disabled={isSelf(u.user_id)}
+                      >
+                        <SelectTrigger className="w-40 h-8 text-xs">
+                          <SelectValue placeholder="Select role" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {ASSIGNABLE_ROLES.map((r) => (
+                            <SelectItem key={r} value={r} className="text-xs">
+                              {ROLE_LABELS[r]}
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="unassigned" className="text-xs text-muted-foreground">
+                            Unassigned
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+
+                      <Button
+                        size="sm"
+                        className="h-8 text-xs"
+                        disabled={!hasChange || assignRole.isPending || isSelf(u.user_id)}
+                        onClick={() =>
+                          assignRole.mutate({ userId: u.user_id, role: selectedRole })
+                        }
+                      >
+                        Save
+                      </Button>
+                    </div>
+
+                    {isSelf(u.user_id) && (
+                      <span className="text-xs text-muted-foreground italic shrink-0">you</span>
+                    )}
                   </div>
-                  <div className="flex gap-2 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => assignRole.mutate({ userId: u.user_id, role: "doctor" })}
-                      disabled={assignRole.isPending}
-                    >
-                      <UserPlus className="h-3.5 w-3.5 mr-1" />
-                      Doctor
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => assignRole.mutate({ userId: u.user_id, role: "specialist" })}
-                      disabled={assignRole.isPending}
-                    >
-                      <UserPlus className="h-3.5 w-3.5 mr-1" />
-                      Specialist
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </CardContent>
       </Card>
     </div>
-  );
-}
-
-// ─── Sub-component ────────────────────────────────────────────────────────────
-
-type RoleGroupProps = {
-  title: string;
-  icon: React.ReactNode;
-  users: UserWithRole[];
-  isLoading: boolean;
-  emptyMessage: string;
-  onRemove: (userId: string) => void;
-  onChangeTo: (userId: string) => void;
-  changeToLabel: string;
-  isSelf: (userId: string) => boolean;
-};
-
-function RoleGroup({
-  title, icon, users, isLoading, emptyMessage,
-  onRemove, onChangeTo, changeToLabel, isSelf,
-}: RoleGroupProps) {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base">
-          {icon}
-          {title}
-          <Badge variant="secondary" className="ml-1">{users.length}</Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <div className="space-y-3">
-            {[1, 2].map((i) => <Skeleton key={i} className="h-12 w-full rounded-md" />)}
-          </div>
-        ) : users.length === 0 ? (
-          <p className="text-sm text-muted-foreground">{emptyMessage}</p>
-        ) : (
-          <div className="divide-y">
-            {users.map((u) => (
-              <div key={u.user_id} className="flex items-center justify-between py-3 gap-3">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{u.full_name || "—"}</p>
-                  <p className="text-xs text-muted-foreground truncate">{u.email}</p>
-                </div>
-                {!isSelf(u.user_id) && (
-                  <div className="flex gap-2 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="text-muted-foreground hover:text-foreground"
-                      onClick={() => onChangeTo(u.user_id)}
-                    >
-                      {changeToLabel}
-                    </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button size="sm" variant="ghost" className="text-destructive hover:text-destructive hover:bg-destructive/10">
-                          <UserMinus className="h-3.5 w-3.5" />
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Remove role?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            <strong>{u.full_name || u.email}</strong> will become a user without a role and will not be able to access the system.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => onRemove(u.user_id)}
-                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                          >
-                            Remove
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                )}
-                {isSelf(u.user_id) && (
-                  <Badge variant="outline" className="text-xs shrink-0">Anda</Badge>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
   );
 }

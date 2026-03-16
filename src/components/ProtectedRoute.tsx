@@ -7,15 +7,17 @@ import { PageSkeleton } from "@/components/PageSkeleton";
 
 /** Declares which roles can access each route prefix. */
 const ROUTE_PERMISSIONS: Array<{ prefix: string; roles: AppRole[] }> = [
-  { prefix: "/request",         roles: ["doctor", "pharmacist"] },
-  { prefix: "/specialist",      roles: ["specialist", "pharmacist"] },
-  { prefix: "/role-management", roles: ["pharmacist"] },
-  { prefix: "/fulfilment",      roles: ["pharmacist"] },
-  { prefix: "/drugs",           roles: ["pharmacist"] },
-  { prefix: "/terimaan",        roles: ["pharmacist"] },
-  { prefix: "/pesakit",         roles: ["pharmacist"] },
-  { prefix: "/laporan",         roles: ["pharmacist"] },
-  { prefix: "/",                roles: ["pharmacist"] },
+  { prefix: "/role-management", roles: ["admin"] },
+  { prefix: "/fms",             roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/mo",              roles: ["admin", "mo", "pharmacist"] },
+  { prefix: "/request",         roles: ["admin", "mo", "pharmacist"] },
+  { prefix: "/specialist",      roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/fulfilment",      roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/drugs",           roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/terimaan",        roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/pesakit",         roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/laporan",         roles: ["admin", "fms", "pharmacist"] },
+  { prefix: "/",                roles: ["admin", "pharmacist"] },
 ];
 
 function getAllowedRoles(pathname: string): AppRole[] {
@@ -24,7 +26,7 @@ function getAllowedRoles(pathname: string): AppRole[] {
       return roles;
     }
   }
-  return ["pharmacist"];
+  return ["admin", "pharmacist"];
 }
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {

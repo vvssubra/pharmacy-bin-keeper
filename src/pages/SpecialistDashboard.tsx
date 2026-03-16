@@ -59,18 +59,32 @@ export default function SpecialistDashboard() {
     },
   });
 
-  // --- Antibiotic queries ---
+  // --- Antibiotic queries (with submitter name lookup) ---
   const { data: abForms = [] } = useQuery({
     queryKey: ["specialist-antibiotic-forms"],
     refetchInterval: 30000,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data: forms, error } = await supabase
         .from("antibiotic_forms" as any)
         .select("*")
         .in("status", ["pending_specialist", "approved", "rejected"])
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return data as any[];
+
+      const ids = [...new Set((forms ?? []).map((f: any) => f.submitted_by).filter(Boolean))];
+      const profileMap: Record<string, string> = {};
+      if (ids.length > 0) {
+        const { data: profiles } = await supabase
+          .from("profiles")
+          .select("user_id, full_name")
+          .in("user_id", ids);
+        for (const p of profiles ?? []) profileMap[p.user_id] = p.full_name;
+      }
+
+      return (forms ?? []).map((f: any) => ({
+        ...f,
+        submitter_name: profileMap[f.submitted_by] ?? "Unknown MO",
+      })) as any[];
     },
   });
 
@@ -278,19 +292,21 @@ export default function SpecialistDashboard() {
                     <TableHead>Patient Name</TableHead>
                     <TableHead>IC</TableHead>
                     <TableHead>Diagnosis</TableHead>
+                    <TableHead>Submitted By</TableHead>
                     <TableHead>Unit</TableHead>
                     <TableHead>Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {abPending.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No antibiotic forms pending</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No antibiotic forms pending</TableCell></TableRow>
                   ) : abPending.map((f: any) => (
                     <TableRow key={f.id}>
                       <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true })}</TableCell>
                       <TableCell className="font-medium">{f.patient_name}</TableCell>
                       <TableCell className="text-xs">{formatIC(f.patient_ic)}</TableCell>
                       <TableCell className="text-xs max-w-[150px] truncate">{f.diagnosis}</TableCell>
+                      <TableCell className="text-xs font-medium">{f.submitter_name}</TableCell>
                       <TableCell><Badge variant="outline" className="text-[10px]">{f.prescription_unit || "—"}</Badge></TableCell>
                       <TableCell>
                         <div className="flex gap-1">
