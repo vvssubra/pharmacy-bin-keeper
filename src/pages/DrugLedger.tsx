@@ -33,25 +33,25 @@ type MockRow = {
   seunit?: number;
   jumlahRM?: number;
   namaPegawai: string;
-  sumber: "Excel Import" | "Manual" | "Baki Awal";
+  sumber: "Excel Import" | "Manual" | "Opening Balance";
 };
 
 const MOCK_ROWS: MockRow[] = [
-  { id: "1", tarikh: "2025-01-02", noRujukan: "BA-001", pihak: "-", jenis: "baki_awal", kuantiti: 500, seunit: 0.25, jumlahRM: 125.0, namaPegawai: "Pn. Siti", sumber: "Baki Awal" },
+  { id: "1", tarikh: "2025-01-02", noRujukan: "BA-001", pihak: "-", jenis: "baki_awal", kuantiti: 500, seunit: 0.25, jumlahRM: 125.0, namaPegawai: "Pn. Siti", sumber: "Opening Balance" },
   { id: "2", tarikh: "2025-01-08", noRujukan: "DO-20250108-A", pihak: "Stor Utama JKNJ", jenis: "terimaan", kuantiti: 200, seunit: 0.25, jumlahRM: 50.0, namaPegawai: "En. Ahmad", sumber: "Excel Import" },
   { id: "3", tarikh: "2025-01-10", noRujukan: "KEL-001", pihak: "Bilik Rawatan 1", jenis: "keluaran", kuantiti: 50, jumlahRM: 12.5, namaPegawai: "Pn. Lina", sumber: "Manual" },
   { id: "4", tarikh: "2025-01-15", noRujukan: "KEL-002", pihak: "Bilik Rawatan 2", jenis: "keluaran", kuantiti: 80, jumlahRM: 20.0, namaPegawai: "En. Razak", sumber: "Excel Import" },
   { id: "5", tarikh: "2025-01-22", noRujukan: "DO-20250122-B", pihak: "Stor Utama JKNJ", jenis: "terimaan", kuantiti: 300, seunit: 0.25, jumlahRM: 75.0, namaPegawai: "En. Ahmad", sumber: "Excel Import" },
-  { id: "6", tarikh: "2025-02-01", noRujukan: "KEL-003", pihak: "Farmasi Pesakit Luar", jenis: "keluaran", kuantiti: 120, jumlahRM: 30.0, namaPegawai: "Pn. Siti", sumber: "Manual" },
+  { id: "6", tarikh: "2025-02-01", noRujukan: "KEL-003", pihak: "Outpatient Pharmacy", jenis: "keluaran", kuantiti: 120, jumlahRM: 30.0, namaPegawai: "Pn. Siti", sumber: "Manual" },
   { id: "7", tarikh: "2025-02-05", noRujukan: "KEL-004", pihak: "Bilik Rawatan 1", jenis: "keluaran", kuantiti: 60, jumlahRM: 15.0, namaPegawai: "Pn. Lina", sumber: "Excel Import" },
   { id: "8", tarikh: "2025-02-12", noRujukan: "DO-20250212-C", pihak: "Stor Utama JKNJ", jenis: "terimaan", kuantiti: 150, seunit: 0.28, jumlahRM: 42.0, namaPegawai: "En. Ahmad", sumber: "Excel Import" },
   { id: "9", tarikh: "2025-02-18", noRujukan: "KEL-005", pihak: "Bilik Rawatan 3", jenis: "keluaran", kuantiti: 90, jumlahRM: 25.2, namaPegawai: "En. Razak", sumber: "Manual" },
-  { id: "10", tarikh: "2025-02-25", noRujukan: "KEL-006", pihak: "Farmasi Pesakit Luar", jenis: "keluaran", kuantiti: 200, jumlahRM: 56.0, namaPegawai: "Pn. Siti", sumber: "Excel Import" },
+  { id: "10", tarikh: "2025-02-25", noRujukan: "KEL-006", pihak: "Outpatient Pharmacy", jenis: "keluaran", kuantiti: 200, jumlahRM: 56.0, namaPegawai: "Pn. Siti", sumber: "Excel Import" },
   { id: "11", tarikh: "2025-03-01", noRujukan: "DO-20250301-D", pihak: "Stor Utama JKNJ", jenis: "terimaan", kuantiti: 400, seunit: 0.28, jumlahRM: 112.0, namaPegawai: "En. Ahmad", sumber: "Excel Import" },
   { id: "12", tarikh: "2025-03-05", noRujukan: "KEL-007", pihak: "Bilik Rawatan 2", jenis: "keluaran", kuantiti: 150, jumlahRM: 42.0, namaPegawai: "Pn. Lina", sumber: "Manual" },
   { id: "13", tarikh: "2025-03-08", noRujukan: "KEL-008", pihak: "Bilik Rawatan 1", jenis: "keluaran", kuantiti: 100, jumlahRM: 28.0, namaPegawai: "Pn. Siti", sumber: "Excel Import" },
   { id: "14", tarikh: "2025-03-10", noRujukan: "DO-20250310-E", pihak: "Stor Utama JKNJ", jenis: "terimaan", kuantiti: 250, seunit: 0.30, jumlahRM: 75.0, namaPegawai: "En. Ahmad", sumber: "Manual" },
-  { id: "15", tarikh: "2025-03-11", noRujukan: "KEL-009", pihak: "Farmasi Pesakit Luar", jenis: "keluaran", kuantiti: 70, jumlahRM: 21.0, namaPegawai: "En. Razak", sumber: "Excel Import" },
+  { id: "15", tarikh: "2025-03-11", noRujukan: "KEL-009", pihak: "Outpatient Pharmacy", jenis: "keluaran", kuantiti: 70, jumlahRM: 21.0, namaPegawai: "En. Razak", sumber: "Excel Import" },
 ];
 
 function getBakiLevel(qty: number, min: number, max: number) {
@@ -63,7 +63,7 @@ function getBakiLevel(qty: number, min: number, max: number) {
 
 function sumberBadge(sumber: string) {
   switch (sumber) {
-    case "Baki Awal":
+    case "Opening Balance":
       return <Badge className="bg-purple-600 text-white border-transparent text-[10px]">{sumber}</Badge>;
     case "Manual":
       return <Badge className="bg-blue-500 text-white border-transparent text-[10px]">{sumber}</Badge>;

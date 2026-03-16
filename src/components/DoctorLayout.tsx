@@ -11,7 +11,7 @@ const devLinks = [
   { to: "/specialist", label: "Specialist" },
   { to: "/fulfilment", label: "Fulfilment" },
   { to: "/drugs", label: "Drug Master" },
-  { to: "/pesakit", label: "Pesakit" },
+  { to: "/pesakit", label: "Patient Registry" },
 ];
 
 export function DoctorLayout({ children }: { children: React.ReactNode }) {

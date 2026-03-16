@@ -226,7 +226,7 @@ export default function SpecialistDashboard() {
             </CardContent>
           </Card>
 
-          {/* Ubat History */}
+          {/* Drug Approval History */}
           <Collapsible>
             <Card>
               <CollapsibleTrigger asChild>
@@ -345,7 +345,7 @@ export default function SpecialistDashboard() {
         </TabsContent>
       </Tabs>
 
-      {/* Ubat Approve Dialog */}
+      {/* Drug Approve Dialog */}
       <Dialog open={!!approveTarget} onOpenChange={(o) => !o && setApproveTarget(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Approve Request</DialogTitle></DialogHeader>
@@ -370,7 +370,7 @@ export default function SpecialistDashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Ubat Reject Dialog */}
+      {/* Drug Reject Dialog */}
       <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && setRejectTarget(null)}>
         <DialogContent>
           <DialogHeader><DialogTitle>Reject Request</DialogTitle></DialogHeader>

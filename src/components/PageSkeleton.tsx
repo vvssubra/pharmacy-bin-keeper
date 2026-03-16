@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 /** Full-page skeleton shown while data is loading. */
 export function PageSkeleton() {
   return (
-    <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Memuatkan...">
+    <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Loading...">
       {/* Page title */}
       <div className="space-y-2">
         <Skeleton className="h-7 w-48" />
@@ -42,7 +42,7 @@ export function PageSkeleton() {
 /** Compact inline skeleton for a single table/card section */
 export function SectionSkeleton({ rows = 4 }: { rows?: number }) {
   return (
-    <div className="space-y-2" aria-busy="true" aria-label="Memuatkan...">
+    <div className="space-y-2" aria-busy="true" aria-label="Loading...">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-3">
           <Skeleton className="h-4 flex-1" />

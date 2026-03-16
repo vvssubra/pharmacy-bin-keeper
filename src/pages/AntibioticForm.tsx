@@ -177,7 +177,7 @@ export default function AntibioticForm() {
             <div className="space-y-4">
               <p className="text-sm font-medium text-muted-foreground">Please complete patient details</p>
               <div className="space-y-2">
-                <Label>1. Tarikh</Label>
+                <Label>1. Date</Label>
                 <Input type="date" value={tarikh} onChange={e => setTarikh(e.target.value)} />
               </div>
               <div className="space-y-2">

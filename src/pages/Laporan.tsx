@@ -265,7 +265,7 @@ export default function Laporan() {
           </CardContent>
         </Card>
 
-        {/* CARD 4 — Laporan Pengeluaran Harian */}
+        {/* CARD 4 — Daily Dispensing Report */}
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Daily Dispensing Report</CardTitle>

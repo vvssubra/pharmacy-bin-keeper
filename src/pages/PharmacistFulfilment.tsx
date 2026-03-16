@@ -38,7 +38,7 @@ export default function PharmacistFulfilment() {
   const [abViewTarget, setAbViewTarget] = useState<any>(null);
   const [abAckTarget, setAbAckTarget] = useState<any>(null);
 
-  // --- Ubat Kawalan ---
+  // --- Controlled Drug ---
   const { data: requests = [] } = useQuery({
     queryKey: ["fulfilment-requests"],
     refetchInterval: 15000,

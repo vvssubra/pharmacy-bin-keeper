@@ -11,7 +11,7 @@ const devLinks = [
   { to: "/specialist", label: "Specialist" },
   { to: "/fulfilment", label: "Fulfilment" },
   { to: "/drugs", label: "Drug Master" },
-  { to: "/pesakit", label: "Pesakit" },
+  { to: "/pesakit", label: "Patient Registry" },
 ];
 
 export function SpecialistLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +21,7 @@ export function SpecialistLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="flex h-14 items-center justify-between border-b bg-card px-6">
-        <p className="text-sm font-semibold text-foreground">Papan Pemuka Pakar</p>
+        <p className="text-sm font-semibold text-foreground">Specialist Dashboard</p>
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-foreground">{profile?.full_name || "Specialist"}</span>
           {role && <Badge variant="secondary" className="text-xs capitalize">{role}</Badge>}

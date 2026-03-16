@@ -382,7 +382,7 @@ export default function BinCard() {
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
             <Input
-              placeholder="Cari nama pesakit atau no. rujukan..."
+              placeholder="Search patient name or ref. no..."
               value={searchQ}
               onChange={(e) => { setSearchQ(e.target.value); setPage(1); }}
               className="w-[280px] pl-8 text-sm"
