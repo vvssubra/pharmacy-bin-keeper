@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow, startOfDay, format } from "date-fns";
-import { ms } from "date-fns/locale";
 import { AlertTriangle, Check } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,12 +137,12 @@ export default function PharmacistFulfilment() {
       return { drugName: drug.drug_name, stockAfter, unit: drug.unit_pengukuran };
     },
     onSuccess: (result) => {
-      toast.success(`Selesai. Baki baharu ${result.drugName}: ${result.stockAfter} ${result.unit}`);
+      toast.success(`Complete. New balance of ${result.drugName}: ${result.stockAfter} ${result.unit}`);
       setFulfillTarget(null);
       queryClient.invalidateQueries({ queryKey: ["fulfilment-requests"] });
       queryClient.invalidateQueries({ queryKey: ["all-transactions-for-stock"] });
     },
-    onError: () => toast.error("Gagal memproses permintaan"),
+    onError: () => toast.error("Failed to process request"),
   });
 
   const rejectMutation = useMutation({
@@ -151,8 +150,8 @@ export default function PharmacistFulfilment() {
       const { error } = await supabase.from("dispensing_requests").update({ status: "rejected", rejection_reason: rejectReason }).eq("id", rejectTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Permintaan ditolak"); setRejectTarget(null); setRejectReason(""); queryClient.invalidateQueries({ queryKey: ["fulfilment-requests"] }); },
-    onError: () => toast.error("Gagal menolak"),
+    onSuccess: () => { toast.success("Request rejected"); setRejectTarget(null); setRejectReason(""); queryClient.invalidateQueries({ queryKey: ["fulfilment-requests"] }); },
+    onError: () => toast.error("Failed to reject"),
   });
 
   const deferMutation = useMutation({
@@ -161,7 +160,7 @@ export default function PharmacistFulfilment() {
       const { error } = await supabase.from("dispensing_requests").update({ deferred_date: format(tomorrow, "yyyy-MM-dd") }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Permintaan ditangguh ke esok"); queryClient.invalidateQueries({ queryKey: ["fulfilment-requests"] }); },
+    onSuccess: () => { toast.success("Request deferred to tomorrow"); queryClient.invalidateQueries({ queryKey: ["fulfilment-requests"] }); },
   });
 
   const abAckMutation = useMutation({
@@ -173,26 +172,26 @@ export default function PharmacistFulfilment() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Borang diakui. Tiada perubahan stok dilakukan.");
+      toast.success("Form acknowledged. No stock changes made.");
       setAbAckTarget(null);
       queryClient.invalidateQueries({ queryKey: ["fulfilment-antibiotic-forms"] });
     },
-    onError: () => toast.error("Gagal mengakui borang"),
+    onError: () => toast.error("Failed to acknowledge form"),
   });
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Permintaan Untuk Diselesaikan</h1>
-        <p className="text-sm text-muted-foreground">Klik Selesai untuk mengesahkan pengeluaran dan tolak stok</p>
+        <h1 className="text-2xl font-semibold text-foreground">Requests to Fulfil</h1>
+        <p className="text-sm text-muted-foreground">Click Complete to confirm dispensing and deduct stock</p>
       </div>
 
       <Tabs defaultValue="pending">
         <TabsList>
-          <TabsTrigger value="pending">Menunggu Pengesahan ({pending.length})</TabsTrigger>
-          <TabsTrigger value="fulfilled">Selesai Hari Ini ({fulfilledToday.length})</TabsTrigger>
+          <TabsTrigger value="pending">Awaiting Confirmation ({pending.length})</TabsTrigger>
+          <TabsTrigger value="fulfilled">Completed Today ({fulfilledToday.length})</TabsTrigger>
           <TabsTrigger value="antibiotik" className="gap-1">
-            Borang Antibiotik
+            Antibiotic Forms
             {abPendingAck.length > 0 && (
               <Badge variant="destructive" className="h-5 min-w-5 text-[10px] rounded-full px-1.5">{abPendingAck.length}</Badge>
             )}
@@ -202,7 +201,7 @@ export default function PharmacistFulfilment() {
         {/* Tab 1: Pending ubat kawalan */}
         <TabsContent value="pending" className="space-y-4 mt-4">
           {pending.length === 0 ? (
-            <Card><CardContent className="py-12 text-center text-muted-foreground">Tiada permintaan menunggu</CardContent></Card>
+            <Card><CardContent className="py-12 text-center text-muted-foreground">No pending requests</CardContent></Card>
           ) : pending.map(req => {
             const drug = req.drugs as any;
             const currentStock = stockMap.get(req.drug_id) ?? 0;
@@ -218,38 +217,38 @@ export default function PharmacistFulfilment() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <CardTitle className="text-base">{drug?.drug_name}</CardTitle>
-                      <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(req.created_at), { addSuffix: true, locale: ms })}</span>
+                      <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(req.created_at), { addSuffix: true })}</span>
                     </div>
                     <div className="flex gap-1">
-                      {isSpecialistApproved && <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px] inline-flex items-center gap-1"><Check className="h-3 w-3" /> Diluluskan Pakar</Badge>}
-                      {isDeferred && <Badge variant="secondary" className="text-[10px]">Ditangguh</Badge>}
+                      {isSpecialistApproved && <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px] inline-flex items-center gap-1"><Check className="h-3 w-3" /> Specialist Approved</Badge>}
+                      {isDeferred && <Badge variant="secondary" className="text-[10px]">Deferred</Badge>}
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm mb-4">
-                    <div><span className="text-muted-foreground text-xs">Pesakit</span><p className="font-medium">{req.patient_name}</p></div>
+                    <div><span className="text-muted-foreground text-xs">Patient</span><p className="font-medium">{req.patient_name}</p></div>
                     <div><span className="text-muted-foreground text-xs">IC</span><p>{formatIC(req.no_ic)}</p></div>
-                    <div><span className="text-muted-foreground text-xs">Kuantiti</span><p>{req.quantity} {drug?.unit_pengukuran}</p></div>
-                    <div><span className="text-muted-foreground text-xs">Doktor</span><p>{req.prescriber_name}</p></div>
+                    <div><span className="text-muted-foreground text-xs">Quantity</span><p>{req.quantity} {drug?.unit_pengukuran}</p></div>
+                    <div><span className="text-muted-foreground text-xs">Doctor</span><p>{req.prescriber_name}</p></div>
                     <div>
-                      <span className="text-muted-foreground text-xs">Stok Semasa</span>
-                      <p className={belowMin ? "text-destructive font-medium" : ""}>{currentStock} → {afterStock} selepas selesai</p>
+                      <span className="text-muted-foreground text-xs">Current Stock</span>
+                      <p className={belowMin ? "text-destructive font-medium" : ""}>{currentStock} → {afterStock} after completion</p>
                     </div>
                   </div>
                   {belowMin && !outOfStock && (
-                    <p className="text-xs text-destructive flex items-center gap-1 mb-3"><AlertTriangle className="h-3 w-3" /> Stok di bawah paras minimum</p>
+                    <p className="text-xs text-destructive flex items-center gap-1 mb-3"><AlertTriangle className="h-3 w-3" /> Stock below minimum level</p>
                   )}
-                  {outOfStock && <p className="text-xs text-destructive font-medium mb-3">Stok Habis — Tambah Terimaan dahulu</p>}
+                  {outOfStock && <p className="text-xs text-destructive font-medium mb-3">Out of Stock — Add Receipt first</p>}
                   <div className="flex items-center justify-between">
                     <DropdownMenu>
-                      <DropdownMenuTrigger asChild><Button variant="outline" size="sm">Tindakan Lain</Button></DropdownMenuTrigger>
+                      <DropdownMenuTrigger asChild><Button variant="outline" size="sm">Other Actions</Button></DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => setRejectTarget(req)}>Tolak</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => deferMutation.mutate(req.id)}>Tangguh ke esok</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setRejectTarget(req)}>Reject</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => deferMutation.mutate(req.id)}>Defer to tomorrow</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button onClick={() => setFulfillTarget(req)} disabled={outOfStock}>Selesai</Button>
+                    <Button onClick={() => setFulfillTarget(req)} disabled={outOfStock}>Complete</Button>
                   </div>
                 </CardContent>
               </Card>
@@ -264,15 +263,15 @@ export default function PharmacistFulfilment() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Masa</TableHead><TableHead>Pesakit</TableHead><TableHead>IC</TableHead><TableHead>Ubat</TableHead><TableHead>Kuantiti</TableHead><TableHead>Baki Selepas</TableHead><TableHead>Pegawai</TableHead>
+                    <TableHead>Time</TableHead><TableHead>Patient</TableHead><TableHead>IC</TableHead><TableHead>Drug</TableHead><TableHead>Quantity</TableHead><TableHead>Balance After</TableHead><TableHead>Officer</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {fulfilledToday.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Tiada pengeluaran hari ini</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No dispensing today</TableCell></TableRow>
                   ) : fulfilledToday.map(r => (
                     <TableRow key={r.id}>
-                      <TableCell className="text-xs">{r.fulfilled_at ? formatDistanceToNow(new Date(r.fulfilled_at), { addSuffix: true, locale: ms }) : "—"}</TableCell>
+                      <TableCell className="text-xs">{r.fulfilled_at ? formatDistanceToNow(new Date(r.fulfilled_at), { addSuffix: true }) : "—"}</TableCell>
                       <TableCell>{r.patient_name}</TableCell>
                       <TableCell className="text-xs">{formatIC(r.no_ic)}</TableCell>
                       <TableCell>{(r.drugs as any)?.drug_name}</TableCell>
@@ -287,26 +286,26 @@ export default function PharmacistFulfilment() {
           </Card>
         </TabsContent>
 
-        {/* Tab 3: Borang Antibiotik */}
+        {/* Tab 3: Antibiotic Forms */}
         <TabsContent value="antibiotik" className="mt-4">
           <Tabs defaultValue="pending-ack">
             <TabsList>
-              <TabsTrigger value="pending-ack">Perlu Pengesahan ({abPendingAck.length})</TabsTrigger>
-              <TabsTrigger value="acked-today">Telah Disahkan Hari Ini ({abAckedToday.length})</TabsTrigger>
+              <TabsTrigger value="pending-ack">Needs Confirmation ({abPendingAck.length})</TabsTrigger>
+              <TabsTrigger value="acked-today">Confirmed Today ({abAckedToday.length})</TabsTrigger>
             </TabsList>
 
             <TabsContent value="pending-ack" className="space-y-4 mt-4">
               {abPendingAck.length === 0 ? (
-                <Card><CardContent className="py-12 text-center text-muted-foreground">Tiada borang antibiotik menunggu pengesahan</CardContent></Card>
+                <Card><CardContent className="py-12 text-center text-muted-foreground">No antibiotic forms awaiting confirmation</CardContent></Card>
               ) : abPendingAck.map((f: any) => (
                 <Card key={f.id} className="overflow-hidden" style={{ borderLeft: "4px solid #0891B2" }}>
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <CardTitle className="text-base">{f.patient_name}</CardTitle>
-                        <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true, locale: ms })}</span>
+                        <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true })}</span>
                       </div>
-                      <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px] inline-flex items-center gap-1"><Check className="h-3 w-3" /> Diluluskan Pakar</Badge>
+                      <Badge className="bg-green-100 text-green-700 border-green-300 text-[10px] inline-flex items-center gap-1"><Check className="h-3 w-3" /> Specialist Approved</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -314,12 +313,12 @@ export default function PharmacistFulfilment() {
                       <div><span className="text-muted-foreground text-xs">IC</span><p>{formatIC(f.patient_ic)}</p></div>
                       <div><span className="text-muted-foreground text-xs">Diagnosis</span><p className="truncate max-w-[150px]">{f.diagnosis}</p></div>
                       <div><span className="text-muted-foreground text-xs">Unit</span><Badge variant="outline" className="text-[10px]">{f.prescription_unit || "—"}</Badge></div>
-                      <div><span className="text-muted-foreground text-xs">Antibiotik</span><p className="truncate max-w-[150px]">{f.antibiotic_regimen || "—"}</p></div>
+                      <div><span className="text-muted-foreground text-xs">Antibiotic</span><p className="truncate max-w-[150px]">{f.antibiotic_regimen || "—"}</p></div>
                     </div>
                     {f.fms_code && <p className="text-xs text-muted-foreground mb-2">FMS Code: {f.fms_code}</p>}
                     <div className="flex items-center justify-between">
-                      <Button variant="outline" size="sm" onClick={() => setAbViewTarget(f)}>Semak Borang</Button>
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => setAbAckTarget(f)}>Akui Terima</Button>
+                      <Button variant="outline" size="sm" onClick={() => setAbViewTarget(f)}>Review Form</Button>
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => setAbAckTarget(f)}>Acknowledge</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -332,15 +331,15 @@ export default function PharmacistFulfilment() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Masa</TableHead><TableHead>Pesakit</TableHead><TableHead>IC</TableHead><TableHead>Diagnosis</TableHead><TableHead>Antibiotik</TableHead>
+                        <TableHead>Time</TableHead><TableHead>Patient</TableHead><TableHead>IC</TableHead><TableHead>Diagnosis</TableHead><TableHead>Antibiotic</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {abAckedToday.length === 0 ? (
-                        <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">Tiada borang disahkan hari ini</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={5} className="text-center py-8 text-muted-foreground">No forms confirmed today</TableCell></TableRow>
                       ) : abAckedToday.map((f: any) => (
                         <TableRow key={f.id}>
-                          <TableCell className="text-xs">{f.acknowledged_at ? formatDistanceToNow(new Date(f.acknowledged_at), { addSuffix: true, locale: ms }) : "—"}</TableCell>
+                          <TableCell className="text-xs">{f.acknowledged_at ? formatDistanceToNow(new Date(f.acknowledged_at), { addSuffix: true }) : "—"}</TableCell>
                           <TableCell>{f.patient_name}</TableCell>
                           <TableCell className="text-xs">{formatIC(f.patient_ic)}</TableCell>
                           <TableCell className="text-xs truncate max-w-[150px]">{f.diagnosis}</TableCell>
@@ -359,16 +358,16 @@ export default function PharmacistFulfilment() {
       {/* Fulfill Dialog */}
       <Dialog open={!!fulfillTarget} onOpenChange={(o) => !o && setFulfillTarget(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Sahkan Pengeluaran</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Confirm Dispensing</DialogTitle></DialogHeader>
           {fulfillTarget && (
             <p className="text-sm">
-              Sahkan pengeluaran <strong>{fulfillTarget.quantity} {(fulfillTarget.drugs as any)?.unit_pengukuran}</strong>{" "}
-              <strong>{(fulfillTarget.drugs as any)?.drug_name}</strong> untuk <strong>{fulfillTarget.patient_name}</strong>?
+              Confirm dispensing <strong>{fulfillTarget.quantity} {(fulfillTarget.drugs as any)?.unit_pengukuran}</strong>{" "}
+              <strong>{(fulfillTarget.drugs as any)?.drug_name}</strong> for <strong>{fulfillTarget.patient_name}</strong>?
             </p>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setFulfillTarget(null)}>Batal</Button>
-            <Button onClick={() => fulfillMutation.mutate()} disabled={fulfillMutation.isPending}>{fulfillMutation.isPending ? "Memproses..." : "Sahkan & Selesai"}</Button>
+            <Button variant="outline" onClick={() => setFulfillTarget(null)}>Cancel</Button>
+            <Button onClick={() => fulfillMutation.mutate()} disabled={fulfillMutation.isPending}>{fulfillMutation.isPending ? "Processing..." : "Confirm & Complete"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -376,14 +375,14 @@ export default function PharmacistFulfilment() {
       {/* Reject Dialog */}
       <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && setRejectTarget(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Tolak Permintaan</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Reject Request</DialogTitle></DialogHeader>
           <div className="space-y-2">
-            <Label>Sebab Penolakan *</Label>
-            <Textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Min 10 aksara" />
+            <Label>Rejection Reason *</Label>
+            <Textarea value={rejectReason} onChange={e => setRejectReason(e.target.value)} placeholder="Min 10 characters" />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectTarget(null)}>Batal</Button>
-            <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={rejectMutation.isPending || rejectReason.length < 10}>Sahkan Penolakan</Button>
+            <Button variant="outline" onClick={() => setRejectTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={rejectMutation.isPending || rejectReason.length < 10}>Confirm Rejection</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -391,10 +390,10 @@ export default function PharmacistFulfilment() {
       {/* Antibiotic View Dialog */}
       <Dialog open={!!abViewTarget} onOpenChange={(o) => !o && setAbViewTarget(null)}>
         <DialogContent className="max-w-3xl">
-          <DialogHeader><DialogTitle>Borang Antibiotik — {abViewTarget?.patient_name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Antibiotic Form — {abViewTarget?.patient_name}</DialogTitle></DialogHeader>
           {abViewTarget && <AntibioticFormReadOnly form={abViewTarget} />}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAbViewTarget(null)}>Tutup</Button>
+            <Button variant="outline" onClick={() => setAbViewTarget(null)}>Close</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -402,13 +401,13 @@ export default function PharmacistFulfilment() {
       {/* Antibiotic Acknowledge Dialog */}
       <Dialog open={!!abAckTarget} onOpenChange={(o) => !o && setAbAckTarget(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Akui Terima Borang Antibiotik</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Acknowledge Antibiotic Form</DialogTitle></DialogHeader>
           {abAckTarget && (
-            <p className="text-sm">Sahkan penerimaan borang antibiotik untuk <strong>{abAckTarget.patient_name}</strong>?</p>
+            <p className="text-sm">Confirm receipt of antibiotic form for <strong>{abAckTarget.patient_name}</strong>?</p>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAbAckTarget(null)}>Batal</Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => abAckMutation.mutate()} disabled={abAckMutation.isPending}>Sahkan</Button>
+            <Button variant="outline" onClick={() => setAbAckTarget(null)}>Cancel</Button>
+            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => abAckMutation.mutate()} disabled={abAckMutation.isPending}>Confirm</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { format } from "date-fns";
-import { ms } from "date-fns/locale";
 import {
   FileDown, FileSpreadsheet, Search, CalendarIcon, ChevronDown,
 } from "lucide-react";
@@ -57,7 +56,7 @@ function DatePickerField({ label, date, onSelect }: { label: string; date?: Date
         <PopoverTrigger asChild>
           <Button variant="outline" className={cn("w-full justify-start text-left font-normal text-sm h-9", !date && "text-muted-foreground")}>
             <CalendarIcon className="mr-2 h-3.5 w-3.5" />
-            {date ? format(date, "dd/MM/yyyy") : "Pilih tarikh"}
+            {date ? format(date, "dd/MM/yyyy") : "Select date"}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
@@ -69,7 +68,7 @@ function DatePickerField({ label, date, onSelect }: { label: string; date?: Date
 }
 
 function comingSoon() {
-  toast({ title: "Akan datang", description: "Ciri ini sedang dalam pembangunan." });
+  toast({ title: "Coming soon", description: "This feature is under development." });
 }
 
 export default function Laporan() {
@@ -106,8 +105,8 @@ export default function Laporan() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold text-foreground">Laporan</h1>
-        <p className="text-sm text-muted-foreground">Jana laporan dan eksport data</p>
+        <h1 className="text-2xl font-semibold text-foreground">Reports</h1>
+        <p className="text-sm text-muted-foreground">Generate reports and export data</p>
       </div>
 
       {/* 4 Report Cards — 2x2 */}
@@ -116,23 +115,23 @@ export default function Laporan() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base">Kad Stok Digital (KEW.PS-3)</CardTitle>
-            <CardDescription>Jana PDF kad stok dalam format KEW.PS-3 untuk kegunaan audit</CardDescription>
+            <CardDescription>Generate stock card PDF in KEW.PS-3 format for audit purposes</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label className="text-xs">Ubat</Label>
+              <Label className="text-xs">Drug</Label>
               <Popover open={drugOpen} onOpenChange={setDrugOpen}>
                 <PopoverTrigger asChild>
                   <Button variant="outline" role="combobox" className="w-full justify-between text-sm h-9 font-normal">
-                    {selectedDrugName || "Pilih ubat..."}
+                    {selectedDrugName || "Select drug..."}
                     <ChevronDown className="ml-2 h-3.5 w-3.5 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0 pointer-events-auto" align="start">
                   <Command>
-                    <CommandInput placeholder="Cari ubat..." />
+                    <CommandInput placeholder="Search drugs..." />
                     <CommandList>
-                      <CommandEmpty>Tiada ubat dijumpai.</CommandEmpty>
+                      <CommandEmpty>No drugs found.</CommandEmpty>
                       <CommandGroup>
                         {drugs.map((d) => (
                           <CommandItem key={d.id} value={d.drug_name} onSelect={() => { setSelectedDrug(d.id); setDrugOpen(false); }}>
@@ -146,27 +145,27 @@ export default function Laporan() {
               </Popover>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <DatePickerField label="Dari Tarikh" date={pdfFrom} onSelect={setPdfFrom} />
-              <DatePickerField label="Hingga Tarikh" date={pdfTo} onSelect={setPdfTo} />
+              <DatePickerField label="From Date" date={pdfFrom} onSelect={setPdfFrom} />
+              <DatePickerField label="To Date" date={pdfTo} onSelect={setPdfTo} />
             </div>
             <Button className="w-full" onClick={comingSoon}>
               <FileDown className="mr-2 h-4 w-4" />
-              Jana PDF
+              Generate PDF
             </Button>
-            <p className="text-xs text-muted-foreground">PDF akan mengandungi Bahagian A dan Bahagian B dalam format KEW.PS-3</p>
+            <p className="text-xs text-muted-foreground">PDF will contain Part A and Part B in KEW.PS-3 format</p>
           </CardContent>
         </Card>
 
         {/* CARD 2 — Quarterly Summary */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Ringkasan Suku Tahun</CardTitle>
-            <CardDescription>Agregat terimaan dan keluaran stok mengikut suku tahun</CardDescription>
+            <CardTitle className="text-base">Quarterly Summary</CardTitle>
+            <CardDescription>Aggregate stock receipts and dispensing by quarter</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-xs">Tahun</Label>
+                <Label className="text-xs">Year</Label>
                 <Select value={year} onValueChange={setYear}>
                   <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
@@ -177,21 +176,21 @@ export default function Laporan() {
                 </Select>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-xs">Suku</Label>
+                <Label className="text-xs">Quarter</Label>
                 <Select value={quarter} onValueChange={setQuarter}>
                   <SelectTrigger className="h-9 text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Semua Suku</SelectItem>
-                    <SelectItem value="Q1">Q1 Jan–Mac</SelectItem>
+                    <SelectItem value="all">All Quarters</SelectItem>
+                    <SelectItem value="Q1">Q1 Jan–Mar</SelectItem>
                     <SelectItem value="Q2">Q2 Apr–Jun</SelectItem>
                     <SelectItem value="Q3">Q3 Jul–Sep</SelectItem>
-                    <SelectItem value="Q4">Q4 Okt–Dis</SelectItem>
+                    <SelectItem value="Q4">Q4 Oct–Dec</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <div className="flex gap-2">
-              <Button className="flex-1" onClick={comingSoon}>Jana Laporan</Button>
+              <Button className="flex-1" onClick={comingSoon}>Generate Report</Button>
               <Button variant="secondary" onClick={comingSoon}>
                 <FileSpreadsheet className="mr-1 h-4 w-4" />
                 Export Excel
@@ -200,10 +199,10 @@ export default function Laporan() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="text-xs">Ubat</TableHead>
-                  <TableHead className="text-xs text-right">Terima</TableHead>
-                  <TableHead className="text-xs text-right">Keluar</TableHead>
-                  <TableHead className="text-xs text-right">Baki</TableHead>
+                  <TableHead className="text-xs">Drug</TableHead>
+                  <TableHead className="text-xs text-right">Received</TableHead>
+                  <TableHead className="text-xs text-right">Dispensed</TableHead>
+                  <TableHead className="text-xs text-right">Balance</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -223,29 +222,29 @@ export default function Laporan() {
         {/* CARD 3 — Drug Movement Summary */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Ringkasan Pergerakan Ubat</CardTitle>
-            <CardDescription>Jumlah keluaran stok mengikut tempoh yang dipilih</CardDescription>
+            <CardTitle className="text-base">Drug Movement Summary</CardTitle>
+            <CardDescription>Total stock dispensing by selected period</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <DatePickerField label="Dari Tarikh" date={movFrom} onSelect={setMovFrom} />
-              <DatePickerField label="Hingga Tarikh" date={movTo} onSelect={setMovTo} />
+              <DatePickerField label="From Date" date={movFrom} onSelect={setMovFrom} />
+              <DatePickerField label="To Date" date={movTo} onSelect={setMovTo} />
             </div>
             <Button className="w-full" onClick={() => setShowMovement(true)}>
               <Search className="mr-2 h-4 w-4" />
-              Cari
+              Search
             </Button>
             {showMovement && (
               <div className="overflow-auto max-h-[300px]">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="text-xs">Ubat</TableHead>
+                      <TableHead className="text-xs">Drug</TableHead>
                       <TableHead className="text-xs text-right">Qty</TableHead>
                       <TableHead className="text-xs text-right">RM</TableHead>
-                      <TableHead className="text-xs text-right">Bil.</TableHead>
+                      <TableHead className="text-xs text-right">Count</TableHead>
                       <TableHead className="text-xs text-right">Avg</TableHead>
-                      <TableHead className="text-xs">Terakhir</TableHead>
+                      <TableHead className="text-xs">Last Date</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -269,13 +268,13 @@ export default function Laporan() {
         {/* CARD 4 — Laporan Pengeluaran Harian */}
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-base">Laporan Pengeluaran Harian</CardTitle>
-            <CardDescription>Log pengeluaran ubat harian merentas semua ubat</CardDescription>
+            <CardTitle className="text-base">Daily Dispensing Report</CardTitle>
+            <CardDescription>Daily drug dispensing log across all drugs</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-end gap-3">
               <div className="flex-1">
-                <DatePickerField label="Tarikh" date={dailyDate} onSelect={(d) => d && setDailyDate(d)} />
+                <DatePickerField label="Date" date={dailyDate} onSelect={(d) => d && setDailyDate(d)} />
               </div>
               <Button variant="secondary" onClick={comingSoon}>
                 <FileSpreadsheet className="mr-1 h-4 w-4" />
@@ -286,12 +285,12 @@ export default function Laporan() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="text-xs">Ubat</TableHead>
-                    <TableHead className="text-xs">Pesakit</TableHead>
+                    <TableHead className="text-xs">Drug</TableHead>
+                    <TableHead className="text-xs">Patient</TableHead>
                     <TableHead className="text-xs">IC</TableHead>
                     <TableHead className="text-xs text-right">Qty</TableHead>
-                    <TableHead className="text-xs">Pegawai</TableHead>
-                    <TableHead className="text-xs">Masa</TableHead>
+                    <TableHead className="text-xs">Officer</TableHead>
+                    <TableHead className="text-xs">Time</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
