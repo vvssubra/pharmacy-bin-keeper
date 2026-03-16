@@ -61,7 +61,7 @@ export default function AntibioticForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<{ patient_name: string; patient_ic: string; diagnosis: string } | null>(null);
 
-  // Bahagian 1
+  // Section 1
   const [tarikh, setTarikh] = useState(format(new Date(), "yyyy-MM-dd"));
   const [patientName, setPatientName] = useState("");
   const [patientIC, setPatientIC] = useState("");
@@ -77,7 +77,7 @@ export default function AntibioticForm() {
   const [healthEdTca, setHealthEdTca] = useState(false);
   const [prescriberNotes, setPrescriberNotes] = useState("");
 
-  // Bahagian 2
+  // Section 2
   const [checklist, setChecklist] = useState<ChecklistState>(defaultChecklist);
 
   const age = getAgeFromIC(patientIC);
@@ -90,7 +90,7 @@ export default function AntibioticForm() {
 
   const handleSubmit = async () => {
     if (!patientName || !patientIC || !diagnosis) {
-      toast.error("Sila lengkapkan Nama, IC dan Diagnosis");
+      toast.error("Please complete Name, IC and Diagnosis");
       return;
     }
     setSubmitting(true);
@@ -117,7 +117,7 @@ export default function AntibioticForm() {
       if (error) throw error;
       setSubmitted({ patient_name: patientName, patient_ic: patientIC, diagnosis });
     } catch {
-      toast.error("Gagal menghantar borang");
+      toast.error("Failed to submit form");
     } finally {
       setSubmitting(false);
     }
@@ -131,21 +131,21 @@ export default function AntibioticForm() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="text-xl font-bold text-foreground">Borang Antibiotik Dihantar!</h2>
+            <h2 className="text-xl font-bold text-foreground">Antibiotic Form Submitted!</h2>
             <div className="rounded-lg border p-4 text-left space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Pesakit</span><span className="font-medium">{submitted.patient_name}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Patient</span><span className="font-medium">{submitted.patient_name}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">IC</span><span className="font-medium">{submitted.patient_ic}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Diagnosis</span><span className="font-medium">{submitted.diagnosis}</span></div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Status</span>
-                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Menunggu Kelulusan Pakar</Badge>
+                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Awaiting Specialist Approval</Badge>
               </div>
             </div>
             <div className="flex flex-col gap-2">
               <Button onClick={() => { setSubmitted(null); setPatientName(""); setPatientIC(""); setDiagnosis(""); setChecklist(defaultChecklist); setAntibioticRegimen(""); setPrescriberNotes(""); }}>
-                Hantar Borang Baharu
+                Submit New Form
               </Button>
-              <Button variant="link" onClick={() => navigate("/request")}>Kembali ke Pilihan Permohonan</Button>
+              <Button variant="link" onClick={() => navigate("/request")}>Back to Request Options</Button>
             </div>
           </CardContent>
         </Card>
@@ -156,7 +156,7 @@ export default function AntibioticForm() {
   return (
     <div className="max-w-5xl mx-auto space-y-6 pb-12">
       <Button variant="ghost" size="sm" onClick={() => navigate("/request")} className="gap-1">
-        <ArrowLeft className="h-4 w-4" /> Kembali
+        <ArrowLeft className="h-4 w-4" /> Back to Request Options
       </Button>
 
       {/* Header */}
@@ -167,30 +167,30 @@ export default function AntibioticForm() {
         </CardHeader>
       </Card>
 
-      {/* BAHAGIAN 1 */}
+      {/* SECTION 1 */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">BAHAGIAN 1: Butiran Pesakit</CardTitle>
+          <CardTitle className="text-base">SECTION 1: Patient Details</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-4">
-              <p className="text-sm font-medium text-muted-foreground">Sila lengkapkan butiran pesakit</p>
+              <p className="text-sm font-medium text-muted-foreground">Please complete patient details</p>
               <div className="space-y-2">
                 <Label>1. Tarikh</Label>
                 <Input type="date" value={tarikh} onChange={e => setTarikh(e.target.value)} />
               </div>
               <div className="space-y-2">
-                <Label>2. Nama Pesakit *</Label>
-                <Input value={patientName} onChange={e => setPatientName(e.target.value.toUpperCase())} placeholder="Nama penuh" />
+                <Label>2. Patient Name *</Label>
+                <Input value={patientName} onChange={e => setPatientName(e.target.value.toUpperCase())} placeholder="Full name" />
               </div>
               <div className="space-y-2">
-                <Label>3. No. IC Pesakit *</Label>
+                <Label>3. Patient IC No. *</Label>
                 <Input value={patientIC} onChange={e => setPatientIC(formatIC(e.target.value))} placeholder="000000-00-0000" inputMode="numeric" />
               </div>
               {showWeight && (
                 <div className="space-y-2">
-                  <Label>4. Berat Badan (kg) <span className="text-xs text-muted-foreground">(Wajib jika pesakit &lt; 12 tahun)</span></Label>
+                  <Label>4. Body Weight (kg) <span className="text-xs text-muted-foreground">(Required if patient &lt; 12 years old)</span></Label>
                   <Input type="number" value={patientWeight} onChange={e => setPatientWeight(e.target.value)} placeholder="kg" />
                 </div>
               )}
@@ -255,12 +255,12 @@ export default function AntibioticForm() {
 
           <Separator />
           <p className="text-sm text-muted-foreground text-center">
-            Sila lengkapkan semakan klinikal berdasarkan dapatan & diagnosis. Tanda (✓) jika YA.
+            Please complete clinical review based on findings & diagnosis. Tick (✓) if YES.
           </p>
         </CardContent>
       </Card>
 
-      {/* BAHAGIAN 2 */}
+      {/* SECTION 2 */}
       <div className="grid gap-4 lg:grid-cols-2">
         {/* LEFT COLUMN */}
         <div className="space-y-4">
@@ -426,18 +426,18 @@ export default function AntibioticForm() {
       <Card>
         <CardContent className="pt-6 space-y-2">
           <Label>Prescriber's Notes (if any)</Label>
-          <Textarea value={prescriberNotes} onChange={e => setPrescriberNotes(e.target.value)} placeholder="Nota tambahan" />
+          <Textarea value={prescriberNotes} onChange={e => setPrescriberNotes(e.target.value)} placeholder="Additional notes" />
         </CardContent>
       </Card>
 
       {/* SUBMIT */}
       <div className="space-y-3">
         <p className="text-xs text-muted-foreground text-center">
-          Sila lampirkan borang ini bersama preskripsi atau dokumen pesakit untuk rujukan farmasi.
+          Please attach this form together with the prescription or patient documents for pharmacy reference.
         </p>
         <Button className="w-full gap-2" style={{ backgroundColor: "#1A3C6E" }} onClick={handleSubmit} disabled={submitting}>
           <ShieldCheck className="h-4 w-4" />
-          {submitting ? "Menghantar..." : "Hantar untuk Kelulusan Pakar"}
+          {submitting ? "Submitting..." : "Submit for Specialist Approval"}
         </Button>
       </div>
     </div>

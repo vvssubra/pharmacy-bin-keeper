@@ -28,9 +28,9 @@ type UserWithRole = {
 };
 
 const ROLE_LABELS: Record<string, string> = {
-  pharmacist: "Jurufarmasit",
-  doctor: "Doktor",
-  specialist: "Pakar",
+  pharmacist: "Pharmacist",
+  doctor: "Doctor",
+  specialist: "Specialist",
 };
 
 export default function RoleManagement() {
@@ -56,9 +56,9 @@ export default function RoleManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-users-with-roles"] });
-      toast.success("Peranan berjaya dikemas kini.");
+      toast.success("Role updated successfully.");
     },
-    onError: () => toast.error("Gagal mengemas kini peranan."),
+    onError: () => toast.error("Failed to update role."),
   });
 
   const removeRole = useMutation({
@@ -71,9 +71,9 @@ export default function RoleManagement() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-users-with-roles"] });
-      toast.success("Peranan berjaya dibuang.");
+      toast.success("Role removed successfully.");
     },
-    onError: () => toast.error("Gagal membuang peranan."),
+    onError: () => toast.error("Failed to remove role."),
   });
 
   const isSelf = (userId: string) => userId === currentUser?.id;
@@ -87,37 +87,37 @@ export default function RoleManagement() {
       <div>
         <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
           <UserCog className="h-6 w-6" />
-          Pengurusan Peranan
+          Role Management
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Tetapkan peranan kepada pengguna berdaftar.
+          Assign roles to registered users.
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Doctors group */}
         <RoleGroup
-          title="Doktor"
+          title="Doctor"
           icon={<Stethoscope className="h-4 w-4" />}
           users={doctors}
           isLoading={isLoading}
-          emptyMessage="Tiada doktor ditetapkan."
+          emptyMessage="No doctors assigned."
           onRemove={(userId) => removeRole.mutate(userId)}
           onChangeTo={(userId) => assignRole.mutate({ userId, role: "specialist" })}
-          changeToLabel="Jadikan Pakar"
+          changeToLabel="Make Specialist"
           isSelf={isSelf}
         />
 
         {/* Specialists group */}
         <RoleGroup
-          title="Pakar"
+          title="Specialist"
           icon={<ShieldCheck className="h-4 w-4" />}
           users={specialists}
           isLoading={isLoading}
-          emptyMessage="Tiada pakar ditetapkan."
+          emptyMessage="No specialists assigned."
           onRemove={(userId) => removeRole.mutate(userId)}
           onChangeTo={(userId) => assignRole.mutate({ userId, role: "doctor" })}
-          changeToLabel="Jadikan Doktor"
+          changeToLabel="Make Doctor"
           isSelf={isSelf}
         />
       </div>
@@ -127,7 +127,7 @@ export default function RoleManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <Users className="h-4 w-4 text-muted-foreground" />
-            Pengguna Belum Ditetapkan
+            Unassigned Users
             {unassigned.length > 0 && (
               <Badge variant="secondary" className="ml-1">{unassigned.length}</Badge>
             )}
@@ -139,7 +139,7 @@ export default function RoleManagement() {
               {[1, 2, 3].map((i) => <Skeleton key={i} className="h-12 w-full rounded-md" />)}
             </div>
           ) : unassigned.length === 0 ? (
-            <p className="text-sm text-muted-foreground">Semua pengguna telah ditetapkan peranan.</p>
+            <p className="text-sm text-muted-foreground">All users have been assigned a role.</p>
           ) : (
             <div className="divide-y">
               {unassigned.map((u) => (
@@ -156,7 +156,7 @@ export default function RoleManagement() {
                       disabled={assignRole.isPending}
                     >
                       <UserPlus className="h-3.5 w-3.5 mr-1" />
-                      Doktor
+                      Doctor
                     </Button>
                     <Button
                       size="sm"
@@ -165,7 +165,7 @@ export default function RoleManagement() {
                       disabled={assignRole.isPending}
                     >
                       <UserPlus className="h-3.5 w-3.5 mr-1" />
-                      Pakar
+                      Specialist
                     </Button>
                   </div>
                 </div>
@@ -238,18 +238,18 @@ function RoleGroup({
                       </AlertDialogTrigger>
                       <AlertDialogContent>
                         <AlertDialogHeader>
-                          <AlertDialogTitle>Buang peranan?</AlertDialogTitle>
+                          <AlertDialogTitle>Remove role?</AlertDialogTitle>
                           <AlertDialogDescription>
-                            <strong>{u.full_name || u.email}</strong> akan menjadi pengguna tanpa peranan dan tidak dapat mengakses sistem.
+                            <strong>{u.full_name || u.email}</strong> will become a user without a role and will not be able to access the system.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
-                          <AlertDialogCancel>Batal</AlertDialogCancel>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => onRemove(u.user_id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                           >
-                            Buang
+                            Remove
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>

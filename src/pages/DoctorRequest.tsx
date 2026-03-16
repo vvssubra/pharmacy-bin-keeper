@@ -25,11 +25,11 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const formSchema = z.object({
-  patient_name: z.string().min(1, "Nama pesakit diperlukan"),
-  no_ic: z.string().min(14, "No. IC tidak lengkap"),
-  drug_id: z.string().min(1, "Sila pilih ubat"),
-  quantity: z.coerce.number().int().min(1, "Kuantiti mestilah sekurang-kurangnya 1"),
-  prescriber_name: z.string().min(1, "Nama doktor diperlukan"),
+  patient_name: z.string().min(1, "Patient name is required"),
+  no_ic: z.string().min(14, "IC number is incomplete"),
+  drug_id: z.string().min(1, "Please select a drug"),
+  quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
+  prescriber_name: z.string().min(1, "Doctor name is required"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -123,7 +123,7 @@ export default function DoctorRequest() {
       setSubmitted({ ...values, ...result });
       queryClient.invalidateQueries({ queryKey: ["drug-stock"] });
     },
-    onError: () => toast.error("Gagal menghantar permintaan"),
+    onError: () => toast.error("Failed to submit request"),
   });
 
   const onSubmit = (values: FormValues) => submitMutation.mutate(values);
@@ -138,27 +138,27 @@ export default function DoctorRequest() {
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
             </div>
-            <h2 className="text-xl font-bold text-foreground">Permintaan Berjaya Dihantar!</h2>
+            <h2 className="text-xl font-bold text-foreground">Request Submitted Successfully!</h2>
             <div className="rounded-lg border p-4 text-left space-y-2 text-sm">
-              <div className="flex justify-between"><span className="text-muted-foreground">Pesakit</span><span className="font-medium">{submitted.patient_name}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Patient</span><span className="font-medium">{submitted.patient_name}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">IC</span><span className="font-medium">{submitted.no_ic}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Ubat</span><span className="font-medium">{submitted.drug_name}</span></div>
-              <div className="flex justify-between"><span className="text-muted-foreground">Kuantiti</span><span className="font-medium">{submitted.quantity}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Drug</span><span className="font-medium">{submitted.drug_name}</span></div>
+              <div className="flex justify-between"><span className="text-muted-foreground">Quantity</span><span className="font-medium">{submitted.quantity}</span></div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Status</span>
                 {submitted.is_specialist ? (
-                  <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Menunggu kelulusan pakar</Badge>
+                  <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Awaiting specialist approval</Badge>
                 ) : (
-                  <Badge className="bg-blue-100 text-blue-700 border-blue-300">Menunggu pengesahan farmasis</Badge>
+                  <Badge className="bg-blue-100 text-blue-700 border-blue-300">Awaiting pharmacist confirmation</Badge>
                 )}
               </div>
             </div>
             <div className="flex flex-col gap-2">
               <Button onClick={() => { setSubmitted(null); form.reset({ patient_name: "", no_ic: "", drug_id: "", quantity: 0, prescriber_name: profile?.full_name || "" }); }}>
-                Hantar Permintaan Baharu
+                Submit New Request
               </Button>
               <Button variant="link" onClick={() => { setSubmitted(null); form.reset({ ...form.getValues(), drug_id: "", quantity: 0 }); }}>
-                Tukar Ubat Sahaja
+                Change Drug Only
               </Button>
             </div>
           </CardContent>
@@ -171,18 +171,18 @@ export default function DoctorRequest() {
     <div className="flex min-h-[80vh] items-center justify-center px-4">
       <Card className="w-full max-w-[600px]">
         <CardHeader>
-          <CardTitle>Permintaan Pengeluaran Ubat</CardTitle>
-          <CardDescription>Isi maklumat pesakit dan ubat yang diperlukan</CardDescription>
+          <CardTitle>Drug Dispensing Request</CardTitle>
+          <CardDescription>Enter patient and drug details</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <FormField control={form.control} name="patient_name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Pesakit *</FormLabel>
+                  <FormLabel>Patient Name *</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Nama penuh pesakit"
+                      placeholder="Patient full name"
                       {...field}
                       onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                     />
@@ -193,7 +193,7 @@ export default function DoctorRequest() {
 
               <FormField control={form.control} name="no_ic" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>No. IC Pesakit *</FormLabel>
+                  <FormLabel>Patient IC No. *</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="000000-00-0000"
@@ -208,28 +208,28 @@ export default function DoctorRequest() {
 
               <FormField control={form.control} name="drug_id" render={({ field }) => (
                 <FormItem className="flex flex-col">
-                  <FormLabel>Ubat *</FormLabel>
+                  <FormLabel>Drug *</FormLabel>
                   <Popover open={drugPopoverOpen} onOpenChange={setDrugPopoverOpen}>
                     <PopoverTrigger asChild>
                       <FormControl>
                         <Button variant="outline" role="combobox" className={cn("w-full justify-between", !field.value && "text-muted-foreground")}>
-                          {field.value ? drugs.find(d => d.id === field.value)?.drug_name ?? "Pilih ubat..." : "Pilih ubat..."}
+                          {field.value ? drugs.find(d => d.id === field.value)?.drug_name ?? "Select drug..." : "Select drug..."}
                           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                         </Button>
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
                       <Command>
-                        <CommandInput placeholder="Cari ubat..." />
+                        <CommandInput placeholder="Search drugs..." />
                         <CommandList>
-                          <CommandEmpty>Tiada ubat dijumpai.</CommandEmpty>
+                          <CommandEmpty>No drugs found.</CommandEmpty>
                           <CommandGroup>
                             {drugs.map(d => (
                               <CommandItem key={d.id} value={d.drug_name} onSelect={() => { field.onChange(d.id); setDrugPopoverOpen(false); }}>
                                 <Check className={cn("mr-2 h-4 w-4", field.value === d.id ? "opacity-100" : "opacity-0")} />
                                 {d.drug_name}
                                 {d.perlu_kelulusan_pakar && (
-                                  <Badge className="ml-2 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Perlu Kelulusan Pakar</Badge>
+                                  <Badge className="ml-2 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Requires Specialist Approval</Badge>
                                 )}
                               </CommandItem>
                             ))}
@@ -246,26 +246,26 @@ export default function DoctorRequest() {
                 <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
                   <Info className="h-4 w-4 text-blue-600" />
                   <AlertDescription className="text-blue-700 dark:text-blue-400">
-                    Ubat ini memerlukan kelulusan pakar sebelum diproses oleh farmasis.
+                    This drug requires specialist approval before pharmacist processing.
                   </AlertDescription>
                 </Alert>
               )}
 
               <FormField control={form.control} name="quantity" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kuantiti *</FormLabel>
+                  <FormLabel>Quantity *</FormLabel>
                   <FormControl>
                     <Input type="number" min={1} {...field} />
                   </FormControl>
                   {selectedDrug && (
                     <p className="text-xs text-muted-foreground">
-                      Unit: {selectedDrug.unit_pengukuran} · Stok semasa: {currentStock ?? "—"} {selectedDrug.unit_pengukuran}
+                      Unit: {selectedDrug.unit_pengukuran} · Current stock: {currentStock ?? "—"} {selectedDrug.unit_pengukuran}
                     </p>
                   )}
                   {stockExceeded && (
                     <p className="text-xs text-destructive flex items-center gap-1">
                       <AlertCircle className="h-3 w-3" />
-                      Kuantiti melebihi stok semasa ({currentStock} {selectedDrug?.unit_pengukuran})
+                      Quantity exceeds current stock ({currentStock} {selectedDrug?.unit_pengukuran})
                     </p>
                   )}
                   <FormMessage />
@@ -274,14 +274,14 @@ export default function DoctorRequest() {
 
               <FormField control={form.control} name="prescriber_name" render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Doktor / Preskriber *</FormLabel>
+                  <FormLabel>Doctor / Prescriber Name *</FormLabel>
                   <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )} />
 
-              <Button type="submit" className="w-full" style={{ backgroundColor: "#1A3C6E" }} disabled={submitMutation.isPending || stockExceeded}>
-                {submitMutation.isPending ? "Menghantar..." : "Hantar Permintaan"}
+              <Button type="submit" className="w-full" style={{ backgroundColor: "#1A3C6E" }} disabled={submitMutation.isPending || stockExceeded} onClick={() => form.handleSubmit(onSubmit)()}>
+                {submitMutation.isPending ? "Submitting..." : "Submit Request"}
               </Button>
             </form>
           </Form>
