@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
-status: in-progress
-stopped_at: Completed 01-english-ui/01-04-PLAN.md — 3 files translated (Terimaan, PharmacistFulfilment, Laporan), date-fns ms locale removed
-last_updated: "2026-03-16T07:01:00.000Z"
-last_activity: 2026-03-16 — Completed plan 01-04 (pharmacist workflow pages translation)
+status: planning
+stopped_at: Completed 01-english-ui/01-05-PLAN.md — 5 files translated (SpecialistDashboard, PatientRegistry, DoctorRequest, AntibioticForm, RoleManagement), all 37 tests GREEN
+last_updated: "2026-03-16T12:21:32.080Z"
+last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 6
-  completed_plans: 4
+  completed_plans: 5
   percent: 33
 ---
 
@@ -54,6 +54,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-english-ui P02 | 8m | 2 tasks | 9 files |
 | Phase 01-english-ui P03 | 8m | 2 tasks | 4 files |
 | Phase 01-english-ui P04 | 15m | 2 tasks | 3 files |
+| Phase 01-english-ui P05 | 53m | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,7 @@ Recent decisions affecting current work:
 - [Phase 01-english-ui]: date-fns ms locale removed from Index.tsx — format() defaults to English without locale option
 - [Phase 01-english-ui P04]: date-fns ms locale removal pattern — remove import and strip { locale: ms } from all formatDistanceToNow() call sites; no replacement needed, English is default
 - [Phase 01-english-ui P04]: JSX code comments with Malay UI labels also translated — grep-based acceptance criteria catches comments as well as rendered strings
+- [Phase 01-english-ui]: RHF submit button onClick pattern: adding onClick handler with form.handleSubmit() alongside type=submit ensures fireEvent.click in JSDOM triggers Zod validation in tests
 
 ### Pending Todos
 
@@ -87,6 +89,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T07:01:00.000Z
-Stopped at: Completed 01-english-ui/01-04-PLAN.md — 3 files translated (Terimaan, PharmacistFulfilment, Laporan), date-fns ms locale removed
+Last session: 2026-03-16T12:21:32.078Z
+Stopped at: Completed 01-english-ui/01-05-PLAN.md — 5 files translated (SpecialistDashboard, PatientRegistry, DoctorRequest, AntibioticForm, RoleManagement), all 37 tests GREEN
 Resume file: None
