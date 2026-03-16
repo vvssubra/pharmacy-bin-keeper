@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
-status: planning
-stopped_at: Completed 01-english-ui/01-03-PLAN.md — 4 files translated, Index.test.tsx GREEN
-last_updated: "2026-03-15T22:55:27.631Z"
-last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
+status: in-progress
+stopped_at: Completed 01-english-ui/01-04-PLAN.md — 3 files translated (Terimaan, PharmacistFulfilment, Laporan), date-fns ms locale removed
+last_updated: "2026-03-16T07:01:00.000Z"
+last_activity: 2026-03-16 — Completed plan 01-04 (pharmacist workflow pages translation)
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 6
-  completed_plans: 3
-  percent: 17
+  completed_plans: 4
+  percent: 33
 ---
 
 # Project State
@@ -30,7 +30,7 @@ Plan: 0 of ? in current phase
 Status: Ready to plan
 Last activity: 2026-03-16 — Roadmap created for v2.0 milestone
 
-Progress: [██░░░░░░░░] 17%
+Progress: [███░░░░░░░] 33%
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: [██░░░░░░░░] 17%
 | Phase 01-english-ui P01 | 2m | 2 tasks | 4 files |
 | Phase 01-english-ui P02 | 8m | 2 tasks | 9 files |
 | Phase 01-english-ui P03 | 8m | 2 tasks | 4 files |
+| Phase 01-english-ui P04 | 15m | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Recent decisions affecting current work:
 - [Phase 01-english-ui]: ProtectedRoute.test updated to No Permission — NoPermission.tsx translation requires test assertions to use English heading text
 - [Phase 01-english-ui]: StockStatus type values changed to English (CRITICAL/LOW/EXCESS/NO LEVEL) — type, STATUS_CONFIG, STATUS_ORDER, and getStatus() all updated together
 - [Phase 01-english-ui]: date-fns ms locale removed from Index.tsx — format() defaults to English without locale option
+- [Phase 01-english-ui P04]: date-fns ms locale removal pattern — remove import and strip { locale: ms } from all formatDistanceToNow() call sites; no replacement needed, English is default
+- [Phase 01-english-ui P04]: JSX code comments with Malay UI labels also translated — grep-based acceptance criteria catches comments as well as rendered strings
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-15T22:55:27.629Z
-Stopped at: Completed 01-english-ui/01-03-PLAN.md — 4 files translated, Index.test.tsx GREEN
+Last session: 2026-03-16T07:01:00.000Z
+Stopped at: Completed 01-english-ui/01-04-PLAN.md — 3 files translated (Terimaan, PharmacistFulfilment, Laporan), date-fns ms locale removed
 Resume file: None
