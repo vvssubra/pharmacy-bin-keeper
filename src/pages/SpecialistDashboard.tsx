@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { formatDistanceToNow, startOfDay } from "date-fns";
-import { ms } from "date-fns/locale";
 import { Clock, CheckCircle, XCircle, ChevronDown } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,7 +44,7 @@ export default function SpecialistDashboard() {
   const [abNotes, setAbNotes] = useState("");
   const [abRejectReason, setAbRejectReason] = useState("");
 
-  // --- Ubat Kawalan queries ---
+  // --- Controlled Drug queries ---
   const { data: requests = [] } = useQuery({
     queryKey: ["specialist-requests"],
     refetchInterval: 30000,
@@ -77,7 +76,7 @@ export default function SpecialistDashboard() {
 
   const todayStart = startOfDay(new Date()).toISOString();
 
-  // Ubat Kawalan computed
+  // Controlled Drug computed
   const pending = useMemo(() => requests.filter(r => r.status === "pending_specialist"), [requests]);
   const processedToday = useMemo(() =>
     requests.filter(r =>
@@ -108,8 +107,8 @@ export default function SpecialistDashboard() {
         .eq("id", approveTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Permintaan diluluskan"); setApproveTarget(null); setNotes(""); queryClient.invalidateQueries({ queryKey: ["specialist-requests"] }); },
-    onError: () => toast.error("Gagal meluluskan permintaan"),
+    onSuccess: () => { toast.success("Request approved"); setApproveTarget(null); setNotes(""); queryClient.invalidateQueries({ queryKey: ["specialist-requests"] }); },
+    onError: () => toast.error("Failed to approve request"),
   });
 
   const rejectMutation = useMutation({
@@ -120,8 +119,8 @@ export default function SpecialistDashboard() {
         .eq("id", rejectTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Permintaan ditolak"); setRejectTarget(null); setRejectReason(""); queryClient.invalidateQueries({ queryKey: ["specialist-requests"] }); },
-    onError: () => toast.error("Gagal menolak permintaan"),
+    onSuccess: () => { toast.success("Request rejected"); setRejectTarget(null); setRejectReason(""); queryClient.invalidateQueries({ queryKey: ["specialist-requests"] }); },
+    onError: () => toast.error("Failed to reject request"),
   });
 
   const abApproveMutation = useMutation({
@@ -132,8 +131,8 @@ export default function SpecialistDashboard() {
         .eq("id", abApproveTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Borang antibiotik diluluskan — farmasis telah dimaklumkan"); setAbApproveTarget(null); setAbNotes(""); queryClient.invalidateQueries({ queryKey: ["specialist-antibiotic-forms"] }); },
-    onError: () => toast.error("Gagal meluluskan borang"),
+    onSuccess: () => { toast.success("Antibiotic form approved — pharmacist has been notified"); setAbApproveTarget(null); setAbNotes(""); queryClient.invalidateQueries({ queryKey: ["specialist-antibiotic-forms"] }); },
+    onError: () => toast.error("Failed to approve form"),
   });
 
   const abRejectMutation = useMutation({
@@ -144,15 +143,15 @@ export default function SpecialistDashboard() {
         .eq("id", abRejectTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Borang antibiotik ditolak"); setAbRejectTarget(null); setAbRejectReason(""); queryClient.invalidateQueries({ queryKey: ["specialist-antibiotic-forms"] }); },
-    onError: () => toast.error("Gagal menolak borang"),
+    onSuccess: () => { toast.success("Antibiotic form rejected"); setAbRejectTarget(null); setAbRejectReason(""); queryClient.invalidateQueries({ queryKey: ["specialist-antibiotic-forms"] }); },
+    onError: () => toast.error("Failed to reject form"),
   });
 
   const stats = [
-    { label: "Menunggu (Ubat)", count: pending.length, icon: Clock, bg: "bg-yellow-100 dark:bg-yellow-900/30", color: "text-yellow-700 dark:text-yellow-400" },
-    { label: "Menunggu (Antibiotik)", count: abPending.length, icon: Clock, bg: "bg-cyan-100 dark:bg-cyan-900/30", color: "text-cyan-700 dark:text-cyan-400" },
-    { label: "Diluluskan Hari Ini", count: approvedToday + abApprovedToday, icon: CheckCircle, bg: "bg-green-100 dark:bg-green-900/30", color: "text-green-700 dark:text-green-400" },
-    { label: "Ditolak Hari Ini", count: rejectedToday + abRejectedToday, icon: XCircle, bg: "bg-red-100 dark:bg-red-900/30", color: "text-red-700 dark:text-red-400" },
+    { label: "Pending (Drug)", count: pending.length, icon: Clock, bg: "bg-yellow-100 dark:bg-yellow-900/30", color: "text-yellow-700 dark:text-yellow-400" },
+    { label: "Pending (Antibiotic)", count: abPending.length, icon: Clock, bg: "bg-cyan-100 dark:bg-cyan-900/30", color: "text-cyan-700 dark:text-cyan-400" },
+    { label: "Approved Today", count: approvedToday + abApprovedToday, icon: CheckCircle, bg: "bg-green-100 dark:bg-green-900/30", color: "text-green-700 dark:text-green-400" },
+    { label: "Rejected Today", count: rejectedToday + abRejectedToday, icon: XCircle, bg: "bg-red-100 dark:bg-red-900/30", color: "text-red-700 dark:text-red-400" },
   ];
 
   return (
@@ -174,50 +173,50 @@ export default function SpecialistDashboard() {
 
       <Tabs defaultValue="ubat">
         <TabsList>
-          <TabsTrigger value="ubat">Ubat Kawalan</TabsTrigger>
+          <TabsTrigger value="ubat">Controlled Drug</TabsTrigger>
           <TabsTrigger value="antibiotik" className="gap-1">
-            Borang Antibiotik
+            Antibiotic Form
             {abPending.length > 0 && (
               <Badge variant="destructive" className="h-5 min-w-5 text-[10px] rounded-full px-1.5">{abPending.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
 
-        {/* TAB 1: Ubat Kawalan */}
+        {/* TAB 1: Controlled Drug */}
         <TabsContent value="ubat" className="space-y-4 mt-4">
           <Card>
-            <CardHeader><CardTitle className="text-base">Permintaan Menunggu Kelulusan</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">Pending Approval Requests</CardTitle></CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Masa Dihantar</TableHead>
-                    <TableHead>Nama Pesakit</TableHead>
-                    <TableHead>No. IC</TableHead>
-                    <TableHead>Ubat</TableHead>
-                    <TableHead>Kuantiti</TableHead>
-                    <TableHead>Doktor</TableHead>
-                    <TableHead>Tindakan</TableHead>
+                    <TableHead>Time Submitted</TableHead>
+                    <TableHead>Patient Name</TableHead>
+                    <TableHead>IC No.</TableHead>
+                    <TableHead>Drug</TableHead>
+                    <TableHead>Quantity</TableHead>
+                    <TableHead>Doctor</TableHead>
+                    <TableHead>Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {pending.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Tiada permintaan menunggu kelulusan</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No pending approval requests</TableCell></TableRow>
                   ) : pending.map(r => (
                     <TableRow key={r.id}>
-                      <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true, locale: ms })}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</TableCell>
                       <TableCell className="font-medium">{r.patient_name}</TableCell>
                       <TableCell className="text-xs">{formatIC(r.no_ic)}</TableCell>
                       <TableCell>
                         {(r.drugs as any)?.drug_name}
-                        <Badge className="ml-1 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Pakar</Badge>
+                        <Badge className="ml-1 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Specialist</Badge>
                       </TableCell>
                       <TableCell>{r.quantity} {(r.drugs as any)?.unit_pengukuran}</TableCell>
                       <TableCell className="text-xs">{r.prescriber_name}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setApproveTarget(r)}>Lulus</Button>
-                          <Button size="sm" variant="destructive" className="h-7" onClick={() => setRejectTarget(r)}>Tolak</Button>
+                          <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setApproveTarget(r)}>Approve</Button>
+                          <Button size="sm" variant="destructive" className="h-7" onClick={() => setRejectTarget(r)}>Reject</Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -233,7 +232,7 @@ export default function SpecialistDashboard() {
               <CollapsibleTrigger asChild>
                 <CardHeader className="cursor-pointer hover:bg-muted/50">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">Sejarah Kelulusan (Ubat)</CardTitle>
+                    <CardTitle className="text-base">Approval History (Drug)</CardTitle>
                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
@@ -243,18 +242,18 @@ export default function SpecialistDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Masa</TableHead><TableHead>Pesakit</TableHead><TableHead>Ubat</TableHead><TableHead>Kuantiti</TableHead><TableHead>Keputusan</TableHead><TableHead>Nota</TableHead>
+                        <TableHead>Time</TableHead><TableHead>Patient</TableHead><TableHead>Drug</TableHead><TableHead>Quantity</TableHead><TableHead>Decision</TableHead><TableHead>Notes</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {history.map(r => (
                         <TableRow key={r.id}>
-                          <TableCell className="text-xs">{formatDistanceToNow(new Date(r.specialist_action_at), { addSuffix: true, locale: ms })}</TableCell>
+                          <TableCell className="text-xs">{formatDistanceToNow(new Date(r.specialist_action_at), { addSuffix: true })}</TableCell>
                           <TableCell>{r.patient_name}</TableCell>
                           <TableCell>{(r.drugs as any)?.drug_name}</TableCell>
                           <TableCell>{r.quantity}</TableCell>
                           <TableCell>
-                            {r.status === "rejected" ? <Badge variant="destructive" className="text-xs">Ditolak</Badge> : <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">Diluluskan</Badge>}
+                            {r.status === "rejected" ? <Badge variant="destructive" className="text-xs">Rejected</Badge> : <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">Approved</Badge>}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{r.specialist_notes || "—"}</TableCell>
                         </TableRow>
@@ -270,33 +269,33 @@ export default function SpecialistDashboard() {
         {/* TAB 2: Borang Antibiotik */}
         <TabsContent value="antibiotik" className="space-y-4 mt-4">
           <Card>
-            <CardHeader><CardTitle className="text-base">Borang Antibiotik Menunggu Kelulusan</CardTitle></CardHeader>
+            <CardHeader><CardTitle className="text-base">Antibiotic Forms Pending Approval</CardTitle></CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Masa</TableHead>
-                    <TableHead>Nama Pesakit</TableHead>
+                    <TableHead>Time</TableHead>
+                    <TableHead>Patient Name</TableHead>
                     <TableHead>IC</TableHead>
                     <TableHead>Diagnosis</TableHead>
                     <TableHead>Unit</TableHead>
-                    <TableHead>Tindakan</TableHead>
+                    <TableHead>Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {abPending.length === 0 ? (
-                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Tiada borang antibiotik menunggu</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No antibiotic forms pending</TableCell></TableRow>
                   ) : abPending.map((f: any) => (
                     <TableRow key={f.id}>
-                      <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true, locale: ms })}</TableCell>
+                      <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true })}</TableCell>
                       <TableCell className="font-medium">{f.patient_name}</TableCell>
                       <TableCell className="text-xs">{formatIC(f.patient_ic)}</TableCell>
                       <TableCell className="text-xs max-w-[150px] truncate">{f.diagnosis}</TableCell>
                       <TableCell><Badge variant="outline" className="text-[10px]">{f.prescription_unit || "—"}</Badge></TableCell>
                       <TableCell>
                         <div className="flex gap-1">
-                          <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setAbApproveTarget(f)}>Semak & Lulus</Button>
-                          <Button size="sm" variant="destructive" className="h-7" onClick={() => setAbRejectTarget(f)}>Tolak</Button>
+                          <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setAbApproveTarget(f)}>Review & Approve</Button>
+                          <Button size="sm" variant="destructive" className="h-7" onClick={() => setAbRejectTarget(f)}>Reject</Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -312,7 +311,7 @@ export default function SpecialistDashboard() {
               <CollapsibleTrigger asChild>
                 <CardHeader className="cursor-pointer hover:bg-muted/50">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-base">Sejarah Kelulusan (Antibiotik)</CardTitle>
+                    <CardTitle className="text-base">Approval History (Antibiotic)</CardTitle>
                     <ChevronDown className="h-4 w-4 text-muted-foreground" />
                   </div>
                 </CardHeader>
@@ -322,17 +321,17 @@ export default function SpecialistDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Masa</TableHead><TableHead>Pesakit</TableHead><TableHead>Diagnosis</TableHead><TableHead>Keputusan</TableHead><TableHead>Nota</TableHead>
+                        <TableHead>Time</TableHead><TableHead>Patient</TableHead><TableHead>Diagnosis</TableHead><TableHead>Decision</TableHead><TableHead>Notes</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {abHistory.map((f: any) => (
                         <TableRow key={f.id}>
-                          <TableCell className="text-xs">{formatDistanceToNow(new Date(f.specialist_action_at), { addSuffix: true, locale: ms })}</TableCell>
+                          <TableCell className="text-xs">{formatDistanceToNow(new Date(f.specialist_action_at), { addSuffix: true })}</TableCell>
                           <TableCell>{f.patient_name}</TableCell>
                           <TableCell className="text-xs max-w-[150px] truncate">{f.diagnosis}</TableCell>
                           <TableCell>
-                            {f.status === "rejected" ? <Badge variant="destructive" className="text-xs">Ditolak</Badge> : <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">Diluluskan</Badge>}
+                            {f.status === "rejected" ? <Badge variant="destructive" className="text-xs">Rejected</Badge> : <Badge className="bg-green-100 text-green-700 border-green-300 text-xs">Approved</Badge>}
                           </TableCell>
                           <TableCell className="text-xs text-muted-foreground max-w-[200px] truncate">{f.specialist_notes || "—"}</TableCell>
                         </TableRow>
@@ -349,24 +348,24 @@ export default function SpecialistDashboard() {
       {/* Ubat Approve Dialog */}
       <Dialog open={!!approveTarget} onOpenChange={(o) => !o && setApproveTarget(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Luluskan Permintaan</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Approve Request</DialogTitle></DialogHeader>
           {approveTarget && (
             <div className="space-y-4">
               <div className="rounded border p-3 space-y-1 text-sm">
-                <p><span className="text-muted-foreground">Pesakit:</span> {approveTarget.patient_name}</p>
+                <p><span className="text-muted-foreground">Patient:</span> {approveTarget.patient_name}</p>
                 <p><span className="text-muted-foreground">IC:</span> {formatIC(approveTarget.no_ic)}</p>
-                <p><span className="text-muted-foreground">Ubat:</span> {(approveTarget.drugs as any)?.drug_name}</p>
-                <p><span className="text-muted-foreground">Kuantiti:</span> {approveTarget.quantity}</p>
+                <p><span className="text-muted-foreground">Drug:</span> {(approveTarget.drugs as any)?.drug_name}</p>
+                <p><span className="text-muted-foreground">Quantity:</span> {approveTarget.quantity}</p>
               </div>
               <div className="space-y-2">
-                <Label>Nota Kelulusan (pilihan)</Label>
-                <Textarea placeholder="Nota tambahan" value={notes} onChange={e => setNotes(e.target.value)} />
+                <Label>Approval Notes (optional)</Label>
+                <Textarea placeholder="Additional notes" value={notes} onChange={e => setNotes(e.target.value)} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setApproveTarget(null)}>Batal</Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => approveMutation.mutate()} disabled={approveMutation.isPending}>{approveMutation.isPending ? "Memproses..." : "Sahkan Kelulusan"}</Button>
+            <Button variant="outline" onClick={() => setApproveTarget(null)}>Cancel</Button>
+            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => approveMutation.mutate()} disabled={approveMutation.isPending}>{approveMutation.isPending ? "Processing..." : "Confirm Approval"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -374,22 +373,22 @@ export default function SpecialistDashboard() {
       {/* Ubat Reject Dialog */}
       <Dialog open={!!rejectTarget} onOpenChange={(o) => !o && setRejectTarget(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Tolak Permintaan</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Reject Request</DialogTitle></DialogHeader>
           {rejectTarget && (
             <div className="space-y-4">
               <div className="rounded border p-3 space-y-1 text-sm">
-                <p><span className="text-muted-foreground">Pesakit:</span> {rejectTarget.patient_name}</p>
-                <p><span className="text-muted-foreground">Ubat:</span> {(rejectTarget.drugs as any)?.drug_name}</p>
+                <p><span className="text-muted-foreground">Patient:</span> {rejectTarget.patient_name}</p>
+                <p><span className="text-muted-foreground">Drug:</span> {(rejectTarget.drugs as any)?.drug_name}</p>
               </div>
               <div className="space-y-2">
-                <Label>Sebab Penolakan *</Label>
-                <Textarea placeholder="Min 10 aksara" value={rejectReason} onChange={e => setRejectReason(e.target.value)} />
+                <Label>Rejection Reason *</Label>
+                <Textarea placeholder="Min 10 characters" value={rejectReason} onChange={e => setRejectReason(e.target.value)} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRejectTarget(null)}>Batal</Button>
-            <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={rejectMutation.isPending || rejectReason.length < 10}>{rejectMutation.isPending ? "Memproses..." : "Sahkan Penolakan"}</Button>
+            <Button variant="outline" onClick={() => setRejectTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => rejectMutation.mutate()} disabled={rejectMutation.isPending || rejectReason.length < 10}>{rejectMutation.isPending ? "Processing..." : "Confirm Rejection"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -397,19 +396,19 @@ export default function SpecialistDashboard() {
       {/* Antibiotic Approve Dialog — full form review */}
       <Dialog open={!!abApproveTarget} onOpenChange={(o) => !o && setAbApproveTarget(null)}>
         <DialogContent className="max-w-3xl">
-          <DialogHeader><DialogTitle>Semak Borang Antibiotik — {abApproveTarget?.patient_name}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Review Antibiotic Form — {abApproveTarget?.patient_name}</DialogTitle></DialogHeader>
           {abApproveTarget && (
             <div className="space-y-4">
               <AntibioticFormReadOnly form={abApproveTarget} />
               <div className="space-y-2">
-                <Label>Nota Kelulusan (pilihan)</Label>
-                <Textarea placeholder="Nota tambahan" value={abNotes} onChange={e => setAbNotes(e.target.value)} />
+                <Label>Approval Notes (optional)</Label>
+                <Textarea placeholder="Additional notes" value={abNotes} onChange={e => setAbNotes(e.target.value)} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAbApproveTarget(null)}>Batal</Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => abApproveMutation.mutate()} disabled={abApproveMutation.isPending}>{abApproveMutation.isPending ? "Memproses..." : "Lulus Borang"}</Button>
+            <Button variant="outline" onClick={() => setAbApproveTarget(null)}>Cancel</Button>
+            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => abApproveMutation.mutate()} disabled={abApproveMutation.isPending}>{abApproveMutation.isPending ? "Processing..." : "Approve Form"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -417,22 +416,22 @@ export default function SpecialistDashboard() {
       {/* Antibiotic Reject Dialog */}
       <Dialog open={!!abRejectTarget} onOpenChange={(o) => !o && setAbRejectTarget(null)}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Tolak Borang Antibiotik</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>Reject Antibiotic Form</DialogTitle></DialogHeader>
           {abRejectTarget && (
             <div className="space-y-4">
               <div className="rounded border p-3 space-y-1 text-sm">
-                <p><span className="text-muted-foreground">Pesakit:</span> {abRejectTarget.patient_name}</p>
+                <p><span className="text-muted-foreground">Patient:</span> {abRejectTarget.patient_name}</p>
                 <p><span className="text-muted-foreground">Diagnosis:</span> {abRejectTarget.diagnosis}</p>
               </div>
               <div className="space-y-2">
-                <Label>Sebab Penolakan *</Label>
-                <Textarea placeholder="Min 10 aksara" value={abRejectReason} onChange={e => setAbRejectReason(e.target.value)} />
+                <Label>Rejection Reason *</Label>
+                <Textarea placeholder="Min 10 characters" value={abRejectReason} onChange={e => setAbRejectReason(e.target.value)} />
               </div>
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setAbRejectTarget(null)}>Batal</Button>
-            <Button variant="destructive" onClick={() => abRejectMutation.mutate()} disabled={abRejectMutation.isPending || abRejectReason.length < 10}>{abRejectMutation.isPending ? "Memproses..." : "Sahkan Penolakan"}</Button>
+            <Button variant="outline" onClick={() => setAbRejectTarget(null)}>Cancel</Button>
+            <Button variant="destructive" onClick={() => abRejectMutation.mutate()} disabled={abRejectMutation.isPending || abRejectReason.length < 10}>{abRejectMutation.isPending ? "Processing..." : "Confirm Rejection"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format, formatDistanceToNow } from "date-fns";
-import { ms } from "date-fns/locale";
 import { Search, UserPlus, RefreshCw, Check, ChevronsUpDown, AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -209,13 +208,13 @@ export default function PatientRegistry() {
       return { drugName: selectedDrug?.drug_name, afterStock, unit: selectedDrug?.unit_pengukuran };
     },
     onSuccess: (result) => {
-      toast.success(`Refill berjaya — Stok ${result?.drugName} dikurangkan ${refillQty}. Baki: ${result?.afterStock} ${result?.unit}`);
+      toast.success(`Refill successful — ${result?.drugName} stock reduced by ${refillQty}. Remaining: ${result?.afterStock} ${result?.unit}`);
       setRefillOpen(false);
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       queryClient.invalidateQueries({ queryKey: ["patient-history"] });
       queryClient.invalidateQueries({ queryKey: ["all-tx-stock"] });
     },
-    onError: () => toast.error("Gagal menyimpan refill"),
+    onError: () => toast.error("Failed to save refill"),
   });
 
   // Patient search for refill dialog
@@ -229,8 +228,8 @@ export default function PatientRegistry() {
     <div className="space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Rekod Pesakit</h1>
-          <p className="text-sm text-muted-foreground">Senarai pesakit dan sejarah pengeluaran ubat</p>
+          <h1 className="text-2xl font-semibold text-foreground">Patient Registry</h1>
+          <p className="text-sm text-muted-foreground">Patient list and drug dispensing history</p>
         </div>
         <Button onClick={openRefillWalkin} style={{ backgroundColor: "#1A3C6E" }}>
           <UserPlus className="mr-1 h-4 w-4" /> Refill Walk-in
@@ -241,7 +240,7 @@ export default function PatientRegistry() {
       <div className="relative">
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
-          placeholder="Cari nama pesakit atau no. IC..."
+          placeholder="Search patient name or IC no..."
           value={searchQ}
           onChange={(e) => setSearchQ(e.target.value)}
           className="pl-9 text-base"
@@ -254,8 +253,8 @@ export default function PatientRegistry() {
           <div className="space-y-2 pr-2">
             {filteredPatients.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground">
-                <p className="text-sm">Pesakit tidak dijumpai</p>
-                <Button variant="link" size="sm" onClick={openRefillWalkin}>Tambah sebagai pesakit baharu?</Button>
+                <p className="text-sm">No patients found</p>
+                <Button variant="link" size="sm" onClick={openRefillWalkin}>Add as new patient?</Button>
               </div>
             ) : filteredPatients.map(p => (
               <Card
@@ -275,7 +274,7 @@ export default function PatientRegistry() {
         {/* Right - Detail */}
         <div className="lg:col-span-2">
           {!selectedPatient ? (
-            <Card><CardContent className="py-16 text-center text-muted-foreground">Pilih pesakit untuk lihat sejarah pengeluaran</CardContent></Card>
+            <Card><CardContent className="py-16 text-center text-muted-foreground">Select a patient to view dispensing history</CardContent></Card>
           ) : (
             <div className="space-y-4">
               <Card>
@@ -285,11 +284,11 @@ export default function PatientRegistry() {
                       <h2 className="text-xl font-bold">{selectedPatient.patient_name}</h2>
                       <p className="text-sm text-muted-foreground">{formatIC(selectedPatient.no_ic)}</p>
                       <p className="text-xs text-muted-foreground mt-1">
-                        Dalam sistem sejak {format(new Date(selectedPatient.created_at), "dd/MM/yyyy")}
+                        In system since {format(new Date(selectedPatient.created_at), "dd/MM/yyyy")}
                       </p>
                     </div>
                     <Button size="sm" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openRefillForPatient(selectedPatient)}>
-                      <RefreshCw className="mr-1 h-3 w-3" /> Refill Ubat
+                      <RefreshCw className="mr-1 h-3 w-3" /> Refill Drug
                     </Button>
                   </div>
                 </CardContent>
@@ -298,10 +297,10 @@ export default function PatientRegistry() {
               {/* Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { label: "Ubat Semasa", value: history.length > 0 ? (history[0].drugs as any)?.drug_name ?? "—" : "—" },
-                  { label: "Jumlah Kunjungan", value: history.length },
-                  { label: "Kunjungan Terakhir", value: history.length > 0 ? format(new Date(history[0].dispensed_at), "dd/MM/yyyy") : "—" },
-                  { label: "Kuantiti Terkini", value: history.length > 0 ? history[0].quantity : "—" },
+                  { label: "Current Drug", value: history.length > 0 ? (history[0].drugs as any)?.drug_name ?? "—" : "—" },
+                  { label: "Total Visits", value: history.length },
+                  { label: "Last Visit", value: history.length > 0 ? format(new Date(history[0].dispensed_at), "dd/MM/yyyy") : "—" },
+                  { label: "Latest Quantity", value: history.length > 0 ? history[0].quantity : "—" },
                 ].map(s => (
                   <Card key={s.label}>
                     <CardContent className="p-3 text-center">
@@ -318,17 +317,17 @@ export default function PatientRegistry() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Tarikh</TableHead>
-                        <TableHead>Ubat</TableHead>
-                        <TableHead>Kuantiti</TableHead>
-                        <TableHead>Kaedah</TableHead>
-                        <TableHead>Pegawai</TableHead>
-                        <TableHead>Stok Selepas</TableHead>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Drug</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Method</TableHead>
+                        <TableHead>Officer</TableHead>
+                        <TableHead>Stock After</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {history.length === 0 ? (
-                        <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">Tiada sejarah</TableCell></TableRow>
+                        <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No history</TableCell></TableRow>
                       ) : history.map(h => (
                         <TableRow key={h.id}>
                           <TableCell className="text-xs">{format(new Date(h.dispensed_at), "dd/MM/yyyy")}</TableCell>
@@ -357,7 +356,7 @@ export default function PatientRegistry() {
         <DialogContent className="max-w-lg">
           <DialogHeader>
             <DialogTitle>Refill Walk-in</DialogTitle>
-            <DialogDescription>Rekod pengeluaran ubat tanpa melalui proses temujanji</DialogDescription>
+            <DialogDescription>Record drug dispensing without appointment process</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -365,9 +364,9 @@ export default function PatientRegistry() {
             {!refillPatient ? (
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <Label>Cari pesakit (nama atau IC)</Label>
+                  <Label>Search patient (name or IC)</Label>
                   <Input
-                    placeholder="Nama atau IC"
+                    placeholder="Name or IC"
                     value={newPatientName}
                     onChange={e => { setNewPatientName(e.target.value); setIsNewPatient(false); }}
                   />
@@ -387,12 +386,12 @@ export default function PatientRegistry() {
                   </div>
                 )}
                 {!isNewPatient && (
-                  <Button variant="link" size="sm" onClick={() => setIsNewPatient(true)}>Tambah pesakit baharu</Button>
+                  <Button variant="link" size="sm" onClick={() => setIsNewPatient(true)}>Add new patient</Button>
                 )}
                 {isNewPatient && (
                   <div className="space-y-2 border rounded p-3">
                     <div className="space-y-1">
-                      <Label className="text-xs">Nama Pesakit</Label>
+                      <Label className="text-xs">Patient Name</Label>
                       <Input value={newPatientName} onChange={e => setNewPatientName(e.target.value.toUpperCase())} />
                     </div>
                     <div className="space-y-1">
@@ -404,17 +403,17 @@ export default function PatientRegistry() {
                       disabled={!newPatientName || newPatientIC.replace(/\D/g, "").length < 12}
                       onClick={() => setRefillPatient({ name: newPatientName, ic: newPatientIC })}
                     >
-                      Sahkan Pesakit
+                      Confirm Patient
                     </Button>
                   </div>
                 )}
               </div>
             ) : (
               <div className="bg-muted rounded p-3 text-sm">
-                <p><span className="text-muted-foreground">Pesakit:</span> <strong>{refillPatient.name}</strong></p>
+                <p><span className="text-muted-foreground">Patient:</span> <strong>{refillPatient.name}</strong></p>
                 <p><span className="text-muted-foreground">IC:</span> {formatIC(refillPatient.ic)}</p>
                 {!refillPatient.id && (
-                  <Button variant="link" size="sm" className="px-0" onClick={() => setRefillPatient(null)}>Bukan pesakit ini?</Button>
+                  <Button variant="link" size="sm" className="px-0" onClick={() => setRefillPatient(null)}>Not this patient?</Button>
                 )}
               </div>
             )}
@@ -423,24 +422,24 @@ export default function PatientRegistry() {
             {refillPatient && (
               <>
                 <div className="space-y-2">
-                  <Label>Ubat</Label>
+                  <Label>Drug</Label>
                   <Popover open={drugPopoverOpen} onOpenChange={setDrugPopoverOpen}>
                     <PopoverTrigger asChild>
                       <Button variant="outline" className={cn("w-full justify-between", !refillDrugId && "text-muted-foreground")}>
-                        {refillDrugId ? `${drugs.find(d => d.id === refillDrugId)?.drug_name} — Stok: ${stockMap.get(refillDrugId) ?? 0}` : "Pilih ubat..."}
+                        {refillDrugId ? `${drugs.find(d => d.id === refillDrugId)?.drug_name} — Stock: ${stockMap.get(refillDrugId) ?? 0}` : "Select drug..."}
                         <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
                       <Command>
-                        <CommandInput placeholder="Cari ubat..." />
+                        <CommandInput placeholder="Search drugs..." />
                         <CommandList>
-                          <CommandEmpty>Tiada ubat dijumpai.</CommandEmpty>
+                          <CommandEmpty>No drugs found.</CommandEmpty>
                           <CommandGroup>
                             {drugs.map(d => (
                               <CommandItem key={d.id} value={d.drug_name} onSelect={() => { setRefillDrugId(d.id); setDrugPopoverOpen(false); }}>
                                 <Check className={cn("mr-2 h-4 w-4", refillDrugId === d.id ? "opacity-100" : "opacity-0")} />
-                                {d.drug_name} — Stok: {stockMap.get(d.id) ?? 0} {d.unit_pengukuran}
+                                {d.drug_name} — Stock: {stockMap.get(d.id) ?? 0} {d.unit_pengukuran}
                               </CommandItem>
                             ))}
                           </CommandGroup>
@@ -452,21 +451,21 @@ export default function PatientRegistry() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label>Kuantiti</Label>
+                    <Label>Quantity</Label>
                     <Input type="number" min={1} value={refillQty} onChange={e => setRefillQty(parseInt(e.target.value) || 0)} />
                     {refillDrugId && refillQty > 0 && (
                       <p className={cn("text-xs", belowMin ? "text-destructive" : "text-muted-foreground")}>
-                        Stok selepas refill: {afterStock} {selectedDrug?.unit_pengukuran}
+                        Stock after refill: {afterStock} {selectedDrug?.unit_pengukuran}
                       </p>
                     )}
                     {stockExceeded && (
                       <p className="text-xs text-destructive flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" /> Melebihi stok semasa
+                        <AlertCircle className="h-3 w-3" /> Exceeds current stock
                       </p>
                     )}
                   </div>
                   <div className="space-y-2">
-                    <Label>Tarikh</Label>
+                    <Label>Date</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="w-full justify-start text-left font-normal">
@@ -484,10 +483,10 @@ export default function PatientRegistry() {
                 {/* Summary */}
                 {refillDrugId && refillQty > 0 && !stockExceeded && (
                   <div className="bg-muted rounded p-3 text-xs space-y-1">
-                    <p>Pengeluaran: {refillQty} {selectedDrug?.unit_pengukuran} {selectedDrug?.drug_name}</p>
-                    <p>Pesakit: {refillPatient.name} ({formatIC(refillPatient.ic)})</p>
-                    <p>Tarikh: {format(refillDate, "dd/MM/yyyy")}</p>
-                    <p>Stok semasa: {currentStock} → Stok selepas: {afterStock}</p>
+                    <p>Dispensing: {refillQty} {selectedDrug?.unit_pengukuran} {selectedDrug?.drug_name}</p>
+                    <p>Patient: {refillPatient.name} ({formatIC(refillPatient.ic)})</p>
+                    <p>Date: {format(refillDate, "dd/MM/yyyy")}</p>
+                    <p>Current stock: {currentStock} → Stock after: {afterStock}</p>
                   </div>
                 )}
               </>
@@ -495,13 +494,13 @@ export default function PatientRegistry() {
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setRefillOpen(false)}>Batal</Button>
+            <Button variant="outline" onClick={() => setRefillOpen(false)}>Cancel</Button>
             <Button
               className="bg-green-600 hover:bg-green-700 text-white"
               disabled={!refillPatient || !refillDrugId || refillQty < 1 || stockExceeded || refillMutation.isPending}
               onClick={() => refillMutation.mutate()}
             >
-              {refillMutation.isPending ? "Menyimpan..." : "Simpan & Tolak Stok"}
+              {refillMutation.isPending ? "Saving..." : "Save & Deduct Stock"}
             </Button>
           </DialogFooter>
         </DialogContent>
