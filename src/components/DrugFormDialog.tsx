@@ -142,6 +142,7 @@ export function DrugFormDialog({ open, onOpenChange, drug }: DrugFormDialogProps
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["drugs"] });
+      queryClient.invalidateQueries({ queryKey: ["drugs-for-request"] });
       toast.success(isEdit ? "Drug updated" : "Drug added");
       onOpenChange(false);
     },

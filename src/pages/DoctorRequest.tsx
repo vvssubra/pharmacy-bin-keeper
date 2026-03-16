@@ -47,7 +47,7 @@ export default function DoctorRequest() {
   const [drugPopoverOpen, setDrugPopoverOpen] = useState(false);
   const [submitted, setSubmitted] = useState<FormValues & { drug_name: string; is_specialist: boolean; status: string } | null>(null);
 
-  // Fetch active drugs with baki awal
+  // Fetch all active drugs from the master list
   const { data: drugs = [] } = useQuery({
     queryKey: ["drugs-for-request"],
     queryFn: async () => {
@@ -57,15 +57,7 @@ export default function DoctorRequest() {
         .eq("is_active", true)
         .order("drug_name");
       if (drugError) throw drugError;
-
-      // Get baki awal to filter only drugs with opening balance
-      const { data: bakiData } = await supabase
-        .from("transactions")
-        .select("drug_id")
-        .eq("jenis", "baki_awal");
-
-      const bakiSet = new Set((bakiData ?? []).map(b => b.drug_id));
-      return (drugList ?? []).filter(d => bakiSet.has(d.id));
+      return drugList ?? [];
     },
   });
 
