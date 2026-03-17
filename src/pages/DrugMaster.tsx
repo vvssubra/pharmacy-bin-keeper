@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
-import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen, CreditCard } from "lucide-react";
+import { FileText, Plus, Search, Pencil, Ban, RotateCcw, BookOpen, CreditCard, CalendarRange } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { DrugFormDialog } from "@/components/DrugFormDialog";
 import { OpeningBalanceDialog } from "@/components/OpeningBalanceDialog";
+import DrugQuotaDialog from "@/components/DrugQuotaDialog";
 
 type Drug = {
   id: string;
@@ -38,6 +39,7 @@ type Drug = {
   stok_reorder: number;
   stok_max: number;
   is_active: boolean;
+  perlu_kelulusan_pakar: boolean;
 };
 
 type BakiAwal = {
@@ -53,6 +55,7 @@ export default function DrugMaster() {
   const [editDrug, setEditDrug] = useState<Drug | null>(null);
   const [deactivateTarget, setDeactivateTarget] = useState<Drug | null>(null);
   const [balanceTarget, setBalanceTarget] = useState<Drug | null>(null);
+  const [quotaTarget, setQuotaTarget] = useState<Drug | null>(null);
   const { role } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -246,6 +249,11 @@ export default function DrugMaster() {
                           >
                             {drug.is_active ? <Ban className="h-4 w-4" /> : <RotateCcw className="h-4 w-4" />}
                           </Button>
+                          {role === "admin" && drug.perlu_kelulusan_pakar && (
+                            <Button variant="ghost" size="icon" className="h-7 w-7" title="Set Annual Quota" onClick={() => setQuotaTarget(drug)}>
+                              <CalendarRange className="h-3.5 w-3.5" />
+                            </Button>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -258,6 +266,13 @@ export default function DrugMaster() {
       </Card>
 
       <DrugFormDialog open={formOpen} onOpenChange={setFormOpen} drug={editDrug} />
+
+      <DrugQuotaDialog
+        open={!!quotaTarget}
+        onOpenChange={open => { if (!open) setQuotaTarget(null); }}
+        drugId={quotaTarget?.id ?? ""}
+        drugName={quotaTarget?.drug_name ?? ""}
+      />
 
       <OpeningBalanceDialog
         open={!!balanceTarget}
