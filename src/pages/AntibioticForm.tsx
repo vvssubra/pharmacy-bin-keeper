@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { ArrowLeft, ShieldCheck, CheckCircle } from "lucide-react";
+import { usePathwayCheck } from "@/hooks/usePathwayCheck";
+import PathwayCheckBanner from "@/components/PathwayCheckBanner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +84,15 @@ export default function AntibioticForm() {
 
   const age = getAgeFromIC(patientIC);
   const showWeight = age !== null && age < 12;
+
+  const { verdict: pathwayVerdict, explanation: pathwayExplanation, status: pathwayStatus } = usePathwayCheck({
+    diagnosis,
+    antibiotic: antibioticRegimen,
+    indication: prescriberNotes,
+    checklist: checklist as Record<string, unknown>,
+    allergy_status: drugAllergy ? drugAllergyDetail : undefined,
+    patient_age: age ?? undefined,
+  });
   const centorTotal = checklist.pharyngitis.temp + checklist.pharyngitis.no_cough + checklist.pharyngitis.adenopathy + checklist.pharyngitis.exudate + checklist.pharyngitis.age_score;
 
   const updateChecklist = <S extends keyof ChecklistState>(section: S, field: keyof ChecklistState[S], value: any) => {
@@ -111,6 +122,7 @@ export default function AntibioticForm() {
         health_ed_tca: healthEdTca,
         checklist_data: { ...checklist, pharyngitis: { ...checklist.pharyngitis, total_score: centorTotal } },
         prescriber_notes: prescriberNotes || null,
+        pathway_check_result: pathwayVerdict ?? "unavailable",
         status: "pending_specialist",
         submitted_by: user?.id,
       } as any);
@@ -432,6 +444,11 @@ export default function AntibioticForm() {
 
       {/* SUBMIT */}
       <div className="space-y-3">
+        <PathwayCheckBanner
+          status={pathwayStatus}
+          verdict={pathwayVerdict}
+          explanation={pathwayExplanation}
+        />
         <p className="text-xs text-muted-foreground text-center">
           Please attach this form together with the prescription or patient documents for pharmacy reference.
         </p>

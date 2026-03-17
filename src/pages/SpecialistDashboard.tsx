@@ -24,6 +24,20 @@ import {
 import { AntibioticFormReadOnly } from "@/components/AntibioticFormReadOnly";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const NAG_BADGE_CONFIG: Record<string, { label: string; cls: string }> = {
+  supported:        { label: "✅ Supported",        cls: "bg-green-100 text-green-700 border-green-300" },
+  review:           { label: "⚠ Review",            cls: "bg-amber-100 text-amber-700 border-amber-300" },
+  not_supported:    { label: "❌ Not supported",    cls: "bg-red-100 text-red-700 border-red-300" },
+  refer_specialist: { label: "💬 Refer specialist", cls: "bg-blue-100 text-blue-700 border-blue-300" },
+  unavailable:      { label: "— Unavailable",       cls: "bg-gray-100 text-gray-600 border-gray-300" },
+};
+
+function renderNagBadge(result: string | null | undefined) {
+  if (!result) return <span className="text-xs text-muted-foreground">—</span>;
+  const c = NAG_BADGE_CONFIG[result] ?? { label: result, cls: "" };
+  return <Badge variant="outline" className={`text-[10px] ${c.cls}`}>{c.label}</Badge>;
+}
+
 function formatIC(ic: string) {
   const d = ic.replace(/\D/g, "");
   if (d.length === 12) return `${d.slice(0, 6)}-${d.slice(6, 8)}-${d.slice(8)}`;
@@ -294,12 +308,13 @@ export default function SpecialistDashboard() {
                     <TableHead>Diagnosis</TableHead>
                     <TableHead>Submitted By</TableHead>
                     <TableHead>Unit</TableHead>
+                    <TableHead>NAG Check</TableHead>
                     <TableHead>Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {abPending.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No antibiotic forms pending</TableCell></TableRow>
+                    <TableRow><TableCell colSpan={8} className="text-center py-8 text-muted-foreground">No antibiotic forms pending</TableCell></TableRow>
                   ) : abPending.map((f: any) => (
                     <TableRow key={f.id}>
                       <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(f.created_at), { addSuffix: true })}</TableCell>
@@ -308,6 +323,7 @@ export default function SpecialistDashboard() {
                       <TableCell className="text-xs max-w-[150px] truncate">{f.diagnosis}</TableCell>
                       <TableCell className="text-xs font-medium">{f.submitter_name}</TableCell>
                       <TableCell><Badge variant="outline" className="text-[10px]">{f.prescription_unit || "—"}</Badge></TableCell>
+                      <TableCell>{renderNagBadge(f.pathway_check_result)}</TableCell>
                       <TableCell>
                         <div className="flex gap-1">
                           <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setAbApproveTarget(f)}>Review & Approve</Button>
