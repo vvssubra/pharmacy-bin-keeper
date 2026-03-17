@@ -1,6 +1,6 @@
 // supabase/functions/ai-query/index.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import Anthropic from "https://esm.sh/@anthropic-ai/sdk";
+import Anthropic from "https://esm.sh/@anthropic-ai/sdk@0.52.0";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import {
   verifyJWT,
@@ -104,8 +104,10 @@ Deno.serve(async (req) => {
     tokensUsed = response.usage.input_tokens + response.usage.output_tokens;
     answer = response.content[0].type === "text" ? response.content[0].text : "";
   } catch (err) {
+    const errMsg = err instanceof Error ? err.message : String(err);
+    console.error("Claude API error:", errMsg);
     try {
-      await writeAuditLog({ userId: userId!, role, functionName: FUNCTION_NAME, statusCode: 500, errorMessage: "claude_api_error" });
+      await writeAuditLog({ userId: userId!, role, functionName: FUNCTION_NAME, statusCode: 500, errorMessage: `claude_api_error: ${errMsg.slice(0, 200)}` });
     } catch {
       // Audit log failure must not abort the primary response
     }
