@@ -3,7 +3,8 @@
     "mode": "interactive",
     "research": true,
     "plan_checker": true,
-    "verifier": true
+    "verifier": true,
+    "_auto_chain_active": false
   },
   "models": {
     "profile": "balanced"
