@@ -75,6 +75,29 @@ export default function MoDashboard() {
     },
   });
 
+  const currentYear = new Date().getFullYear();
+
+  const { data: drugQuotas = [] } = useQuery({
+    queryKey: ["mo-drug-quotas", currentYear],
+    queryFn: async () => {
+      const { data } = await supabase.from("drug_quotas").select("drug_id, quota_limit").eq("year", currentYear);
+      return (data ?? []) as { drug_id: string; quota_limit: number }[];
+    },
+  });
+
+  const { data: ytdCounts = {} } = useQuery({
+    queryKey: ["mo-ytd-counts", currentYear],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const yearStart = `${currentYear}-01-01`;
+      const yearEnd = `${currentYear + 1}-01-01`;
+      const { data } = await supabase.from("dispensing_requests").select("drug_id").eq("status", "fulfilled").gte("created_at", yearStart).lt("created_at", yearEnd);
+      const counts: Record<string, number> = {};
+      for (const r of data ?? []) counts[r.drug_id] = (counts[r.drug_id] ?? 0) + 1;
+      return counts;
+    },
+  });
+
   // My recent requests
   const { data: myRequests = [], isLoading: reqLoading } = useQuery({
     queryKey: ["mo-my-requests", user?.id],
@@ -169,6 +192,7 @@ export default function MoDashboard() {
                   <TableHead className="text-right">Current Stock</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Requires Approval</TableHead>
+                  <TableHead>Quota Remaining</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -188,6 +212,18 @@ export default function MoDashboard() {
                       ) : (
                         <Badge variant="outline" className="text-[10px] text-muted-foreground">Standard</Badge>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      {d.perlu_kelulusan_pakar ? (() => {
+                        const quotaRow = drugQuotas.find(q => q.drug_id === d.id);
+                        if (!quotaRow) return <Badge variant="outline" className="text-[10px] text-muted-foreground">No quota set</Badge>;
+                        const remaining = quotaRow.quota_limit - ((ytdCounts as Record<string,number>)[d.id] ?? 0);
+                        const pct = quotaRow.quota_limit > 0 ? remaining / quotaRow.quota_limit : 0;
+                        const cls = pct <= 0.1 ? "bg-red-100 text-red-700 border-red-300"
+                                   : pct <= 0.25 ? "bg-amber-100 text-amber-700 border-amber-300"
+                                   : "bg-green-100 text-green-700 border-green-300";
+                        return <Badge variant="outline" className={`text-[10px] ${cls}`}>{remaining} / {quotaRow.quota_limit}</Badge>;
+                      })() : <span className="text-xs text-muted-foreground">—</span>}
                     </TableCell>
                   </TableRow>
                 ))}
