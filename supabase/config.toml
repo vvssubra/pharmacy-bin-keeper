@@ -1,3 +1,6 @@
 # Use project ref aeclqhwpqvbmhepkayuy (https://aeclqhwpqvbmhepkayuy.supabase.co)
 # Override with: supabase link --project-ref <ref>
 project_id = "aeclqhwpqvbmhepkayuy"
+
+[functions.ai-query]
+verify_jwt = false
