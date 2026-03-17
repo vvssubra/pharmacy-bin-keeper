@@ -47,10 +47,10 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 1. `profiles` table → `full_name`, `facility`
 2. `user_roles` table → `role`
 
-Roles: `admin`, `pharmacist`, `doctor`, `specialist`
+Roles: `admin`, `fms`, `mo`, `pharmacist`
 
 `ProtectedRoute` (`src/components/ProtectedRoute.tsx`) enforces role-based access:
-- `/specialist` → `specialist` only
+- `/specialist` → `fms` only
 - `/fulfilment` → `admin` or `pharmacist` only
 - Other routes → any authenticated user
 
@@ -72,6 +72,8 @@ Key tables (types auto-generated at `src/integrations/supabase/types.ts`):
 | `patient_drug_history` | Links patients to dispensed drugs |
 | `profiles` | User full_name + facility |
 | `user_roles` | User → role mapping |
+| `drug_quotas` | Annual patient quota per controlled drug (admin sets per year) |
+| `ai_audit_logs` | AI call audit trail (user_id, role, function_name, status_code, tokens_used) |
 
 **Stock calculation:** There is no dedicated stock column. Current stock is always computed by summing `transactions` for a drug (`terimaan` adds, `keluaran` subtracts, `baki_awal` sets opening balance).
 
@@ -87,10 +89,12 @@ Key tables (types auto-generated at `src/integrations/supabase/types.ts`):
 | `/fulfilment` | `PharmacistFulfilment` | admin/pharmacist |
 | `/pesakit` | `PatientRegistry` | pharmacist |
 | `/laporan` | `Laporan` | admin/pharmacist |
-| `/request` | `DoctorLanding` | doctor |
-| `/request/ubat` | `DoctorRequest` | doctor |
-| `/request/antibiotik` | `AntibioticForm` | doctor |
-| `/specialist` | `SpecialistDashboard` | specialist |
+| `/request` | `DoctorLanding` | mo |
+| `/request/ubat` | `DoctorRequest` | mo |
+| `/request/antibiotik` | `AntibioticForm` | mo |
+| `/specialist` | `SpecialistDashboard` | fms |
+| `/fms` | `FmsDashboard` | admin/fms/pharmacist |
+| `/mo` | `MoDashboard` | admin/mo/pharmacist |
 
 ### UI Conventions
 
