@@ -51,7 +51,6 @@ export default function AiChatWidget() {
 
       if (resp.status === 429) {
         setRateLimitMsg("You've reached the limit (20 queries/hour). Please try again later.");
-        setMessages(prev => prev.slice(0, -1));
         return;
       }
 
@@ -98,7 +97,7 @@ export default function AiChatWidget() {
 
       {/* Slide-up panel */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="w-full sm:w-96 flex flex-col p-0">
+        <SheetContent side="bottom" className="w-full h-[500px] flex flex-col p-0">
           <SheetHeader className="px-4 py-3 border-b">
             <SheetTitle className="flex items-center gap-2 text-sm">
               <Bot className="h-4 w-4" />
