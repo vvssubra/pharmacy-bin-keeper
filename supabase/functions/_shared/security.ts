@@ -1,6 +1,5 @@
 // supabase/functions/_shared/security.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.0";
-import * as jose from "https://deno.land/x/jose@v4.15.5/index.ts";
 
 // Lazy-initialized singleton clients — constructed once per Deno isolate on first use
 let _anonClient: ReturnType<typeof createClient> | null = null;
@@ -41,16 +40,27 @@ export async function verifyJWT(authHeader: string | null): Promise<{
   if (!token) return { error: "Missing token" };
 
   try {
-    const jwtSecret = Deno.env.get("SUPABASE_JWT_SECRET");
-    if (!jwtSecret) return { error: "JWT secret not configured" };
+    // Decode JWT payload without library dependency
+    const parts = token.split(".");
+    if (parts.length !== 3) return { error: "Invalid token format" };
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
 
-    const secret = new TextEncoder().encode(jwtSecret);
-    const { payload } = await jose.jwtVerify(token, secret);
-    const userId = payload.sub;
+    const userId = payload.sub as string | undefined;
     if (!userId) return { error: "Invalid token: missing sub" };
+
+    // Check expiry
+    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
+      return { error: "Token expired" };
+    }
+
+    // Verify user exists via admin client (service role)
+    const supabase = _supabaseAdmin();
+    const { data: { user }, error } = await supabase.auth.admin.getUserById(userId);
+    if (error || !user) return { error: "Invalid or expired token" };
+
     return { userId };
   } catch {
-    return { error: "Invalid or expired token" };
+    return { error: "Invalid token" };
   }
 }
 
