@@ -1,17 +1,29 @@
 // supabase/functions/_shared/security.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// Singleton clients — created once per Deno isolate
-const _supabaseAnon = () =>
-  createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-  );
-const _supabaseAdmin = () =>
-  createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
+// Lazy-initialized singleton clients — constructed once per Deno isolate on first use
+let _anonClient: ReturnType<typeof createClient> | null = null;
+let _adminClient: ReturnType<typeof createClient> | null = null;
+
+function _supabaseAnon() {
+  if (!_anonClient) {
+    _anonClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+    );
+  }
+  return _anonClient;
+}
+
+function _supabaseAdmin() {
+  if (!_adminClient) {
+    _adminClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
+  }
+  return _adminClient;
+}
 
 // ── JWT verification ────────────────────────────────────────────────────────
 export async function verifyJWT(authHeader: string | null): Promise<{
