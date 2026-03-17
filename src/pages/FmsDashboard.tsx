@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDistanceToNow } from "date-fns";
-import { BarChart2, Package, Clock, AlertTriangle } from "lucide-react";
+import { BarChart2, Package, Clock, AlertTriangle, ShieldCheck } from "lucide-react";
+import { quotaStatus, forecastStatus, daysRemaining, projectedExhaustion } from "@/lib/quotaHelpers";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
 } from "recharts";
@@ -33,6 +34,13 @@ function stockStatus(stock: number, min: number, reorder: number) {
   return "normal";
 }
 
+const FORECAST_STATUS_BADGE: Record<string, string> = {
+  critical: "bg-red-100 text-red-700 border-red-300",
+  warning:  "bg-amber-100 text-amber-700 border-amber-300",
+  healthy:  "bg-green-100 text-green-700 border-green-300",
+  "no-data": "",
+};
+
 const STATUS_BADGE: Record<string, string> = {
   critical: "bg-red-100 text-red-700 border-red-300",
   low:      "bg-amber-100 text-amber-700 border-amber-300",
@@ -50,7 +58,7 @@ export default function FmsDashboard() {
       const [{ data: drugs }, { data: txns }] = await Promise.all([
         supabase
           .from("drugs")
-          .select("id, drug_name, unit_pengukuran, stok_min, stok_reorder, stok_max")
+          .select("id, drug_name, unit_pengukuran, stok_min, stok_reorder, stok_max, perlu_kelulusan_pakar")
           .eq("is_active", true)
           .order("drug_name"),
         supabase
@@ -117,6 +125,41 @@ export default function FmsDashboard() {
         ...f,
         mo_name: profileMap[f.submitted_by] ?? "Unknown MO",
       })) as any[];
+    },
+  });
+
+  const currentYear = new Date().getFullYear();
+
+  const { data: drugQuotas = [] } = useQuery({
+    queryKey: ["fms-drug-quotas", currentYear],
+    queryFn: async () => {
+      const { data } = await supabase.from("drug_quotas").select("drug_id, quota_limit").eq("year", currentYear);
+      return (data ?? []) as { drug_id: string; quota_limit: number }[];
+    },
+  });
+
+  const { data: ytdCounts = {} } = useQuery({
+    queryKey: ["fms-ytd-counts", currentYear],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const yearStart = `${currentYear}-01-01`;
+      const yearEnd = `${currentYear + 1}-01-01`;
+      const { data } = await supabase.from("dispensing_requests").select("drug_id").eq("status", "fulfilled").gte("created_at", yearStart).lt("created_at", yearEnd);
+      const counts: Record<string, number> = {};
+      for (const r of data ?? []) counts[r.drug_id] = (counts[r.drug_id] ?? 0) + 1;
+      return counts;
+    },
+  });
+
+  const { data: usage30 = {} } = useQuery({
+    queryKey: ["fms-usage-30"],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const since = new Date(); since.setDate(since.getDate() - 30);
+      const { data } = await supabase.from("transactions").select("drug_id, kuantiti").eq("jenis", "keluaran").gte("created_at", since.toISOString());
+      const totals: Record<string, number> = {};
+      for (const t of data ?? []) totals[t.drug_id] = (totals[t.drug_id] ?? 0) + t.kuantiti;
+      return totals;
     },
   });
 
@@ -364,6 +407,124 @@ export default function FmsDashboard() {
                 <Line type="monotone" dataKey="qty" name="Units dispensed" stroke="#2563eb" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
+          )}
+        </CardContent>
+      </Card>
+      {/* Controlled Drug Annual Quota */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4" />
+            Controlled Drug Annual Quota
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {stockLoading ? (
+            <div className="p-4 space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-10 w-full" />)}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Drug Name</TableHead>
+                  <TableHead className="text-right">Annual Quota</TableHead>
+                  <TableHead className="text-right">Patients Served YTD</TableHead>
+                  <TableHead className="text-right">Remaining</TableHead>
+                  <TableHead>Projected Exhaustion</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {drugStock.filter(d => (d as any).perlu_kelulusan_pakar).length === 0 ? (
+                  <TableRow><TableCell colSpan={6} className="text-center py-6 text-muted-foreground">No controlled drugs found</TableCell></TableRow>
+                ) : drugStock.filter(d => (d as any).perlu_kelulusan_pakar).map(d => {
+                  const quotaRow = drugQuotas.find(q => q.drug_id === d.id);
+                  const quota = quotaRow ? quotaRow.quota_limit : null;
+                  const served = (ytdCounts as Record<string,number>)[d.id] ?? 0;
+                  const remaining = quota !== null ? quota - served : null;
+                  const monthsElapsed = new Date().getMonth() + 1;
+                  const avgPerMonth = monthsElapsed > 0 ? served / monthsElapsed : 0;
+                  const status = quotaStatus(remaining, quota);
+                  const badgeClass: Record<string, string> = {
+                    critical: "bg-red-100 text-red-700 border-red-300",
+                    warning: "bg-amber-100 text-amber-700 border-amber-300",
+                    healthy: "bg-green-100 text-green-700 border-green-300",
+                    "no-quota": "bg-gray-100 text-gray-600 border-gray-300",
+                  };
+                  return (
+                    <TableRow key={d.id}>
+                      <TableCell className="font-medium text-sm">{d.drug_name}</TableCell>
+                      <TableCell className="text-right text-sm">{quota ?? "—"}</TableCell>
+                      <TableCell className="text-right text-sm">{served}</TableCell>
+                      <TableCell className="text-right font-semibold text-sm">{remaining !== null ? remaining : "—"}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {quota === null ? "No quota set" : projectedExhaustion(remaining!, avgPerMonth)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={`text-[10px] capitalize ${badgeClass[status]}`}>
+                          {status === "no-quota" ? "No quota" : status}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Non-Controlled Stock Forecast */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Package className="h-4 w-4" />
+            Non-Controlled Stock Forecast
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-0">
+          {stockLoading ? (
+            <div className="p-4 space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-10 w-full" />)}</div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Drug Name</TableHead>
+                  <TableHead className="text-right">Current Stock</TableHead>
+                  <TableHead className="text-right">Avg Daily Usage (30d)</TableHead>
+                  <TableHead className="text-right">Days Left</TableHead>
+                  <TableHead>Reorder By</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {drugStock.filter(d => !(d as any).perlu_kelulusan_pakar).map(d => {
+                  const avgDaily = ((usage30 as Record<string,number>)[d.id] ?? 0) / 30;
+                  const days = daysRemaining(d.current_stock, avgDaily);
+                  const fStatus = forecastStatus(days);
+                  const reorderDate = days !== null && days > 0
+                    ? (() => { const dt = new Date(); dt.setDate(dt.getDate() + days - 7); return dt.toLocaleDateString("en-MY", { day: "numeric", month: "short" }); })()
+                    : "—";
+                  return (
+                    <TableRow key={d.id}>
+                      <TableCell className="font-medium text-sm">{d.drug_name}</TableCell>
+                      <TableCell className="text-right text-sm">{d.current_stock} <span className="text-xs text-muted-foreground">{d.unit_pengukuran}</span></TableCell>
+                      <TableCell className="text-right text-sm text-muted-foreground">{avgDaily > 0 ? avgDaily.toFixed(1) : "—"}</TableCell>
+                      <TableCell className="text-right font-semibold text-sm">
+                        {days !== null ? days : <span className="text-muted-foreground text-xs">No usage data</span>}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{reorderDate}</TableCell>
+                      <TableCell>
+                        {fStatus === "no-data" ? (
+                          <span className="text-xs text-muted-foreground">No usage data</span>
+                        ) : (
+                          <Badge variant="outline" className={`text-[10px] capitalize ${FORECAST_STATUS_BADGE[fStatus]}`}>{fStatus}</Badge>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           )}
         </CardContent>
       </Card>
