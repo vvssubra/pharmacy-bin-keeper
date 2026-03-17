@@ -1,5 +1,6 @@
 // supabase/functions/_shared/security.ts
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.0";
+import * as jose from "https://deno.land/x/jose@v4.15.5/index.ts";
 
 // Lazy-initialized singleton clients — constructed once per Deno isolate on first use
 let _anonClient: ReturnType<typeof createClient> | null = null;
@@ -37,10 +38,20 @@ export async function verifyJWT(authHeader: string | null): Promise<{
     return { error: "Missing or invalid Authorization header" };
   }
   const token = authHeader.slice(7);
-  const supabase = _supabaseAnon();
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-  if (error || !user) return { error: "Invalid or expired token" };
-  return { userId: user.id };
+  if (!token) return { error: "Missing token" };
+
+  try {
+    const jwtSecret = Deno.env.get("SUPABASE_JWT_SECRET");
+    if (!jwtSecret) return { error: "JWT secret not configured" };
+
+    const secret = new TextEncoder().encode(jwtSecret);
+    const { payload } = await jose.jwtVerify(token, secret);
+    const userId = payload.sub;
+    if (!userId) return { error: "Invalid token: missing sub" };
+    return { userId };
+  } catch {
+    return { error: "Invalid or expired token" };
+  }
 }
 
 // ── Role check ──────────────────────────────────────────────────────────────

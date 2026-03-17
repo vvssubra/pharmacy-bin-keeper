@@ -1,5 +1,5 @@
 // supabase/functions/ai-query/index.ts
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.0";
 import Anthropic from "https://esm.sh/@anthropic-ai/sdk@0.52.0";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 import {
