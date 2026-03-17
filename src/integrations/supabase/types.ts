@@ -163,6 +163,41 @@ export type Database = {
           },
         ]
       }
+      drug_quotas: {
+        Row: {
+          created_by: string | null
+          drug_id: string
+          id: string
+          quota_limit: number
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          created_by?: string | null
+          drug_id: string
+          id?: string
+          quota_limit: number
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          created_by?: string | null
+          drug_id?: string
+          id?: string
+          quota_limit?: number
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drug_quotas_drug_id_fkey"
+            columns: ["drug_id"]
+            isOneToOne: false
+            referencedRelation: "drugs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drugs: {
         Row: {
           baris: string | null
@@ -428,6 +463,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_all_users_with_roles: {
+        Args: never
+        Returns: {
+          email: string
+          facility: string
+          full_name: string
+          role: string
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -435,9 +480,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_pharmacist: { Args: never; Returns: boolean }
     }
     Enums: {
-      app_role: "pharmacist" | "doctor" | "specialist"
+      app_role:
+        | "admin"
+        | "pharmacist"
+        | "staff"
+        | "doctor"
+        | "specialist"
+        | "fms"
+        | "mo"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -565,7 +618,15 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "pharmacist", "staff", "doctor", "specialist"],
+      app_role: [
+        "admin",
+        "pharmacist",
+        "staff",
+        "doctor",
+        "specialist",
+        "fms",
+        "mo",
+      ],
     },
   },
 } as const
