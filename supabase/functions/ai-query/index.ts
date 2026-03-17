@@ -29,13 +29,22 @@ Deno.serve(async (req) => {
   // ── 1. JWT verification ──────────────────────────────────────────────────
   const { userId, error: jwtError } = await verifyJWT(req.headers.get("authorization"));
   if (jwtError) {
-    return new Response(JSON.stringify({ error: jwtError }), { status: 401, headers: cors });
+    return new Response(JSON.stringify({ error: jwtError }), { status: 401, headers: { ...cors, "Content-Type": "application/json" } });
   }
 
   // ── 2. Role check ─────────────────────────────────────────────────────────
   const role = await getUserRole(userId!);
   if (!role) {
-    return new Response(JSON.stringify({ error: "Unauthorized: no role assigned" }), { status: 403, headers: cors });
+    return new Response(JSON.stringify({ error: "Unauthorized: no role assigned" }), { status: 403, headers: { ...cors, "Content-Type": "application/json" } });
+  }
+
+  // Explicit allowlist — reject any unrecognized roles before rate limit
+  const ALLOWED_ROLES = ["admin", "fms", "mo", "pharmacist"] as const;
+  if (!ALLOWED_ROLES.includes(role as typeof ALLOWED_ROLES[number])) {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized: role not permitted to use AI assistant" }),
+      { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
+    );
   }
 
   // ── 3. Rate limit ─────────────────────────────────────────────────────────
@@ -48,7 +57,7 @@ Deno.serve(async (req) => {
     }
     return new Response(
       JSON.stringify({ error: "Rate limit exceeded", retry_after_seconds: retryAfterSeconds }),
-      { status: 429, headers: cors },
+      { status: 429, headers: { ...cors, "Content-Type": "application/json" } },
     );
   }
 
@@ -57,12 +66,12 @@ Deno.serve(async (req) => {
   try {
     body = await req.json();
   } catch {
-    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: cors });
+    return new Response(JSON.stringify({ error: "Invalid JSON" }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
   }
 
   const parsed = RequestSchema.safeParse(body);
   if (!parsed.success) {
-    return new Response(JSON.stringify({ error: "Invalid input", details: parsed.error.issues }), { status: 400, headers: cors });
+    return new Response(JSON.stringify({ error: "Invalid input", details: parsed.error.issues }), { status: 400, headers: { ...cors, "Content-Type": "application/json" } });
   }
 
   // ── 5. Sanitize input ─────────────────────────────────────────────────────
@@ -100,7 +109,7 @@ Deno.serve(async (req) => {
     } catch {
       // Audit log failure must not abort the primary response
     }
-    return new Response(JSON.stringify({ error: "AI service temporarily unavailable" }), { status: 500, headers: cors });
+    return new Response(JSON.stringify({ error: "AI service temporarily unavailable" }), { status: 500, headers: { ...cors, "Content-Type": "application/json" } });
   }
 
   // ── 9. Audit log ──────────────────────────────────────────────────────────
@@ -131,8 +140,15 @@ async function loadNagDocument(supabase: ReturnType<typeof createClient>): Promi
       .download("nag/nag-2024.txt");
     if (error || !data) return nagDocCache?.text ?? null; // Return stale cache on fetch failure
     const text = await data.text();
-    nagDocCache = { text, fetchedAt: now };
-    return text;
+    const MAX_NAG_CHARS = 102400; // 100KB safety limit
+    const truncated = text.length > MAX_NAG_CHARS
+      ? text.slice(0, MAX_NAG_CHARS) + "\n\n[Document truncated for length]"
+      : text;
+    if (text.length > MAX_NAG_CHARS) {
+      console.warn(`NAG document truncated: original ${text.length} chars exceeds ${MAX_NAG_CHARS} char limit`);
+    }
+    nagDocCache = { text: truncated, fetchedAt: now };
+    return truncated;
   } catch {
     return nagDocCache?.text ?? null; // Return stale cache on exception
   }
