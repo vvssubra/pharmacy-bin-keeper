@@ -1,6 +1,18 @@
 // supabase/functions/_shared/security.ts
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+// Singleton clients — created once per Deno isolate
+const _supabaseAnon = () =>
+  createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_ANON_KEY")!,
+  );
+const _supabaseAdmin = () =>
+  createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+
 // ── JWT verification ────────────────────────────────────────────────────────
 export async function verifyJWT(authHeader: string | null): Promise<{
   userId: string;
@@ -13,10 +25,7 @@ export async function verifyJWT(authHeader: string | null): Promise<{
     return { error: "Missing or invalid Authorization header" };
   }
   const token = authHeader.slice(7);
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_ANON_KEY")!,
-  );
+  const supabase = _supabaseAnon();
   const { data: { user }, error } = await supabase.auth.getUser(token);
   if (error || !user) return { error: "Invalid or expired token" };
   return { userId: user.id };
@@ -24,10 +33,7 @@ export async function verifyJWT(authHeader: string | null): Promise<{
 
 // ── Role check ──────────────────────────────────────────────────────────────
 export async function getUserRole(userId: string): Promise<string | null> {
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
+  const supabase = _supabaseAdmin();
   const { data } = await supabase
     .from("user_roles")
     .select("role")
@@ -50,35 +56,61 @@ export async function checkRateLimit(
   const windowMs = 60 * 60 * 1000; // 1 hour
   const windowStart = now - windowMs;
 
-  // Sliding window log approach using Redis sorted set
-  const pipeline = [
+  // Step 1: Clean old entries + check current count + get oldest entry (all in one pipeline)
+  const checkPipeline = [
     ["zremrangebyscore", key, "-inf", String(windowStart)],
-    ["zadd", key, String(now), String(now)],
     ["zcard", key],
-    ["pexpire", key, String(windowMs)],
+    ["zrange", key, "0", "0", "WITHSCORES"],
   ];
 
-  const resp = await fetch(`${url}/pipeline`, {
+  const checkResp = await fetch(`${url}/pipeline`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(pipeline),
+    body: JSON.stringify(checkPipeline),
   });
 
-  const results = await resp.json();
-  const count = results[2]?.result ?? 0;
+  if (!checkResp.ok) {
+    // Redis unavailable — fail open (allow request)
+    return { allowed: true, retryAfterSeconds: 0 };
+  }
 
-  if (count > limitPerHour) {
-    // Calculate retry-after: time until oldest request exits the window
-    const oldestResp = await fetch(`${url}/zrange/${key}/0/0/WITHSCORES`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const oldestData = await oldestResp.json();
-    const oldestTimestamp = oldestData?.result?.[1] ? parseInt(oldestData.result[1]) : now;
-    const retryAfterSeconds = Math.ceil((oldestTimestamp + windowMs - now) / 1000);
-    return { allowed: false, retryAfterSeconds };
+  const checkResults = await checkResp.json();
+  const count = checkResults[1]?.result ?? 0;
+
+  if (count >= limitPerHour) {
+    // Over limit — compute retry-after from oldest entry
+    const oldestData = checkResults[2]?.result;
+    const oldestTimestamp =
+      Array.isArray(oldestData) && oldestData[1]
+        ? parseInt(oldestData[1])
+        : now;
+    const retryAfterSeconds = Math.ceil(
+      (oldestTimestamp + windowMs - now) / 1000,
+    );
+    return { allowed: false, retryAfterSeconds: Math.max(1, retryAfterSeconds) };
+  }
+
+  // Under limit — now add this request
+  const addPipeline = [
+    ["zadd", key, String(now), String(now)],
+    ["pexpire", key, String(windowMs)],
+  ];
+
+  const addResp = await fetch(`${url}/pipeline`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(addPipeline),
+  });
+
+  if (!addResp.ok) {
+    // Redis write failed — allow request anyway (fail open)
+    return { allowed: true, retryAfterSeconds: 0 };
   }
 
   return { allowed: true, retryAfterSeconds: 0 };
@@ -106,7 +138,8 @@ export function sanitizeInput(text: string): string {
 export function corsHeaders(origin: string | null): HeadersInit {
   const appOrigin = Deno.env.get("APP_ORIGIN") ?? "";
   const allowedOrigins = [appOrigin, "http://localhost:8080", "http://localhost:5173"];
-  const allowed = origin && allowedOrigins.includes(origin) ? origin : appOrigin;
+  const allowed =
+    origin && allowedOrigins.includes(origin) ? origin : (appOrigin || "null");
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -123,11 +156,8 @@ export async function writeAuditLog(entry: {
   tokensUsed?: number;
   errorMessage?: string;
 }): Promise<void> {
-  const supabase = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-  );
-  await supabase.from("ai_audit_logs").insert({
+  const supabase = _supabaseAdmin();
+  const { error } = await supabase.from("ai_audit_logs").insert({
     user_id:       entry.userId,
     role:          entry.role,
     function_name: entry.functionName,
@@ -135,4 +165,5 @@ export async function writeAuditLog(entry: {
     tokens_used:   entry.tokensUsed ?? null,
     error_message: entry.errorMessage ?? null,
   });
+  if (error) throw new Error(`Audit log write failed: ${error.message}`);
 }
