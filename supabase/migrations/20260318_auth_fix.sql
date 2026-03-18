@@ -16,11 +16,18 @@ BEGIN
       NEW.raw_user_meta_data->>'name',
       ''
     )
-  );
+  )
+  ON CONFLICT (user_id) DO NOTHING;
   -- No role assigned — user sees Pending Approval screen until admin assigns one
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- ── 2b. Ensure user_roles has a single-column unique on user_id (required for upsert onConflict: "user_id") ──
+-- Each user holds exactly one role — this also drops the old composite unique
+ALTER TABLE public.user_roles DROP CONSTRAINT IF EXISTS user_roles_user_id_role_key;
+ALTER TABLE public.user_roles DROP CONSTRAINT IF EXISTS user_roles_user_id_key;
+ALTER TABLE public.user_roles ADD CONSTRAINT user_roles_user_id_key UNIQUE (user_id);
 
 -- ── 3. is_admin() helper (SECURITY DEFINER — bypasses RLS safely) ────────────
 CREATE OR REPLACE FUNCTION public.is_admin()
@@ -44,6 +51,11 @@ CREATE POLICY "Admins can view all user_roles"
   USING (user_id = auth.uid() OR public.is_admin());
 
 -- ── 5. Fix user_roles INSERT/UPDATE/DELETE: allow admins ────────────────────
+-- Remove overly-broad pharmacist write policies from previous migration
+DROP POLICY IF EXISTS "Pharmacists can insert user_roles" ON public.user_roles;
+DROP POLICY IF EXISTS "Pharmacists can update user_roles" ON public.user_roles;
+DROP POLICY IF EXISTS "Pharmacists can delete user_roles" ON public.user_roles;
+
 DROP POLICY IF EXISTS "Admins can insert user_roles" ON public.user_roles;
 CREATE POLICY "Admins can insert user_roles"
   ON public.user_roles FOR INSERT
