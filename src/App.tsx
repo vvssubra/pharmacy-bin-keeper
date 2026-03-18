@@ -20,6 +20,7 @@ import SpecialistDashboard from "@/pages/SpecialistDashboard";
 import PharmacistFulfilment from "@/pages/PharmacistFulfilment";
 import PatientRegistry from "@/pages/PatientRegistry";
 import RoleManagement from "@/pages/RoleManagement";
+import ResetPassword from "@/pages/ResetPassword";
 import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             {/* MO routes */}
             <Route path="/request" element={<ProtectedRoute><AppLayout><DoctorLanding /></AppLayout></ProtectedRoute>} />
             <Route path="/request/ubat" element={<ProtectedRoute><AppLayout><DoctorRequest /></AppLayout></ProtectedRoute>} />
