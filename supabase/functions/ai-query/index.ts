@@ -127,35 +127,6 @@ Deno.serve(async (req) => {
   });
 });
 
-// ── NAG document cache (in-memory, survives across requests in same Deno isolate) ──
-let nagDocCache: { text: string; fetchedAt: number } | null = null;
-const NAG_CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-
-async function loadNagDocument(supabase: ReturnType<typeof createClient>): Promise<string | null> {
-  const now = Date.now();
-  if (nagDocCache && (now - nagDocCache.fetchedAt) < NAG_CACHE_TTL_MS) {
-    return nagDocCache.text;
-  }
-  try {
-    const { data, error } = await supabase.storage
-      .from("nag-documents")
-      .download("nag/nag-2024.txt");
-    if (error || !data) return nagDocCache?.text ?? null; // Return stale cache on fetch failure
-    const text = await data.text();
-    const MAX_NAG_CHARS = 102400; // 100KB safety limit
-    const truncated = text.length > MAX_NAG_CHARS
-      ? text.slice(0, MAX_NAG_CHARS) + "\n\n[Document truncated for length]"
-      : text;
-    if (text.length > MAX_NAG_CHARS) {
-      console.warn(`NAG document truncated: original ${text.length} chars exceeds ${MAX_NAG_CHARS} char limit`);
-    }
-    nagDocCache = { text: truncated, fetchedAt: now };
-    return truncated;
-  } catch {
-    return nagDocCache?.text ?? null; // Return stale cache on exception
-  }
-}
-
 // ── Data fetchers ─────────────────────────────────────────────────────────────
 async function fetchDataContext(supabase: ReturnType<typeof createClient>, userId: string, role: string): Promise<object> {
   const thirtyDaysAgo = new Date();
@@ -196,17 +167,15 @@ async function fetchDataContext(supabase: ReturnType<typeof createClient>, userI
   }
 
   if (role === "mo") {
-    const [myRequestsResult, quotasResult, nagText] = await Promise.all([
+    const [myRequestsResult, quotasResult] = await Promise.all([
       supabase.from("dispensing_requests").select("patient_name, status, created_at, drugs(drug_name)").eq("submitted_by", userId).gte("created_at", since),
       supabase.from("drug_quotas").select("quota_limit, year, drugs(drug_name)").eq("year", currentYear),
-      loadNagDocument(supabase),
     ]);
     if (myRequestsResult.error) console.error("Supabase dispensing_requests query error:", myRequestsResult.error.message);
     if (quotasResult.error) console.error("Supabase drug_quotas query error:", quotasResult.error.message);
     return {
       my_requests_last_30d: myRequestsResult.data ?? [],
       controlled_drug_quotas_current_year: quotasResult.data ?? [],
-      _nag_text: nagText,
     };
   }
 
@@ -214,38 +183,65 @@ async function fetchDataContext(supabase: ReturnType<typeof createClient>, userI
 }
 
 function buildSystemPrompt(role: string, dataContext: object): string {
+  const dataStr = JSON.stringify(dataContext);
+
   if (role === "mo") {
-    const ctx = dataContext as { _nag_text?: string | null; my_requests_last_30d?: unknown; controlled_drug_quotas_current_year?: unknown };
-    const nagText = ctx._nag_text ?? null;
-    const cleanData = {
-      my_requests_last_30d: ctx.my_requests_last_30d,
-      controlled_drug_quotas_current_year: ctx.controlled_drug_quotas_current_year,
-    };
-    const dataStr = JSON.stringify(cleanData);
+    return `You are a pharmacy query assistant for a Medical Officer (MO) at a Malaysian government clinic.
+Answer ONLY from the pharmacy data provided below.
 
-    const clinicalBlock = nagText
-      ? "For clinical questions: answer ONLY based on the NAG guidelines provided below. If the case does not match any pathway, say \"Refer to specialist\" — never suggest outside the guidelines. Cite the specific NAG pathway when giving clinical advice."
-      : "Clinical guidelines are temporarily unavailable. For quota/request questions, I can still help.";
+You can help with:
+- Status of your dispensing requests (how many pending, approved, fulfilled, rejected)
+- Which specific requests are still pending or have been rejected
+- Controlled drug quotas: what the annual limit is and how many requests you have submitted
+- Whether a specific drug has a quota limit
 
-    const nagSection = nagText
-      ? `\n\n## NAG (National Antibiotic Guidelines) — use ONLY for clinical questions:\n${nagText}`
-      : "";
-
-    return `You are a clinical and pharmacy assistant for a Malaysian government clinic.
-${clinicalBlock}
-For quota/request questions: answer from the pharmacy data provided.
-Be concise and factual. Only use data explicitly present.
+Do NOT give clinical advice or suggest antibiotics — use the Antibiotic Form's "Suggest Antibiotic (AI)" button for that.
 If the answer is not in the data, say "I don't have that information."
+Be concise and specific. Reference exact drug names, dates, and request counts from the data.
 
-## Pharmacy Data (current snapshot):
-${dataStr}${nagSection}`;
+## Your Pharmacy Data:
+${dataStr}`;
   }
 
-  const dataStr = JSON.stringify(dataContext);
+  if (role === "pharmacist") {
+    return `You are a pharmacy assistant for a Pharmacist at a Malaysian government clinic.
+Answer ONLY from the pharmacy data provided below.
+
+You can help with:
+- Which dispensing requests are pending and need your action (list them specifically)
+- How many requests are in each status (pending/approved/fulfilled/rejected)
+- Drug inventory — which specific drugs are available and their units
+- Recent request history for a specific patient or drug
+
+If the answer is not in the data, say "I don't have that information."
+Be specific — cite exact drug names, patient names, request counts, and dates from the data.
+
+## Pharmacy Data:
+${dataStr}`;
+  }
+
+  if (role === "admin" || role === "fms") {
+    return `You are a pharmacy management assistant for an Admin/FMS user at a Malaysian government clinic.
+Answer ONLY from the pharmacy data provided below.
+
+You can help with:
+- Drug inventory overview: which drugs are active, units, specialist-approval flags
+- Dispensing request counts and status breakdown for the last 30 days
+- Antibiotic form submissions: how many are pending specialist approval, approved, or rejected
+- Controlled drug quotas: limits vs request volume for the current year
+- Identifying specific drugs or patients with multiple pending requests
+
+If the answer is not in the data, say "I don't have that information."
+Be specific — cite exact drug names, counts, dates, and patient names from the data.
+
+## Pharmacy Data:
+${dataStr}`;
+  }
+
   return `You are a pharmacy management assistant. Answer ONLY from the data provided below.
 Do not make up numbers or infer data not present. If the answer is not in the data, say "I don't have that information."
-Be concise. Use numbers directly from the data.
+Be concise and specific. Use exact numbers and names from the data.
 
-## Pharmacy Data (current snapshot):
+## Pharmacy Data:
 ${dataStr}`;
 }

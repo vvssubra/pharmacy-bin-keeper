@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { format } from "date-fns";
-import { ArrowLeft, ShieldCheck, CheckCircle } from "lucide-react";
+import { ArrowLeft, ShieldCheck, CheckCircle, Sparkles, AlertTriangle } from "lucide-react";
 import { usePathwayCheck } from "@/hooks/usePathwayCheck";
 import PathwayCheckBanner from "@/components/PathwayCheckBanner";
 
@@ -57,11 +57,19 @@ const defaultChecklist: ChecklistState = {
   uti: { nit_positive: false, leu_positive: false, frequency: false, dysuria: false, hematuria: false, suprapubic: false, urgency: false, polyuria: false, pregnancy_culture: "" },
 };
 
+interface AiSuggestion {
+  suggestion: string;
+  rationale: string;
+  warning: string | null;
+}
+
 export default function AntibioticForm() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState<{ patient_name: string; patient_ic: string; diagnosis: string } | null>(null);
+  const [aiSuggesting, setAiSuggesting] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<AiSuggestion | null>(null);
 
   // Section 1
   const [tarikh, setTarikh] = useState(format(new Date(), "yyyy-MM-dd"));
@@ -97,6 +105,47 @@ export default function AntibioticForm() {
 
   const updateChecklist = <S extends keyof ChecklistState>(section: S, field: keyof ChecklistState[S], value: any) => {
     setChecklist(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }));
+  };
+
+  const suggestAntibiotic = async () => {
+    if (!diagnosis) {
+      toast.error("Please enter a diagnosis first");
+      return;
+    }
+    setAiSuggesting(true);
+    setAiSuggestion(null);
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token ?? "";
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/antibiotic-suggest`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+          body: JSON.stringify({
+            diagnosis,
+            checklist: checklist as Record<string, unknown>,
+            patient_age: age ?? undefined,
+            allergy_status: drugAllergy ? drugAllergyDetail || "Yes (unspecified)" : undefined,
+            patient_weight_kg: showWeight && patientWeight ? parseFloat(patientWeight) : undefined,
+          }),
+        }
+      );
+      if (resp.status === 429) {
+        toast.error("AI suggestion limit reached. Please try again later.");
+        return;
+      }
+      if (!resp.ok) {
+        toast.error("AI suggestion unavailable. Please try again.");
+        return;
+      }
+      const data = await resp.json() as AiSuggestion;
+      setAiSuggestion(data);
+    } catch {
+      toast.error("Network error. Please check your connection.");
+    } finally {
+      setAiSuggesting(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -154,7 +203,7 @@ export default function AntibioticForm() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Button onClick={() => { setSubmitted(null); setPatientName(""); setPatientIC(""); setDiagnosis(""); setChecklist(defaultChecklist); setAntibioticRegimen(""); setPrescriberNotes(""); }}>
+              <Button onClick={() => { setSubmitted(null); setPatientName(""); setPatientIC(""); setDiagnosis(""); setChecklist(defaultChecklist); setAntibioticRegimen(""); setPrescriberNotes(""); setAiSuggestion(null); }}>
                 Submit New Form
               </Button>
               <Button variant="link" onClick={() => navigate("/request")}>Back to Request Options</Button>
@@ -243,7 +292,45 @@ export default function AntibioticForm() {
               </div>
 
               <div className="space-y-2">
-                <Label>7. Antibiotic Regimen (Dose, frequency, duration)</Label>
+                <div className="flex items-center justify-between">
+                  <Label>7. Antibiotic Regimen (Dose, frequency, duration)</Label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={suggestAntibiotic}
+                    disabled={aiSuggesting || !diagnosis}
+                    className="gap-1.5 text-xs h-7 border-primary/40 text-primary hover:bg-primary/5"
+                  >
+                    <Sparkles className="h-3 w-3" />
+                    {aiSuggesting ? "Suggesting..." : "Suggest Antibiotic (AI)"}
+                  </Button>
+                </div>
+                {aiSuggestion && (
+                  <div className="rounded-md border border-blue-200 bg-blue-50 p-3 space-y-2 text-sm">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="space-y-1 flex-1">
+                        <p className="font-semibold text-blue-900">{aiSuggestion.suggestion}</p>
+                        <p className="text-xs text-blue-700">{aiSuggestion.rationale}</p>
+                        {aiSuggestion.warning && (
+                          <div className="flex items-start gap-1 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-2 py-1">
+                            <AlertTriangle className="h-3 w-3 mt-0.5 shrink-0" />
+                            <span>{aiSuggestion.warning}</span>
+                          </div>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="h-7 text-xs shrink-0"
+                        onClick={() => { setAntibioticRegimen(aiSuggestion.suggestion); setAiSuggestion(null); }}
+                      >
+                        Use
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground">AI suggestion based on NAG 2024. Verify before prescribing.</p>
+                  </div>
+                )}
                 <Textarea value={antibioticRegimen} onChange={e => setAntibioticRegimen(e.target.value)} placeholder="e.g. Amoxicillin 500mg TDS x 5 days" />
                 <Input value={fmsCode} onChange={e => setFmsCode(e.target.value)} placeholder="FMS Code (if A/KK item prescribed by MO)" />
               </div>

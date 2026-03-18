@@ -1,6 +1,7 @@
 // src/components/AiChatWidget.tsx
 import { useState, useRef, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Bot, Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,13 +13,23 @@ interface Message {
   content: string;
 }
 
+const ROLE_EXAMPLES: Record<string, string[]> = {
+  admin:      ["Which drugs are running low on stock?", "How many dispensing requests are pending?", "Show antibiotic forms awaiting specialist approval"],
+  fms:        ["How many antibiotic forms were submitted this month?", "Which controlled drugs are near their quota limit?", "List dispensing requests from the last 7 days"],
+  pharmacist: ["Which requests are still pending my action?", "How many requests were fulfilled today?", "Is Amoxicillin available in the drug list?"],
+  mo:         ["How many of my requests are still pending?", "What is the quota limit for Tramadol this year?", "Which of my requests were rejected recently?"],
+};
+
 export default function AiChatWidget() {
+  const { role } = useAuth();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [rateLimitMsg, setRateLimitMsg] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const examples = role ? (ROLE_EXAMPLES[role] ?? ROLE_EXAMPLES.admin) : [];
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -107,12 +118,22 @@ export default function AiChatWidget() {
 
           <ScrollArea className="flex-1 px-4 py-3">
             {messages.length === 0 && (
-              <div className="text-center text-sm text-muted-foreground mt-8 space-y-2">
-                <Bot className="h-8 w-8 mx-auto opacity-30" />
-                <p>Ask me anything about your pharmacy data.</p>
-                <p className="text-xs">
-                  Examples: "Which drugs are critically low?" or "How many requests are pending?"
-                </p>
+              <div className="text-sm text-muted-foreground mt-6 space-y-3">
+                <div className="text-center space-y-1">
+                  <Bot className="h-8 w-8 mx-auto opacity-30" />
+                  <p>Ask me about your pharmacy data.</p>
+                </div>
+                <div className="space-y-1.5">
+                  {examples.map((ex, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setInput(ex)}
+                      className="w-full text-left text-xs px-3 py-2 rounded-md border border-border bg-muted/40 hover:bg-muted transition-colors"
+                    >
+                      {ex}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             <div className="space-y-3">
