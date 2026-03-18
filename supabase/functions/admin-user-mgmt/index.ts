@@ -1,0 +1,116 @@
+// supabase/functions/admin-user-mgmt/index.ts
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.46.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import {
+  verifyJWT,
+  getUserRole,
+  corsHeaders,
+} from "../_shared/security.ts";
+
+const ALLOWED_ROLES = ["admin", "fms", "mo", "pharmacist"] as const;
+
+const CreateUserSchema = z.object({
+  action: z.literal("create_user"),
+  full_name: z.string().min(1).max(100),
+  email: z.string().email(),
+  password: z.string().min(6).max(72),
+  role: z.enum(ALLOWED_ROLES),
+});
+
+function adminClient() {
+  return createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+  );
+}
+
+Deno.serve(async (req) => {
+  const origin = req.headers.get("origin");
+  const cors = corsHeaders(origin);
+
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: cors, status: 204 });
+  }
+
+  if (req.method !== "POST") {
+    return new Response(
+      JSON.stringify({ error: "Method not allowed" }),
+      { status: 405, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  // ── 1. JWT verification ────────────────────────────────────────────────────
+  const { userId, error: jwtError } = await verifyJWT(req.headers.get("authorization"));
+  if (jwtError) {
+    return new Response(
+      JSON.stringify({ error: jwtError }),
+      { status: 401, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  // ── 2. Role check: admin only ──────────────────────────────────────────────
+  const callerRole = await getUserRole(userId!);
+  if (callerRole !== "admin") {
+    return new Response(
+      JSON.stringify({ error: "Unauthorized: admin role required" }),
+      { status: 403, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  // ── 3. Parse + validate body ───────────────────────────────────────────────
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return new Response(
+      JSON.stringify({ error: "Invalid JSON body" }),
+      { status: 400, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  const parsed = CreateUserSchema.safeParse(body);
+  if (!parsed.success) {
+    return new Response(
+      JSON.stringify({ error: "Validation failed", details: parsed.error.flatten() }),
+      { status: 400, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  const { full_name, email, password, role } = parsed.data;
+  const supabase = adminClient();
+
+  // ── 4. Create auth user ────────────────────────────────────────────────────
+  const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { full_name },
+  });
+
+  if (createError) {
+    const status = createError.message.includes("already registered") ? 409 : 500;
+    return new Response(
+      JSON.stringify({ error: createError.message }),
+      { status, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  // ── 5. Assign role ─────────────────────────────────────────────────────────
+  const { error: roleError } = await supabase
+    .from("user_roles")
+    .upsert({ user_id: newUser.user.id, role }, { onConflict: "user_id" });
+
+  if (roleError) {
+    // User was created but role assignment failed — clean up to avoid orphan
+    await supabase.auth.admin.deleteUser(newUser.user.id);
+    return new Response(
+      JSON.stringify({ error: "Failed to assign role. User creation rolled back." }),
+      { status: 500, headers: { ...cors, "Content-Type": "application/json" } },
+    );
+  }
+
+  return new Response(
+    JSON.stringify({ user_id: newUser.user.id, email: newUser.user.email }),
+    { status: 201, headers: { ...cors, "Content-Type": "application/json" } },
+  );
+});
