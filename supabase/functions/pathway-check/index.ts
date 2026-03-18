@@ -93,7 +93,7 @@ Deno.serve(async (req) => {
       );
       const { data, error } = await supabase.storage
         .from("nag-documents")
-        .download("nag/nag-2024.txt");
+        .download("nag-2024.txt");
       if (error || !data) throw new Error("Storage fetch failed");
       const text = await data.text();
       // Guard against oversized documents (> 500 KB)

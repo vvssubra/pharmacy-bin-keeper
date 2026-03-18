@@ -31,7 +31,7 @@ async function loadNagDocument(supabase: ReturnType<typeof createClient>): Promi
   const now = Date.now();
   if (nagDocCache && (now - nagDocCache.fetchedAt) < NAG_CACHE_TTL_MS) return nagDocCache.text;
   try {
-    const { data, error } = await supabase.storage.from("nag-documents").download("nag/nag-2024.txt");
+    const { data, error } = await supabase.storage.from("nag-documents").download("nag-2024.txt");
     if (error || !data) return nagDocCache?.text ?? null;
     const text = await data.text();
     nagDocCache = { text: text.slice(0, 500_000), fetchedAt: now };
