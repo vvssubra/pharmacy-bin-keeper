@@ -36,29 +36,17 @@ export async function verifyJWT(authHeader: string | null): Promise<{
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return { error: "Missing or invalid Authorization header" };
   }
-  const token = authHeader.slice(7);
-  if (!token) return { error: "Missing token" };
 
   try {
-    // Decode JWT payload without library dependency
-    const parts = token.split(".");
-    if (parts.length !== 3) return { error: "Invalid token format" };
-    const payload = JSON.parse(atob(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
-
-    const userId = payload.sub as string | undefined;
-    if (!userId) return { error: "Invalid token: missing sub" };
-
-    // Check expiry
-    if (payload.exp && payload.exp < Math.floor(Date.now() / 1000)) {
-      return { error: "Token expired" };
-    }
-
-    // Verify user exists via admin client (service role)
-    const supabase = _supabaseAdmin();
-    const { data: { user }, error } = await supabase.auth.admin.getUserById(userId);
+    // Use Supabase's own getUser() — reliable JWT validation without manual base64 decoding
+    const client = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: { user }, error } = await client.auth.getUser();
     if (error || !user) return { error: "Invalid or expired token" };
-
-    return { userId };
+    return { userId: user.id };
   } catch {
     return { error: "Invalid token" };
   }
