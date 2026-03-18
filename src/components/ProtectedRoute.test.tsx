@@ -82,9 +82,9 @@ describe("ProtectedRoute", () => {
   });
 
   describe("specialist role", () => {
-    it("allows access to /specialist", () => {
+    it("blocks access to /specialist", () => {
       renderWithRouter("/specialist", { user: { id: "1" }, role: "specialist", loading: false });
-      expect(screen.getByText("Specialist page")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("blocks access to /drugs", () => {
       renderWithRouter("/drugs", { user: { id: "1" }, role: "specialist", loading: false });
@@ -109,9 +109,9 @@ describe("ProtectedRoute", () => {
       renderWithRouter("/request", { user: { id: "1" }, role: "pharmacist", loading: false });
       expect(screen.getByText("Doctor Request page")).toBeInTheDocument();
     });
-    it("allows access to /role-management", () => {
+    it("blocks access to /role-management", () => {
       renderWithRouter("/role-management", { user: { id: "1" }, role: "pharmacist", loading: false });
-      expect(screen.getByText("Role Management page")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("allows access to /drugs", () => {
       renderWithRouter("/drugs", { user: { id: "1" }, role: "pharmacist", loading: false });
