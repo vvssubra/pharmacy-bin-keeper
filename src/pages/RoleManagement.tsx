@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
-import { UserCog, Users } from "lucide-react";
+import { UserCog, Users, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+const ADMIN_MGMT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin-user-mgmt`;
 
 type UserWithRole = {
   user_id: string;
@@ -41,6 +46,13 @@ export default function RoleManagement() {
   const queryClient = useQueryClient();
   const [pendingRole, setPendingRole] = useState<Record<string, string>>({});
 
+  const [addUserOpen, setAddUserOpen] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newEmail, setNewEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [newRole, setNewRole] = useState<string>("mo");
+  const [addUserError, setAddUserError] = useState<string | null>(null);
+
   const { data: users = [], isLoading } = useQuery<UserWithRole[]>({
     queryKey: ["all-users-with-roles"],
     queryFn: async () => {
@@ -70,6 +82,46 @@ export default function RoleManagement() {
     onError: () => toast.error("Failed to update role."),
   });
 
+  const { data: session } = useQuery({
+    queryKey: ["session"],
+    queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      return session;
+    },
+  });
+
+  const createUser = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(ADMIN_MGMT_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token}`,
+        },
+        body: JSON.stringify({
+          action: "create_user",
+          full_name: newName.trim(),
+          email: newEmail.trim(),
+          password: newPassword,
+          role: newRole,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to create user");
+      return json;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-users-with-roles"] });
+      toast.success("User created successfully.");
+      setAddUserOpen(false);
+      setNewName(""); setNewEmail(""); setNewPassword(""); setNewRole("mo");
+      setAddUserError(null);
+    },
+    onError: (err: Error) => {
+      setAddUserError(err.message);
+    },
+  });
+
   const isSelf = (userId: string) => userId === currentUser?.id;
 
   return (
@@ -85,7 +137,7 @@ export default function RoleManagement() {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-base">
             <Users className="h-4 w-4 text-muted-foreground" />
             All Users
@@ -93,6 +145,10 @@ export default function RoleManagement() {
               <Badge variant="secondary" className="ml-1">{users.length}</Badge>
             )}
           </CardTitle>
+          <Button size="sm" className="h-8 text-xs gap-1" onClick={() => setAddUserOpen(true)}>
+            <Plus className="h-3.5 w-3.5" />
+            Add User
+          </Button>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -169,6 +225,76 @@ export default function RoleManagement() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={addUserOpen} onOpenChange={(open) => { setAddUserOpen(open); if (!open) setAddUserError(null); }}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Add New User</DialogTitle>
+          </DialogHeader>
+          <form
+            onSubmit={(e) => { e.preventDefault(); createUser.mutate(); }}
+            className="space-y-4"
+          >
+            <div className="space-y-2">
+              <Label htmlFor="add-name">Full Name</Label>
+              <Input
+                id="add-name"
+                value={newName}
+                onChange={e => setNewName(e.target.value)}
+                required
+                placeholder="Dr. Ahmad bin Ali"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-email">Email</Label>
+              <Input
+                id="add-email"
+                type="email"
+                value={newEmail}
+                onChange={e => setNewEmail(e.target.value)}
+                required
+                placeholder="ahmad@example.gov.my"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-password">Password</Label>
+              <Input
+                id="add-password"
+                type="password"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                required
+                minLength={6}
+                placeholder="Min 6 characters"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="add-role">Role</Label>
+              <Select value={newRole} onValueChange={setNewRole}>
+                <SelectTrigger id="add-role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {ASSIGNABLE_ROLES.map((r) => (
+                    <SelectItem key={r} value={r}>{ROLE_LABELS[r]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {addUserError && (
+              <p className="text-sm text-destructive">{addUserError}</p>
+            )}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setAddUserOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={createUser.isPending}>
+                {createUser.isPending ? "Creating…" : "Create User"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
