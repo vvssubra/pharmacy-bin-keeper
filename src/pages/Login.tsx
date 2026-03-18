@@ -8,22 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-function getRoleRedirect(role: string | null): string {
-  switch (role) {
-    case "doctor": return "/request";
-    case "specialist": return "/specialist";
-    default: return "/";
-  }
-}
-
 export default function Login() {
-  const { user, role, loading } = useAuth();
+  const { user, loading } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   if (loading) {
     return (
@@ -33,7 +29,7 @@ export default function Login() {
     );
   }
 
-  if (user) return <Navigate to={getRoleRedirect(role)} replace />;
+  if (user) return <Navigate to="/" replace />;
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +66,21 @@ export default function Login() {
     setGoogleLoading(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setForgotLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      setError(error.message);
+    } else {
+      setForgotSent(true);
+    }
+    setForgotLoading(false);
+  };
+
   return (
     <div className="flex min-h-screen items-start justify-center bg-background pt-24 px-4">
       <Card className="w-full max-w-sm">
@@ -78,75 +89,134 @@ export default function Login() {
           <CardDescription>Klinik Kesihatan Kempas</CardDescription>
         </CardHeader>
         <CardContent>
-          <Tabs defaultValue="login" onValueChange={() => setError(null)}>
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="login">Log In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="login">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
-                  <Input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+          {forgotMode && (
+            <div className="space-y-4">
+              {forgotSent ? (
+                <div className="space-y-3 text-center">
+                  <p className="text-sm text-foreground">Check your email for a reset link.</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => { setForgotMode(false); setForgotSent(false); setForgotEmail(""); }}
+                  >
+                    Back to Login
+                  </Button>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
-                  <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
-                </div>
-                {error && (
-                  <p id="login-error" role="alert" aria-live="polite" className="text-sm text-destructive">
-                    {error}
+              ) : (
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Enter your email and we'll send you a reset link.
                   </p>
-                )}
-                <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "login-error" : undefined}>
-                  {submitting ? "Logging in…" : "Log In"}
-                </Button>
-                <div className="relative my-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
+                  <div className="space-y-2">
+                    <Label htmlFor="forgot-email">Email</Label>
+                    <Input
+                      id="forgot-email"
+                      type="email"
+                      value={forgotEmail}
+                      onChange={e => setForgotEmail(e.target.value)}
+                      required
+                      autoComplete="email"
+                    />
                   </div>
-                  <div className="relative flex justify-center text-xs uppercase text-muted-foreground">
-                    <span className="bg-card px-2">or log in with</span>
-                  </div>
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  disabled={googleLoading || submitting}
-                  onClick={handleGoogleLogin}
-                >
-                  {googleLoading ? "Processing…" : "Log in with Google"}
-                </Button>
-              </form>
-            </TabsContent>
+                  {error && (
+                    <p className="text-sm text-destructive">{error}</p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={forgotLoading}>
+                    {forgotLoading ? "Sending…" : "Send Reset Link"}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => { setForgotMode(false); setError(null); }}
+                  >
+                    Cancel
+                  </Button>
+                </form>
+              )}
+            </div>
+          )}
+          {!forgotMode && (
+            <Tabs defaultValue="login" onValueChange={() => setError(null)}>
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="login">Log In</TabsTrigger>
+                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="signup">
-              <form onSubmit={handleSignup} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
-                  <Input id="signup-name" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required autoComplete="name" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
-                  <Input id="signup-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
-                  <Input id="signup-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
-                </div>
-                {error && (
-                  <p id="signup-error" role="alert" aria-live="polite" className="text-sm text-destructive">
-                    {error}
-                  </p>
-                )}
-                <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "signup-error" : undefined}>
-                  {submitting ? "Signing up…" : "Create Account"}
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
+              <TabsContent value="login">
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="login-email">Email</Label>
+                    <Input id="login-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="login-password">Password</Label>
+                    <Input id="login-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required autoComplete="current-password" />
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                      onClick={() => { setForgotMode(true); setError(null); }}
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+                  {error && (
+                    <p id="login-error" role="alert" aria-live="polite" className="text-sm text-destructive">
+                      {error}
+                    </p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "login-error" : undefined}>
+                    {submitting ? "Logging in…" : "Log In"}
+                  </Button>
+                  <div className="relative my-4">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase text-muted-foreground">
+                      <span className="bg-card px-2">or log in with</span>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={googleLoading || submitting}
+                    onClick={handleGoogleLogin}
+                  >
+                    {googleLoading ? "Processing…" : "Log in with Google"}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="signup">
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-name">Full Name</Label>
+                    <Input id="signup-name" type="text" value={fullName} onChange={e => setFullName(e.target.value)} required autoComplete="name" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-email">Email</Label>
+                    <Input id="signup-email" type="email" value={email} onChange={e => setEmail(e.target.value)} required autoComplete="email" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="signup-password">Password</Label>
+                    <Input id="signup-password" type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
+                  </div>
+                  {error && (
+                    <p id="signup-error" role="alert" aria-live="polite" className="text-sm text-destructive">
+                      {error}
+                    </p>
+                  )}
+                  <Button type="submit" className="w-full" disabled={submitting} aria-describedby={error ? "signup-error" : undefined}>
+                    {submitting ? "Signing up…" : "Create Account"}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
+          )}
         </CardContent>
       </Card>
     </div>
