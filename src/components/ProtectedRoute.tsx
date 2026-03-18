@@ -4,6 +4,7 @@ import type { AppRole } from "@/contexts/AuthContext";
 import { AppLayout } from "@/components/AppLayout";
 import { NoPermission } from "@/components/NoPermission";
 import { PageSkeleton } from "@/components/PageSkeleton";
+import { PendingApproval } from "@/components/PendingApproval";
 
 /** Declares which roles can access each route prefix. */
 const ROUTE_PERMISSIONS: Array<{ prefix: string; roles: AppRole[] }> = [
@@ -45,9 +46,14 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/login" replace />;
   }
 
+  // authenticated but no role → pending approval (outside AppLayout)
+  if (!role) {
+    return <PendingApproval />;
+  }
+
   const allowedRoles = getAllowedRoles(location.pathname);
 
-  if (!role || !allowedRoles.includes(role)) {
+  if (!allowedRoles.includes(role)) {
     return <AppLayout><NoPermission /></AppLayout>;
   }
 

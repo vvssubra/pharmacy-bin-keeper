@@ -11,6 +11,9 @@ vi.mock("@/components/AppLayout", () => ({
 vi.mock("@/components/PageSkeleton", () => ({
   PageSkeleton: () => <div>Loading skeleton</div>,
 }));
+vi.mock("@/components/PendingApproval", () => ({
+  PendingApproval: () => <div>Pending Approval</div>,
+}));
 
 const { useAuth } = await import("@/contexts/AuthContext");
 
@@ -45,35 +48,35 @@ describe("ProtectedRoute", () => {
   });
 
   describe("unassigned user (role = null)", () => {
-    it("shows NoPermission on /specialist", () => {
+    it("shows PendingApproval on /specialist", () => {
       renderWithRouter("/specialist", { user: { id: "1" }, role: null, loading: false });
-      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
+      expect(screen.getByText("Pending Approval")).toBeInTheDocument();
     });
-    it("shows NoPermission on /drugs", () => {
+    it("shows PendingApproval on /drugs", () => {
       renderWithRouter("/drugs", { user: { id: "1" }, role: null, loading: false });
-      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
+      expect(screen.getByText("Pending Approval")).toBeInTheDocument();
     });
-    it("shows NoPermission on /request", () => {
+    it("shows PendingApproval on /request", () => {
       renderWithRouter("/request", { user: { id: "1" }, role: null, loading: false });
-      expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
+      expect(screen.getByText("Pending Approval")).toBeInTheDocument();
     });
   });
 
-  describe("doctor role", () => {
+  describe("mo role", () => {
     it("allows access to /request", () => {
-      renderWithRouter("/request", { user: { id: "1" }, role: "doctor", loading: false });
+      renderWithRouter("/request", { user: { id: "1" }, role: "mo", loading: false });
       expect(screen.getByText("Doctor Request page")).toBeInTheDocument();
     });
     it("blocks access to /drugs", () => {
-      renderWithRouter("/drugs", { user: { id: "1" }, role: "doctor", loading: false });
+      renderWithRouter("/drugs", { user: { id: "1" }, role: "mo", loading: false });
       expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("blocks access to /fulfilment", () => {
-      renderWithRouter("/fulfilment", { user: { id: "1" }, role: "doctor", loading: false });
+      renderWithRouter("/fulfilment", { user: { id: "1" }, role: "mo", loading: false });
       expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
     it("blocks access to /role-management", () => {
-      renderWithRouter("/role-management", { user: { id: "1" }, role: "doctor", loading: false });
+      renderWithRouter("/role-management", { user: { id: "1" }, role: "mo", loading: false });
       expect(screen.getByRole("heading", { name: /No Permission/i })).toBeInTheDocument();
     });
   });
