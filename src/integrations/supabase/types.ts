@@ -114,6 +114,8 @@ export type Database = {
           status: string
           submitted_by: string | null
           updated_at: string
+          is_pesara: boolean
+          borrowed_from_facility: string | null
         }
         Insert: {
           created_at?: string
@@ -133,6 +135,8 @@ export type Database = {
           status?: string
           submitted_by?: string | null
           updated_at?: string
+          is_pesara?: boolean
+          borrowed_from_facility?: string | null
         }
         Update: {
           created_at?: string
@@ -152,6 +156,8 @@ export type Database = {
           status?: string
           submitted_by?: string | null
           updated_at?: string
+          is_pesara?: boolean
+          borrowed_from_facility?: string | null
         }
         Relationships: [
           {
