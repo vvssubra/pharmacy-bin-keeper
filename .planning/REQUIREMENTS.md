@@ -32,8 +32,8 @@ Requirements for v2.0 milestone.
 ### Controlled Drug Quota & Pesara
 
 - [x] **CDQ-01**: Doctor can mark a patient as Pesara (Government Retiree) on the drug dispensing request form via a checkbox; the is_pesara flag is saved to dispensing_requests
-- [ ] **CDQ-02**: Specialist sees Regular and Pesara sub-tabs in the Controlled Drug tab, with quota usage badges (healthy/warning/exhausted) on each Regular request row and an "Unlimited" badge on Pesara rows
-- [ ] **CDQ-03**: Specialist approve dialog shows a borrow-from-facility field when quota is exhausted; approve button disabled until field is filled; borrowed_from_facility saved on the dispensing_request record
+- [x] **CDQ-02**: Specialist sees Regular and Pesara sub-tabs in the Controlled Drug tab, with quota usage badges (healthy/warning/exhausted) on each Regular request row and an "Unlimited" badge on Pesara rows
+- [x] **CDQ-03**: Specialist approve dialog shows a borrow-from-facility field when quota is exhausted; approve button disabled until field is filled; borrowed_from_facility saved on the dispensing_request record
 - [ ] **CDQ-04**: FmsDashboard annual quota table shows a Pesara column with patient count and "(Unlimited)" label per controlled drug, and the regular YTD count excludes Pesara patients
 
 ## Future Requirements
@@ -73,8 +73,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | USR-02 | Phase 4 | Pending |
 | USR-03 | Phase 4 | Pending |
 | CDQ-01 | Phase 5 | Complete |
-| CDQ-02 | Phase 5 | Pending |
-| CDQ-03 | Phase 5 | Pending |
+| CDQ-02 | Phase 5 | Complete |
+| CDQ-03 | Phase 5 | Complete |
 | CDQ-04 | Phase 5 | Pending |
 
 **Coverage:**

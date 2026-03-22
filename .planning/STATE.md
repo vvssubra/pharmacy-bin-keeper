@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
 status: unknown
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-03-22T10:25:02.919Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-03-22T10:29:36Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 8
 ---
 
 # Project State
@@ -24,7 +24,7 @@ See: .planning/PROJECT.md (updated 2026-03-16)
 ## Current Position
 
 Phase: 05 (controlled-drug-approval-flow-to-specialist-with-patient-based-quota-and-pesara-category) — EXECUTING
-Plan: 1 of 3
+Plan: 2 of 3
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Plan: 1 of 3
 | Phase 01-english-ui P05 | 53m | 2 tasks | 5 files |
 | Phase 01-english-ui P06 | 15m | 2 tasks | 9 files |
 | Phase 05 P01 | 3 | 2 tasks | 6 files |
+| Phase 05 P02 | 3m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase 05-01]: onCheckedChange (not onChange) must be used on Radix Checkbox — silently ignores onChange
 - [Phase 05-01]: ResizeObserver polyfill added to src/test/setup.ts to unblock Radix UI tests in JSDOM
 - [Phase 05-01]: quotaBadgeState threshold: >=80% = warning, >=100% = exhausted (patient-based quota semantics)
+- [Phase 05-02]: quotaCounts.regular[drug_id] uses unique patient IC set — same patient dispensed twice counts once toward quota
+- [Phase 05-02]: Pesara approve dialog skips quota exhausted alert — isApproveTargetPesara gates the exhaustion check
+- [Phase 05-02]: borrowFacility reset on both dialog onOpenChange and Cancel click to prevent stale state across dialogs
 
 ### Roadmap Evolution
 
