@@ -88,7 +88,7 @@ Plans:
 | 2. Drug-Request Sync | v2.0 | 0/? | Not started | - |
 | 3. Antibiotic PDF | v2.0 | 0/? | Not started | - |
 | 4. Admin User Management | v2.0 | 0/? | Not started | - |
-| 5. Controlled Drug Quota & Pesara | v2.0 | 0/3 | Planning complete | - |
+| 5. Controlled Drug Quota & Pesara | 1/3 | In Progress|  | - |
 
 ### Phase 5: Controlled Drug Quota & Pesara
 
@@ -101,7 +101,7 @@ Plans:
   3. Specialist approve dialog shows quota exhausted alert and borrow-from-facility input when quota is at/over limit; borrowed_from_facility is saved on approval
   4. FmsDashboard annual quota table has a Pesara column showing patient count per drug with "(Unlimited)" label
   5. Regular YTD patient count excludes Pesara patients and counts unique patient ICs per drug
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 05-01-PLAN.md — Update Supabase types + quotaBadgeState helper + DoctorRequest Pesara checkbox

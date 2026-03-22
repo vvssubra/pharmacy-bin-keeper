@@ -2,16 +2,14 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
-status: planning
-stopped_at: Phase 5 context gathered
-last_updated: "2026-03-22T08:50:57.595Z"
-last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
+status: unknown
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-03-22T10:25:02.919Z"
 progress:
   total_phases: 5
   completed_phases: 1
-  total_plans: 6
-  completed_plans: 6
-  percent: 33
+  total_plans: 9
+  completed_plans: 7
 ---
 
 # Project State
@@ -21,16 +19,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-16)
 
 **Core value:** Every drug movement is traceable and every dispensing request is accountable.
-**Current focus:** Phase 1 — English UI
+**Current focus:** Phase 05 — controlled-drug-approval-flow-to-specialist-with-patient-based-quota-and-pesara-category
 
 ## Current Position
 
-Phase: 1 of 4 (English UI)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-03-16 — Roadmap created for v2.0 milestone
-
-Progress: [███░░░░░░░] 33%
+Phase: 05 (controlled-drug-approval-flow-to-specialist-with-patient-based-quota-and-pesara-category) — EXECUTING
+Plan: 1 of 3
 
 ## Performance Metrics
 
@@ -58,6 +52,7 @@ Progress: [███░░░░░░░] 33%
 | Phase 01-english-ui P04 | 15m | 2 tasks | 3 files |
 | Phase 01-english-ui P05 | 53m | 2 tasks | 5 files |
 | Phase 01-english-ui P06 | 15m | 2 tasks | 9 files |
+| Phase 05 P01 | 3 | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -81,6 +76,9 @@ Recent decisions affecting current work:
 - [Phase 01-english-ui]: RHF submit button onClick pattern: adding onClick handler with form.handleSubmit() alongside type=submit ensures fireEvent.click in JSDOM triggers Zod validation in tests
 - [Phase 01-english-ui]: Grep-first verification gate: primary ENGL-05 pattern must return zero matches before any human checkpoint — enforces completeness objectively and caught 9 files missed by Plans 01-05
 - [Phase 01-english-ui]: TypeScript variable names derived from Malay DB column names (currentBaki, tarikh, isBakiAwal) are NOT display strings — they match DB schema identifiers and are excluded from translation scope
+- [Phase 05-01]: onCheckedChange (not onChange) must be used on Radix Checkbox — silently ignores onChange
+- [Phase 05-01]: ResizeObserver polyfill added to src/test/setup.ts to unblock Radix UI tests in JSDOM
+- [Phase 05-01]: quotaBadgeState threshold: >=80% = warning, >=100% = exhausted (patient-based quota semantics)
 
 ### Roadmap Evolution
 
@@ -98,6 +96,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T08:50:57.593Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-controlled-drug-approval-flow-to-specialist-with-patient-based-quota-and-pesara-category/05-CONTEXT.md
+Last session: 2026-03-22T10:25:02.915Z
+Stopped at: Completed 05-01-PLAN.md
+Resume file: None
