@@ -58,11 +58,12 @@ Source: default (standard Tailwind/shadcn 8-point scale; consistent with all exi
 | Body | 14px (text-sm) | 400 (regular) | 1.6 | Noto Sans |
 | Label | 14px (text-sm) | 600 (semibold) | 1.5 | Noto Sans |
 | Heading (card/section) | 16px (text-base) | 600 (semibold) | 1.3 | Figtree |
-| Display (page title) | 20px (text-xl) | 700 (bold) | 1.3 | Figtree |
+| Display (page title) | 20px (text-xl) | 600 (semibold) | 1.3 | Figtree |
 
 Notes:
-- Quota badge text: 12px (text-xs), weight 500 (medium) — consistent with existing `text-[10px]` NAG badge pattern scaled up for quota readability
-- "Unlimited" Pesara label: 12px (text-xs), weight 500, muted-foreground color
+- Quota badge text: 12px (text-xs), weight 400 (regular) — consistent with existing `text-[10px]` NAG badge pattern scaled up for quota readability
+- "Unlimited" Pesara label: 12px (text-xs), weight 400 (regular), muted-foreground color
+- Only 2 weights are declared: 400 (regular) for body text and quota/Pesara badge text; 600 (semibold) for labels, headings, display titles, and all other elevated-hierarchy text
 
 Source: `src/index.css` body/heading declarations; existing badge usage in `SpecialistDashboard.tsx`
 
