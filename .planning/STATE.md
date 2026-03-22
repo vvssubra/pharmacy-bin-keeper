@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
 status: planning
-stopped_at: "Completed 01-english-ui/01-06-PLAN.md — Phase 1 English UI fully verified: zero Malay strings, 37 tests GREEN, human approved"
-last_updated: "2026-03-16T22:24:00.548Z"
+stopped_at: Phase 5 context gathered
+last_updated: "2026-03-22T08:50:57.595Z"
 last_activity: 2026-03-16 — Roadmap created for v2.0 milestone
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 1
   total_plans: 6
   completed_plans: 6
@@ -35,6 +35,7 @@ Progress: [███░░░░░░░] 33%
 ## Performance Metrics
 
 **Velocity:**
+
 - Total plans completed: 0
 - Average duration: -
 - Total execution time: 0 hours
@@ -46,6 +47,7 @@ Progress: [███░░░░░░░] 33%
 | - | - | - | - |
 
 **Recent Trend:**
+
 - Last 5 plans: none yet
 - Trend: -
 
@@ -80,6 +82,10 @@ Recent decisions affecting current work:
 - [Phase 01-english-ui]: Grep-first verification gate: primary ENGL-05 pattern must return zero matches before any human checkpoint — enforces completeness objectively and caught 9 files missed by Plans 01-05
 - [Phase 01-english-ui]: TypeScript variable names derived from Malay DB column names (currentBaki, tarikh, isBakiAwal) are NOT display strings — they match DB schema identifiers and are excluded from translation scope
 
+### Roadmap Evolution
+
+- Phase 5 added: Controlled drug approval flow to specialist with patient-based quota and Pesara category
+
 ### Pending Todos
 
 None yet.
@@ -92,6 +98,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-16T22:16:32.971Z
-Stopped at: Completed 01-english-ui/01-06-PLAN.md — Phase 1 English UI fully verified: zero Malay strings, 37 tests GREEN, human approved
-Resume file: None
+Last session: 2026-03-22T08:50:57.593Z
+Stopped at: Phase 5 context gathered
+Resume file: .planning/phases/05-controlled-drug-approval-flow-to-specialist-with-patient-based-quota-and-pesara-category/05-CONTEXT.md
