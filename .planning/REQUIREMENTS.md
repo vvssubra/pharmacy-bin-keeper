@@ -29,6 +29,13 @@ Requirements for v2.0 milestone.
 
 - [ ] **PDF-01**: Pharmacist can download an approved antibiotic form as a PDF containing full form data (patient info, drug, dose, indication, approval status, approver name, date)
 
+### Controlled Drug Quota & Pesara
+
+- [ ] **CDQ-01**: Doctor can mark a patient as Pesara (Government Retiree) on the drug dispensing request form via a checkbox; the is_pesara flag is saved to dispensing_requests
+- [ ] **CDQ-02**: Specialist sees Regular and Pesara sub-tabs in the Controlled Drug tab, with quota usage badges (healthy/warning/exhausted) on each Regular request row and an "Unlimited" badge on Pesara rows
+- [ ] **CDQ-03**: Specialist approve dialog shows a borrow-from-facility field when quota is exhausted; approve button disabled until field is filled; borrowed_from_facility saved on the dispensing_request record
+- [ ] **CDQ-04**: FmsDashboard annual quota table shows a Pesara column with patient count and "(Unlimited)" label per controlled drug, and the regular YTD count excludes Pesara patients
+
 ## Future Requirements
 
 ### User Management
@@ -65,12 +72,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | USR-01 | Phase 4 | Pending |
 | USR-02 | Phase 4 | Pending |
 | USR-03 | Phase 4 | Pending |
+| CDQ-01 | Phase 5 | Pending |
+| CDQ-02 | Phase 5 | Pending |
+| CDQ-03 | Phase 5 | Pending |
+| CDQ-04 | Phase 5 | Pending |
 
 **Coverage:**
-- v2 requirements: 10 total
-- Mapped to phases: 10
-- Unmapped: 0 ✓
+- v2 requirements: 14 total
+- Mapped to phases: 14
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-16*
-*Last updated: 2026-03-16 — traceability updated after roadmap creation (phase assignments corrected to match research-ordered phases: SYNC-01→Phase 2, PDF-01→Phase 3, USR-01/02/03→Phase 4)*
+*Last updated: 2026-03-22 — added CDQ-01 through CDQ-04 for Phase 5 (Controlled Drug Quota & Pesara)*

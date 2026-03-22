@@ -80,7 +80,7 @@ Plans:
 
 ## Progress
 
-**Execution Order:** 1 → 2 → 3 → 4
+**Execution Order:** 1 → 2 → 3 → 4 → 5
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -88,8 +88,28 @@ Plans:
 | 2. Drug-Request Sync | v2.0 | 0/? | Not started | - |
 | 3. Antibiotic PDF | v2.0 | 0/? | Not started | - |
 | 4. Admin User Management | v2.0 | 0/? | Not started | - |
+| 5. Controlled Drug Quota & Pesara | v2.0 | 0/3 | Planning complete | - |
+
+### Phase 5: Controlled Drug Quota & Pesara
+
+**Goal:** Enhance the controlled drug specialist approval flow with a Pesara (government retiree) patient category, enforce annual patient-based quota as an indicator at specialist approval, and surface quota context (usage badge + Pesara counts) on both SpecialistDashboard and FmsDashboard
+**Requirements**: CDQ-01, CDQ-02, CDQ-03, CDQ-04
+**Depends on:** Phase 4
+**Success Criteria** (what must be TRUE):
+  1. Doctor can tick a Pesara checkbox on the drug request form; the is_pesara flag is saved to dispensing_requests
+  2. Specialist sees Regular and Pesara sub-tabs in the Controlled Drug tab with quota badges on Regular rows and "Unlimited" on Pesara rows
+  3. Specialist approve dialog shows quota exhausted alert and borrow-from-facility input when quota is at/over limit; borrowed_from_facility is saved on approval
+  4. FmsDashboard annual quota table has a Pesara column showing patient count per drug with "(Unlimited)" label
+  5. Regular YTD patient count excludes Pesara patients and counts unique patient ICs per drug
+**Plans:** 3 plans
+
+Plans:
+- [ ] 05-01-PLAN.md — Update Supabase types + quotaBadgeState helper + DoctorRequest Pesara checkbox
+- [ ] 05-02-PLAN.md — SpecialistDashboard Regular/Pesara sub-tabs + quota badges + borrow field
+- [ ] 05-03-PLAN.md — FmsDashboard Pesara column + visual verification checkpoint
 
 ---
 *Roadmap created: 2026-03-16*
 *Milestone: v2.0 English UI & Admin Features*
 *Phase 1 plans created: 2026-03-16*
+*Phase 5 plans created: 2026-03-22*
