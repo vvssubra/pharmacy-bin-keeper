@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -23,6 +25,7 @@ import {
 } from "@/components/ui/collapsible";
 import { AntibioticFormReadOnly } from "@/components/AntibioticFormReadOnly";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { quotaBadgeState, QUOTA_BADGE_CLASS, QUOTA_BADGE_LABEL } from "@/lib/quotaHelpers";
 
 const NAG_BADGE_CONFIG: Record<string, { label: string; cls: string }> = {
   supported:        { label: "✅ Supported",        cls: "bg-green-100 text-green-700 border-green-300" },
@@ -51,6 +54,7 @@ export default function SpecialistDashboard() {
   const [rejectTarget, setRejectTarget] = useState<any>(null);
   const [notes, setNotes] = useState("");
   const [rejectReason, setRejectReason] = useState("");
+  const [borrowFacility, setBorrowFacility] = useState("");
 
   // Antibiotic states
   const [abApproveTarget, setAbApproveTarget] = useState<any>(null);
@@ -70,6 +74,59 @@ export default function SpecialistDashboard() {
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data;
+    },
+  });
+
+  const currentYear = new Date().getFullYear();
+
+  const { data: drugQuotas = [] } = useQuery({
+    queryKey: ["specialist-drug-quotas", currentYear],
+    queryFn: async () => {
+      const { data } = await supabase.from("drug_quotas").select("drug_id, quota_limit").eq("year", currentYear);
+      return (data ?? []) as { drug_id: string; quota_limit: number }[];
+    },
+  });
+
+  const { data: quotaCounts = { regular: {}, pesara: {} } } = useQuery({
+    queryKey: ["specialist-quota-counts", currentYear],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const yearStart = `${currentYear}-01-01`;
+      const yearEnd = `${currentYear + 1}-01-01`;
+
+      const [{ data: regular }, { data: pesara }] = await Promise.all([
+        supabase
+          .from("dispensing_requests")
+          .select("drug_id, no_ic")
+          .eq("status", "fulfilled")
+          .eq("is_pesara", false)
+          .gte("created_at", yearStart)
+          .lt("created_at", yearEnd),
+        supabase
+          .from("dispensing_requests")
+          .select("drug_id, no_ic")
+          .eq("status", "fulfilled")
+          .eq("is_pesara", true)
+          .gte("created_at", yearStart)
+          .lt("created_at", yearEnd),
+      ]);
+
+      const regularCounts: Record<string, number> = {};
+      const uniqueICs: Record<string, Set<string>> = {};
+      for (const r of regular ?? []) {
+        if (!uniqueICs[r.drug_id]) uniqueICs[r.drug_id] = new Set();
+        uniqueICs[r.drug_id].add(r.no_ic);
+      }
+      for (const [drugId, s] of Object.entries(uniqueICs)) {
+        regularCounts[drugId] = s.size;
+      }
+
+      const pesaraCounts: Record<string, number> = {};
+      for (const r of pesara ?? []) {
+        pesaraCounts[r.drug_id] = (pesaraCounts[r.drug_id] ?? 0) + 1;
+      }
+
+      return { regular: regularCounts, pesara: pesaraCounts };
     },
   });
 
@@ -105,7 +162,9 @@ export default function SpecialistDashboard() {
   const todayStart = startOfDay(new Date()).toISOString();
 
   // Controlled Drug computed
-  const pending = useMemo(() => requests.filter(r => r.status === "pending_specialist"), [requests]);
+  const allPending = useMemo(() => requests.filter(r => r.status === "pending_specialist"), [requests]);
+  const regularPending = useMemo(() => allPending.filter(r => !(r as any).is_pesara), [allPending]);
+  const pesaraPending = useMemo(() => allPending.filter(r => (r as any).is_pesara), [allPending]);
   const processedToday = useMemo(() =>
     requests.filter(r =>
       (r.status === "approved" || r.status === "pending_pharmacy" || r.status === "rejected") &&
@@ -126,17 +185,38 @@ export default function SpecialistDashboard() {
   const abRejectedToday = abProcessedToday.filter((f: any) => f.status === "rejected").length;
   const abHistory = useMemo(() => abForms.filter((f: any) => f.specialist_action_at).slice(0, 20), [abForms]);
 
+  // Approve dialog quota computations
+  const approveQuotaRow = approveTarget ? drugQuotas.find(q => q.drug_id === approveTarget.drug_id) : null;
+  const approveQuotaLimit = approveQuotaRow ? approveQuotaRow.quota_limit : null;
+  const approveUsedCount = approveTarget ? (quotaCounts.regular[approveTarget.drug_id] ?? 0) : 0;
+  const isApproveTargetPesara = approveTarget ? !!(approveTarget as any).is_pesara : false;
+  const isQuotaExhausted = !isApproveTargetPesara && approveQuotaLimit !== null && approveUsedCount >= approveQuotaLimit;
+
   // --- Mutations ---
   const approveMutation = useMutation({
     mutationFn: async () => {
       const { error } = await supabase
         .from("dispensing_requests")
-        .update({ status: "pending_pharmacy", specialist_id: user?.id, specialist_action_at: new Date().toISOString(), specialist_notes: notes || null })
+        .update({
+          status: "pending_pharmacy",
+          specialist_id: user?.id,
+          specialist_action_at: new Date().toISOString(),
+          specialist_notes: notes || null,
+          borrowed_from_facility: borrowFacility.trim() || null,
+        })
         .eq("id", approveTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Request approved"); setApproveTarget(null); setNotes(""); queryClient.invalidateQueries({ queryKey: ["specialist-requests"] }); },
-    onError: () => toast.error("Failed to approve request"),
+    onSuccess: () => {
+      toast.success("Request approved");
+      setApproveTarget(null);
+      setNotes("");
+      setBorrowFacility("");
+      queryClient.invalidateQueries({ queryKey: ["specialist-requests"] });
+      queryClient.invalidateQueries({ queryKey: ["specialist-quota-counts"] });
+      queryClient.invalidateQueries({ queryKey: ["specialist-drug-quotas"] });
+    },
+    onError: () => toast.error("Approval failed. Please try again."),
   });
 
   const rejectMutation = useMutation({
@@ -147,7 +227,12 @@ export default function SpecialistDashboard() {
         .eq("id", rejectTarget.id);
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Request rejected"); setRejectTarget(null); setRejectReason(""); queryClient.invalidateQueries({ queryKey: ["specialist-requests"] }); },
+    onSuccess: () => {
+      toast.success("Request rejected");
+      setRejectTarget(null);
+      setRejectReason("");
+      queryClient.invalidateQueries({ queryKey: ["specialist-requests"] });
+    },
     onError: () => toast.error("Failed to reject request"),
   });
 
@@ -176,7 +261,7 @@ export default function SpecialistDashboard() {
   });
 
   const stats = [
-    { label: "Pending (Drug)", count: pending.length, icon: Clock, bg: "bg-yellow-100 dark:bg-yellow-900/30", color: "text-yellow-700 dark:text-yellow-400" },
+    { label: "Pending (Drug)", count: allPending.length, icon: Clock, bg: "bg-yellow-100 dark:bg-yellow-900/30", color: "text-yellow-700 dark:text-yellow-400" },
     { label: "Pending (Antibiotic)", count: abPending.length, icon: Clock, bg: "bg-cyan-100 dark:bg-cyan-900/30", color: "text-cyan-700 dark:text-cyan-400" },
     { label: "Approved Today", count: approvedToday + abApprovedToday, icon: CheckCircle, bg: "bg-green-100 dark:bg-green-900/30", color: "text-green-700 dark:text-green-400" },
     { label: "Rejected Today", count: rejectedToday + abRejectedToday, icon: XCircle, bg: "bg-red-100 dark:bg-red-900/30", color: "text-red-700 dark:text-red-400" },
@@ -212,47 +297,138 @@ export default function SpecialistDashboard() {
 
         {/* TAB 1: Controlled Drug */}
         <TabsContent value="ubat" className="space-y-4 mt-4">
-          <Card>
-            <CardHeader><CardTitle className="text-base">Pending Approval Requests</CardTitle></CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Time Submitted</TableHead>
-                    <TableHead>Patient Name</TableHead>
-                    <TableHead>IC No.</TableHead>
-                    <TableHead>Drug</TableHead>
-                    <TableHead>Quantity</TableHead>
-                    <TableHead>Doctor</TableHead>
-                    <TableHead>Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pending.length === 0 ? (
-                    <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No pending approval requests</TableCell></TableRow>
-                  ) : pending.map(r => (
-                    <TableRow key={r.id}>
-                      <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</TableCell>
-                      <TableCell className="font-medium">{r.patient_name}</TableCell>
-                      <TableCell className="text-xs">{formatIC(r.no_ic)}</TableCell>
-                      <TableCell>
-                        {(r.drugs as any)?.drug_name}
-                        <Badge className="ml-1 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Specialist</Badge>
-                      </TableCell>
-                      <TableCell>{r.quantity} {(r.drugs as any)?.unit_pengukuran}</TableCell>
-                      <TableCell className="text-xs">{r.prescriber_name}</TableCell>
-                      <TableCell>
-                        <div className="flex gap-1">
-                          <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setApproveTarget(r)}>Approve</Button>
-                          <Button size="sm" variant="destructive" className="h-7" onClick={() => setRejectTarget(r)}>Reject</Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+          <Tabs defaultValue="regular">
+            <TabsList>
+              <TabsTrigger value="regular" className="gap-1">
+                Regular
+                {regularPending.length > 0 && (
+                  <Badge className="bg-amber-500 text-white rounded-full text-xs px-1.5 ml-1">
+                    {regularPending.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="pesara" className="gap-1">
+                Pesara
+                {pesaraPending.length > 0 && (
+                  <Badge className="bg-amber-500 text-white rounded-full text-xs px-1.5 ml-1">
+                    {pesaraPending.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="regular">
+              <Card>
+                <CardHeader><CardTitle className="text-base">Pending Approval Requests</CardTitle></CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Time Submitted</TableHead>
+                        <TableHead>Patient Name</TableHead>
+                        <TableHead>IC No.</TableHead>
+                        <TableHead>Drug</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Doctor</TableHead>
+                        <TableHead>Quota</TableHead>
+                        <TableHead>Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {regularPending.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                            <p className="font-medium">No pending requests</p>
+                            <p className="text-xs mt-1">No controlled drug requests are awaiting specialist approval.</p>
+                          </TableCell>
+                        </TableRow>
+                      ) : regularPending.map(r => {
+                        const quotaRow = drugQuotas.find(q => q.drug_id === r.drug_id);
+                        const quotaLimit = quotaRow ? quotaRow.quota_limit : null;
+                        const usedCount = quotaCounts.regular[r.drug_id] ?? 0;
+                        const badgeState = quotaBadgeState(usedCount, quotaLimit);
+                        return (
+                          <TableRow key={r.id}>
+                            <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</TableCell>
+                            <TableCell className="font-medium">{r.patient_name}</TableCell>
+                            <TableCell className="text-xs">{formatIC(r.no_ic)}</TableCell>
+                            <TableCell>
+                              {(r.drugs as any)?.drug_name}
+                              <Badge className="ml-1 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Specialist</Badge>
+                            </TableCell>
+                            <TableCell>{r.quantity} {(r.drugs as any)?.unit_pengukuran}</TableCell>
+                            <TableCell className="text-xs">{r.prescriber_name}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className={`text-xs ${QUOTA_BADGE_CLASS[badgeState]}`}>
+                                {QUOTA_BADGE_LABEL[badgeState](usedCount, quotaLimit)}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-1">
+                                <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setApproveTarget(r)}>Approve</Button>
+                                <Button size="sm" variant="destructive" className="h-7" onClick={() => setRejectTarget(r)}>Reject</Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+            <TabsContent value="pesara">
+              <Card>
+                <CardHeader><CardTitle className="text-base">Pending Pesara Requests</CardTitle></CardHeader>
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Time Submitted</TableHead>
+                        <TableHead>Patient Name</TableHead>
+                        <TableHead>IC No.</TableHead>
+                        <TableHead>Drug</TableHead>
+                        <TableHead>Quantity</TableHead>
+                        <TableHead>Doctor</TableHead>
+                        <TableHead>Quota</TableHead>
+                        <TableHead>Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {pesaraPending.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
+                            <p className="font-medium">No pending Pesara requests</p>
+                            <p className="text-xs mt-1">No Pesara patient requests are awaiting specialist approval.</p>
+                          </TableCell>
+                        </TableRow>
+                      ) : pesaraPending.map(r => (
+                        <TableRow key={r.id}>
+                          <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</TableCell>
+                          <TableCell className="font-medium">{r.patient_name}</TableCell>
+                          <TableCell className="text-xs">{formatIC(r.no_ic)}</TableCell>
+                          <TableCell>
+                            {(r.drugs as any)?.drug_name}
+                            <Badge className="ml-1 bg-yellow-100 text-yellow-700 border-yellow-300 text-[10px]">Specialist</Badge>
+                          </TableCell>
+                          <TableCell>{r.quantity} {(r.drugs as any)?.unit_pengukuran}</TableCell>
+                          <TableCell className="text-xs">{r.prescriber_name}</TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="text-xs bg-blue-100 text-blue-700 border-blue-300">Unlimited</Badge>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-1">
+                              <Button size="sm" className="h-7 bg-green-600 hover:bg-green-700 text-white" onClick={() => setApproveTarget(r)}>Approve</Button>
+                              <Button size="sm" variant="destructive" className="h-7" onClick={() => setRejectTarget(r)}>Reject</Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
 
           {/* Drug Approval History */}
           <Collapsible>
@@ -378,7 +554,7 @@ export default function SpecialistDashboard() {
       </Tabs>
 
       {/* Drug Approve Dialog */}
-      <Dialog open={!!approveTarget} onOpenChange={(o) => !o && setApproveTarget(null)}>
+      <Dialog open={!!approveTarget} onOpenChange={(open) => { if (!open) { setApproveTarget(null); setNotes(""); setBorrowFacility(""); } }}>
         <DialogContent>
           <DialogHeader><DialogTitle>Approve Request</DialogTitle></DialogHeader>
           {approveTarget && (
@@ -389,6 +565,24 @@ export default function SpecialistDashboard() {
                 <p><span className="text-muted-foreground">Drug:</span> {(approveTarget.drugs as any)?.drug_name}</p>
                 <p><span className="text-muted-foreground">Quantity:</span> {approveTarget.quantity}</p>
               </div>
+              {isQuotaExhausted && (
+                <>
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      Quota exhausted: {approveUsedCount}/{approveQuotaLimit} patients for {(approveTarget?.drugs as any)?.drug_name} this year. Approval will exceed the annual patient quota.
+                    </AlertDescription>
+                  </Alert>
+                  <div className="space-y-2">
+                    <Label htmlFor="borrow-facility">Borrowing quota from facility</Label>
+                    <Input
+                      id="borrow-facility"
+                      placeholder="Enter facility name"
+                      value={borrowFacility}
+                      onChange={e => setBorrowFacility(e.target.value)}
+                    />
+                  </div>
+                </>
+              )}
               <div className="space-y-2">
                 <Label>Approval Notes (optional)</Label>
                 <Textarea placeholder="Additional notes" value={notes} onChange={e => setNotes(e.target.value)} />
@@ -396,8 +590,14 @@ export default function SpecialistDashboard() {
             </div>
           )}
           <DialogFooter>
-            <Button variant="outline" onClick={() => setApproveTarget(null)}>Cancel</Button>
-            <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => approveMutation.mutate()} disabled={approveMutation.isPending}>{approveMutation.isPending ? "Processing..." : "Confirm Approval"}</Button>
+            <Button variant="outline" onClick={() => { setApproveTarget(null); setNotes(""); setBorrowFacility(""); }}>Cancel</Button>
+            <Button
+              className="bg-green-600 hover:bg-green-700 text-white"
+              onClick={() => approveMutation.mutate()}
+              disabled={approveMutation.isPending || (isQuotaExhausted && borrowFacility.trim() === "")}
+            >
+              {approveMutation.isPending ? "Processing..." : "Confirm Approval"}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
