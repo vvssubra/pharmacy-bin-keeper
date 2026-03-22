@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import {
   Form, FormField, FormItem, FormLabel, FormControl, FormMessage,
 } from "@/components/ui/form";
@@ -27,6 +29,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 const formSchema = z.object({
   patient_name: z.string().min(1, "Patient name is required"),
   no_ic: z.string().min(14, "IC number is incomplete"),
+  is_pesara: z.boolean().default(false),
   drug_id: z.string().min(1, "Please select a drug"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1"),
   prescriber_name: z.string().min(1, "Doctor name is required"),
@@ -67,6 +70,7 @@ export default function DoctorRequest() {
     defaultValues: {
       patient_name: "",
       no_ic: "",
+      is_pesara: false,
       drug_id: "",
       quantity: 0,
       prescriber_name: profile?.full_name || "",
@@ -103,6 +107,7 @@ export default function DoctorRequest() {
         drug_id: values.drug_id,
         patient_name: values.patient_name,
         no_ic: values.no_ic,
+        is_pesara: values.is_pesara,
         quantity: values.quantity,
         prescriber_name: values.prescriber_name,
         status,
@@ -146,7 +151,7 @@ export default function DoctorRequest() {
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <Button onClick={() => { setSubmitted(null); form.reset({ patient_name: "", no_ic: "", drug_id: "", quantity: 0, prescriber_name: profile?.full_name || "" }); }}>
+              <Button onClick={() => { setSubmitted(null); form.reset({ patient_name: "", no_ic: "", is_pesara: false, drug_id: "", quantity: 0, prescriber_name: profile?.full_name || "" }); }}>
                 Submit New Request
               </Button>
               <Button variant="link" onClick={() => { setSubmitted(null); form.reset({ ...form.getValues(), drug_id: "", quantity: 0 }); }}>
@@ -195,6 +200,26 @@ export default function DoctorRequest() {
                     />
                   </FormControl>
                   <FormMessage />
+                </FormItem>
+              )} />
+
+              <FormField control={form.control} name="is_pesara" render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                  <FormControl>
+                    <Checkbox
+                      id="is_pesara"
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <Label htmlFor="is_pesara" className="font-normal cursor-pointer">
+                      Pesara (Government Retiree)
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      Tick if this patient is a retired government employee (Pesara Kerajaan). Pesara patients are exempt from annual quota limits.
+                    </p>
+                  </div>
                 </FormItem>
               )} />
 

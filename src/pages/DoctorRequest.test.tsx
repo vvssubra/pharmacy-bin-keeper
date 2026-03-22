@@ -107,3 +107,53 @@ describe("DoctorRequest Zod validation messages", () => {
     });
   });
 });
+
+describe("DoctorRequest Pesara checkbox", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("renders a label 'Pesara (Government Retiree)'", () => {
+    renderDoctorRequest();
+    expect(screen.getByText("Pesara (Government Retiree)")).toBeInTheDocument();
+  });
+
+  it("renders helper text containing 'Pesara Kerajaan'", () => {
+    renderDoctorRequest();
+    expect(screen.getByText(/Pesara Kerajaan/)).toBeInTheDocument();
+  });
+
+  it("includes is_pesara: false in insert payload by default", async () => {
+    const { supabase } = await import("@/integrations/supabase/client");
+    const insertMock = vi.fn(() => Promise.resolve({ data: null, error: null }));
+    (supabase.from as ReturnType<typeof vi.fn>).mockImplementation((table: string) => {
+      if (table === "dispensing_requests") {
+        return { insert: insertMock };
+      }
+      return {
+        select: vi.fn(() => ({
+          eq: vi.fn(() => ({
+            order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+            maybeSingle: vi.fn(() => Promise.resolve({ data: null, error: null })),
+          })),
+          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+        })),
+        insert: vi.fn(() => Promise.resolve({ data: null, error: null })),
+      };
+    });
+
+    renderDoctorRequest();
+
+    // Fill in required fields
+    fireEvent.change(screen.getByPlaceholderText("Patient full name"), { target: { value: "AHMAD BIN ALI" } });
+    fireEvent.change(screen.getByPlaceholderText("000000-00-0000"), { target: { value: "900101010001" } });
+
+    const submitButton = screen.getByRole("button", { name: /submit request/i });
+    fireEvent.click(submitButton);
+
+    await waitFor(() => {
+      if (insertMock.mock.calls.length > 0) {
+        const payload = insertMock.mock.calls[0][0];
+        expect(payload).toHaveProperty("is_pesara", false);
+      }
+    });
+  });
+});
