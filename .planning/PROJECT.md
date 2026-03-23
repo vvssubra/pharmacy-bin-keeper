@@ -16,6 +16,7 @@ Every drug movement is traceable and every dispensing request is accountable —
 - English UI (all labels, toasts, statuses in English)
 - Manual user creation by admin (create accounts without self-signup)
 - Drug-request sync (new drugs in master list auto-appear in doctor request form)
+- Controlled drug quota + Pesara category (Phase 5 complete — 2026-03-23)
 
 ## Requirements
 
@@ -73,4 +74,4 @@ Every drug movement is traceable and every dispensing request is accountable —
 | Supabase RLS for data security | Prevents unauthorized data access | ✓ Good |
 
 ---
-*Last updated: 2026-03-16 — Milestone v2.0 started*
+*Last updated: 2026-03-23 — Phase 5 complete (CDQ-01–CDQ-04 validated)*
