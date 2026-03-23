@@ -1,8 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import FmsDashboard from "./FmsDashboard";
+
+// The ytdCounts query now calls:
+//   .select("drug_id, no_ic").eq("status", "fulfilled").eq("is_pesara", false).gte(...).lt(...)
+// The pesaraCounts query calls:
+//   .select("drug_id, no_ic").eq("status", "fulfilled").eq("is_pesara", true).gte(...).lt(...)
+// Both return empty arrays; the mock chain must handle three chained .eq() calls.
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
@@ -10,13 +16,20 @@ vi.mock("@/integrations/supabase/client", () => ({
       select: vi.fn(() => ({
         eq: vi.fn(() => ({
           eq: vi.fn(() => ({
+            eq: vi.fn(() => ({
+              order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+              gte: vi.fn(() => ({ lt: vi.fn(() => Promise.resolve({ data: [], error: null })) })),
+            })),
             order: vi.fn(() => Promise.resolve({ data: [], error: null })),
             gte: vi.fn(() => ({ lt: vi.fn(() => Promise.resolve({ data: [], error: null })) })),
+            in: vi.fn(() => Promise.resolve({ data: [], error: null })),
           })),
           order: vi.fn(() => Promise.resolve({ data: [], error: null })),
           gte: vi.fn(() => ({ lt: vi.fn(() => Promise.resolve({ data: [], error: null })) })),
+          in: vi.fn(() => Promise.resolve({ data: [], error: null })),
         })),
         order: vi.fn(() => Promise.resolve({ data: [], error: null })),
+        in: vi.fn(() => Promise.resolve({ data: [], error: null })),
       })),
     })),
   },
@@ -43,5 +56,10 @@ describe("FmsDashboard sections", () => {
   it("renders Non-Controlled Stock Forecast section", () => {
     render(<MemoryRouter><QueryClientProvider client={makeQC()}><FmsDashboard /></QueryClientProvider></MemoryRouter>);
     expect(screen.getByText(/Non-Controlled Stock Forecast/i)).toBeInTheDocument();
+  });
+
+  it("renders Pesara column header in annual quota table", async () => {
+    render(<MemoryRouter><QueryClientProvider client={makeQC()}><FmsDashboard /></QueryClientProvider></MemoryRouter>);
+    await waitFor(() => expect(screen.getByText("Pesara")).toBeInTheDocument());
   });
 });

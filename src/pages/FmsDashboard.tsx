@@ -144,9 +144,43 @@ export default function FmsDashboard() {
     queryFn: async () => {
       const yearStart = `${currentYear}-01-01`;
       const yearEnd = `${currentYear + 1}-01-01`;
-      const { data } = await supabase.from("dispensing_requests").select("drug_id").eq("status", "fulfilled").gte("created_at", yearStart).lt("created_at", yearEnd);
+      const { data } = await supabase
+        .from("dispensing_requests")
+        .select("drug_id, no_ic")
+        .eq("status", "fulfilled")
+        .eq("is_pesara", false)
+        .gte("created_at", yearStart)
+        .lt("created_at", yearEnd);
+      const uniqueICs: Record<string, Set<string>> = {};
+      for (const r of data ?? []) {
+        if (!uniqueICs[r.drug_id]) uniqueICs[r.drug_id] = new Set();
+        uniqueICs[r.drug_id].add(r.no_ic);
+      }
       const counts: Record<string, number> = {};
-      for (const r of data ?? []) counts[r.drug_id] = (counts[r.drug_id] ?? 0) + 1;
+      for (const [drugId, s] of Object.entries(uniqueICs)) {
+        counts[drugId] = s.size;
+      }
+      return counts;
+    },
+  });
+
+  const { data: pesaraCounts = {} } = useQuery({
+    queryKey: ["fms-pesara-counts", currentYear],
+    refetchInterval: 30000,
+    queryFn: async () => {
+      const yearStart = `${currentYear}-01-01`;
+      const yearEnd = `${currentYear + 1}-01-01`;
+      const { data } = await supabase
+        .from("dispensing_requests")
+        .select("drug_id, no_ic")
+        .eq("status", "fulfilled")
+        .eq("is_pesara", true)
+        .gte("created_at", yearStart)
+        .lt("created_at", yearEnd);
+      const counts: Record<string, number> = {};
+      for (const r of data ?? []) {
+        counts[r.drug_id] = (counts[r.drug_id] ?? 0) + 1;
+      }
       return counts;
     },
   });
@@ -431,11 +465,12 @@ export default function FmsDashboard() {
                   <TableHead className="text-right">Remaining</TableHead>
                   <TableHead>Projected Exhaustion</TableHead>
                   <TableHead>Status</TableHead>
+                  <TableHead className="text-right">Pesara</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {drugStock.filter(d => (d as any).perlu_kelulusan_pakar).length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-6 text-muted-foreground">No controlled drugs found</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center py-6 text-muted-foreground">No controlled drugs found</TableCell></TableRow>
                 ) : drugStock.filter(d => (d as any).perlu_kelulusan_pakar).map(d => {
                   const quotaRow = drugQuotas.find(q => q.drug_id === d.id);
                   const quota = quotaRow ? quotaRow.quota_limit : null;
@@ -463,6 +498,16 @@ export default function FmsDashboard() {
                         <Badge variant="outline" className={`text-[10px] capitalize ${badgeClass[status]}`}>
                           {status === "no-quota" ? "No quota" : status}
                         </Badge>
+                      </TableCell>
+                      <TableCell className="text-right text-sm">
+                        {(() => {
+                          const pesaraCount = (pesaraCounts as Record<string, number>)[d.id] ?? 0;
+                          return (
+                            <span className={pesaraCount > 0 ? "font-semibold text-foreground" : "text-muted-foreground"}>
+                              {pesaraCount} (Unlimited)
+                            </span>
+                          );
+                        })()}
                       </TableCell>
                     </TableRow>
                   );
