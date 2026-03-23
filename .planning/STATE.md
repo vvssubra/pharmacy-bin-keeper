@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: English UI & Admin Features
 status: unknown
-stopped_at: Completed 05-02-PLAN.md
-last_updated: "2026-03-22T10:29:36Z"
+stopped_at: Completed 05-03-PLAN.md (pending visual checkpoint)
+last_updated: "2026-03-23T06:38:06.681Z"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 8
+  completed_plans: 9
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Plan: 2 of 3
 | Phase 01-english-ui P06 | 15m | 2 tasks | 9 files |
 | Phase 05 P01 | 3 | 2 tasks | 6 files |
 | Phase 05 P02 | 3m | 2 tasks | 2 files |
+| Phase 05 P03 | 12 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Recent decisions affecting current work:
 - [Phase 05-02]: quotaCounts.regular[drug_id] uses unique patient IC set — same patient dispensed twice counts once toward quota
 - [Phase 05-02]: Pesara approve dialog skips quota exhausted alert — isApproveTargetPesara gates the exhaustion check
 - [Phase 05-02]: borrowFacility reset on both dialog onOpenChange and Cancel click to prevent stale state across dialogs
+- [Phase 05]: waitFor() needed in Pesara header test — stockLoading guard delays table render until async query resolves
+- [Phase 05]: pesaraCounts uses simple increment (not Set) — Pesara quota is unlimited, volume tracking is sufficient
 
 ### Roadmap Evolution
 
@@ -100,6 +103,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-22T10:25:02.915Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-03-23T06:38:06.680Z
+Stopped at: Completed 05-03-PLAN.md (pending visual checkpoint)
 Resume file: None
