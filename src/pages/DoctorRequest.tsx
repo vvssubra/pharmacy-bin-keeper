@@ -102,7 +102,7 @@ export default function DoctorRequest() {
   const submitMutation = useMutation({
     mutationFn: async (values: FormValues) => {
       const drug = drugs.find(d => d.id === values.drug_id);
-      const status = drug?.perlu_kelulusan_pakar ? "pending_specialist" : "pending_pharmacy";
+      const status = "pending_specialist";
       const { error } = await supabase.from("dispensing_requests").insert({
         drug_id: values.drug_id,
         patient_name: values.patient_name,
@@ -143,11 +143,7 @@ export default function DoctorRequest() {
               <div className="flex justify-between"><span className="text-muted-foreground">Quantity</span><span className="font-medium">{submitted.quantity}</span></div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Status</span>
-                {submitted.is_specialist ? (
-                  <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Awaiting specialist approval</Badge>
-                ) : (
-                  <Badge className="bg-blue-100 text-blue-700 border-blue-300">Awaiting pharmacist confirmation</Badge>
-                )}
+                <Badge className="bg-yellow-100 text-yellow-700 border-yellow-300">Awaiting FMS approval</Badge>
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -259,14 +255,6 @@ export default function DoctorRequest() {
                 </FormItem>
               )} />
 
-              {selectedDrug?.perlu_kelulusan_pakar && (
-                <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950/20">
-                  <Info className="h-4 w-4 text-blue-600" />
-                  <AlertDescription className="text-blue-700 dark:text-blue-400">
-                    This drug requires specialist approval before pharmacist processing.
-                  </AlertDescription>
-                </Alert>
-              )}
 
               <FormField control={form.control} name="quantity" render={({ field }) => (
                 <FormItem>
