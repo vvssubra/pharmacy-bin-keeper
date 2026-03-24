@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { BarChart2, Package, Clock, AlertTriangle, ShieldCheck } from "lucide-react";
 import { quotaStatus, forecastStatus, daysRemaining, projectedExhaustion } from "@/lib/quotaHelpers";
@@ -9,6 +11,12 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+} from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -48,7 +56,43 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 export default function FmsDashboard() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedDrugId, setSelectedDrugId] = useState<string>("all");
+  const [rejectTarget, setRejectTarget] = useState<any>(null);
+  const [rejectReason, setRejectReason] = useState("");
+
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("dispensing_requests")
+        .update({ status: "pending_pharmacy", specialist_id: user?.id, specialist_action_at: new Date().toISOString() })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["fms-pending-requests"] });
+      toast.success("Request approved — sent to pharmacist");
+    },
+    onError: () => toast.error("Failed to approve request"),
+  });
+
+  const rejectMutation = useMutation({
+    mutationFn: async ({ id, reason }: { id: string; reason: string }) => {
+      const { error } = await supabase
+        .from("dispensing_requests")
+        .update({ status: "rejected", specialist_id: user?.id, specialist_action_at: new Date().toISOString(), specialist_notes: reason })
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setRejectTarget(null);
+      setRejectReason("");
+      queryClient.invalidateQueries({ queryKey: ["fms-pending-requests"] });
+      toast.success("Request rejected");
+    },
+    onError: () => toast.error("Failed to reject request"),
+  });
 
   // Drug stock quota
   const { data: drugStock = [], isLoading: stockLoading } = useQuery({
@@ -354,11 +398,12 @@ export default function FmsDashboard() {
                       <TableHead>Drug</TableHead>
                       <TableHead>Qty</TableHead>
                       <TableHead>Submitted By (MO)</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {pendingRequests.length === 0 ? (
-                      <TableRow><TableCell colSpan={5} className="text-center py-6 text-muted-foreground">No pending controlled drug requests</TableCell></TableRow>
+                      <TableRow><TableCell colSpan={6} className="text-center py-6 text-muted-foreground">No pending drug requests</TableCell></TableRow>
                     ) : pendingRequests.map(r => (
                       <TableRow key={r.id}>
                         <TableCell className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(r.created_at), { addSuffix: true })}</TableCell>
@@ -366,6 +411,26 @@ export default function FmsDashboard() {
                         <TableCell className="text-sm">{(r.drugs as any)?.drug_name}</TableCell>
                         <TableCell className="text-sm">{r.quantity} {(r.drugs as any)?.unit_pengukuran}</TableCell>
                         <TableCell className="text-sm font-medium">{(r as any).mo_name}</TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex gap-2 justify-end">
+                            <Button
+                              size="sm"
+                              className="h-7 text-xs bg-green-600 hover:bg-green-700 text-white"
+                              onClick={() => approveMutation.mutate(r.id)}
+                              disabled={approveMutation.isPending}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              className="h-7 text-xs"
+                              onClick={() => { setRejectTarget(r); setRejectReason(""); }}
+                            >
+                              Reject
+                            </Button>
+                          </div>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -517,6 +582,43 @@ export default function FmsDashboard() {
           )}
         </CardContent>
       </Card>
+
+      {/* Reject dialog */}
+      <Dialog open={!!rejectTarget} onOpenChange={open => { if (!open) { setRejectTarget(null); setRejectReason(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Drug Request</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            {rejectTarget && (
+              <p className="text-sm text-muted-foreground">
+                Patient: <span className="font-medium text-foreground">{rejectTarget.patient_name}</span> —{" "}
+                {(rejectTarget.drugs as any)?.drug_name} × {rejectTarget.quantity}
+              </p>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="reject-reason">Reason for rejection</Label>
+              <Textarea
+                id="reject-reason"
+                placeholder="Enter rejection reason..."
+                value={rejectReason}
+                onChange={e => setRejectReason(e.target.value)}
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setRejectTarget(null); setRejectReason(""); }}>Cancel</Button>
+            <Button
+              variant="destructive"
+              disabled={!rejectReason.trim() || rejectMutation.isPending}
+              onClick={() => rejectMutation.mutate({ id: rejectTarget.id, reason: rejectReason })}
+            >
+              Confirm Reject
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Non-Controlled Stock Forecast */}
       <Card>
