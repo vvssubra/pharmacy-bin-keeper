@@ -268,9 +268,6 @@ export default function Dashboard() {
                 <TableHead>Drug Name</TableHead>
                 <TableHead>Unit</TableHead>
                 <TableHead className="text-right">Balance</TableHead>
-                <TableHead className="text-right">Min</TableHead>
-                <TableHead className="text-right">Reorder</TableHead>
-                <TableHead className="text-right">Max</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="w-[120px]">% Max</TableHead>
                 <TableHead>Last Updated</TableHead>
@@ -286,9 +283,6 @@ export default function Dashboard() {
                     <TableCell className="font-medium max-w-[200px] truncate">{d.drug_name}</TableCell>
                     <TableCell className="text-muted-foreground capitalize">{d.unit_pengukuran}</TableCell>
                     <TableCell className="text-right font-bold">{d.baki}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{d.stok_min}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{d.stok_reorder}</TableCell>
-                    <TableCell className="text-right text-muted-foreground">{d.stok_max}</TableCell>
                     <TableCell>
                       <Badge variant="outline" className={cfg.badgeClass}>{d.status}</Badge>
                     </TableCell>

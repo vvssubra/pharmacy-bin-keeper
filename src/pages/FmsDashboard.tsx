@@ -191,7 +191,7 @@ export default function FmsDashboard() {
       const { data } = await supabase
         .from("dispensing_requests")
         .select("drug_id, no_ic")
-        .eq("status", "fulfilled")
+        .in("status", ["approved", "fulfilled"])
         .eq("is_pesara", false)
         .gte("created_at", yearStart)
         .lt("created_at", yearEnd);
