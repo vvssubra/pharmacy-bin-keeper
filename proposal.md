@@ -5,6 +5,8 @@ Pharmacy Bin Keeper is a web system to manage medicine stock and medicine reques
 It helps doctors, pharmacists, and specialists work in one connected workflow.
 
 ## 2) Main Features
+> Note: This proposal excludes the Bin Card feature as requested.
+
 1. **Dashboard**
    - Shows current stock level
    - Shows pending requests that need action
@@ -76,7 +78,7 @@ It helps doctors, pharmacists, and specialists work in one connected workflow.
 - **Less manual work:** reduces paper and duplicate entry
 
 ## 6) Future Upgrades
-1. **Low stock alerts** by email/WhatsApp/notification
+1. **Automated low stock alerts** by email/WhatsApp/notification (today, stock is monitored manually on dashboard)
 2. **Purchase planning support** based on usage trends
 3. **Barcode/QR support** for faster receiving and dispensing
 4. **Export options** (PDF/Excel) for reports and audits
