@@ -1,0 +1,2070 @@
+{
+  "type": "excalidraw",
+  "version": 2,
+  "source": "https://excalidraw.com",
+  "elements": [
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt001",
+      "type": "text",
+      "x": 60,
+      "y": 30,
+      "width": 979.1999999999999,
+      "height": 30.0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Pharmacy Bin Keeper \u2014 Perbandingan Proses Sebelum vs Selepas Inovasi",
+      "originalText": "Pharmacy Bin Keeper \u2014 Perbandingan Proses Sebelum vs Selepas Inovasi",
+      "fontSize": 24,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 24
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box002",
+      "type": "rectangle",
+      "x": 40,
+      "y": 90,
+      "width": 620,
+      "height": 650,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "arrow",
+          "id": "arr050"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box004",
+      "type": "rectangle",
+      "x": 760,
+      "y": 90,
+      "width": 620,
+      "height": 650,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "arrow",
+          "id": "arr051"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt006",
+      "type": "text",
+      "x": 60,
+      "y": 104,
+      "width": 172.79999999999998,
+      "height": 22.5,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roundness": null,
+      "boundElements": [],
+      "text": "SEBELUM \u2014 Manual",
+      "originalText": "SEBELUM \u2014 Manual",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 18
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt007",
+      "type": "text",
+      "x": 780,
+      "y": 104,
+      "width": 334.8,
+      "height": 22.5,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roundness": null,
+      "boundElements": [],
+      "text": "SELEPAS \u2014 Digital \u00b7 Self-hosted",
+      "originalText": "SELEPAS \u2014 Digital \u00b7 Self-hosted",
+      "fontSize": 18,
+      "fontFamily": 1,
+      "textAlign": "left",
+      "verticalAlign": "top",
+      "containerId": null,
+      "lineHeight": 1.25,
+      "baseline": 18
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box008",
+      "type": "rectangle",
+      "x": 70,
+      "y": 160,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt009"
+        },
+        {
+          "type": "arrow",
+          "id": "arr032"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt009",
+      "type": "text",
+      "x": 78,
+      "y": 178.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "MO tulis borang / slip preskripsi manual",
+      "originalText": "MO tulis borang / slip preskripsi manual",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box008",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box010",
+      "type": "rectangle",
+      "x": 70,
+      "y": 238,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt011"
+        },
+        {
+          "type": "arrow",
+          "id": "arr032"
+        },
+        {
+          "type": "arrow",
+          "id": "arr034"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt011",
+      "type": "text",
+      "x": 78,
+      "y": 256.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Jumpa \u00b7 telefon \u00b7 WhatsApp FMS untuk bincang",
+      "originalText": "Jumpa \u00b7 telefon \u00b7 WhatsApp FMS untuk bincang",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box010",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box012",
+      "type": "rectangle",
+      "x": 70,
+      "y": 316,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt013"
+        },
+        {
+          "type": "arrow",
+          "id": "arr034"
+        },
+        {
+          "type": "arrow",
+          "id": "arr036"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt013",
+      "type": "text",
+      "x": 78,
+      "y": 334.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Dapatkan tandatangan timbal FMS di slip",
+      "originalText": "Dapatkan tandatangan timbal FMS di slip",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box012",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box014",
+      "type": "rectangle",
+      "x": 70,
+      "y": 394,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt015"
+        },
+        {
+          "type": "arrow",
+          "id": "arr036"
+        },
+        {
+          "type": "arrow",
+          "id": "arr038"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt015",
+      "type": "text",
+      "x": 78,
+      "y": 412.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Farmasi kira baki manual (kad petak / KEWPS)",
+      "originalText": "Farmasi kira baki manual (kad petak / KEWPS)",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box014",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box016",
+      "type": "rectangle",
+      "x": 70,
+      "y": 472,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt017"
+        },
+        {
+          "type": "arrow",
+          "id": "arr038"
+        },
+        {
+          "type": "arrow",
+          "id": "arr040"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt017",
+      "type": "text",
+      "x": 78,
+      "y": 490.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Cari lokasi ubat \u2014 tiada rujukan berpusat",
+      "originalText": "Cari lokasi ubat \u2014 tiada rujukan berpusat",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box016",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box018",
+      "type": "rectangle",
+      "x": 70,
+      "y": 550,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#fff5f5",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt019"
+        },
+        {
+          "type": "arrow",
+          "id": "arr040"
+        },
+        {
+          "type": "arrow",
+          "id": "arr046"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt019",
+      "type": "text",
+      "x": 78,
+      "y": 568.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Dispens \u2014 slip mudah tercicir / tulisan tak jelas",
+      "originalText": "Dispens \u2014 slip mudah tercicir / tulisan tak jelas",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box018",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box020",
+      "type": "rectangle",
+      "x": 790,
+      "y": 160,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt021"
+        },
+        {
+          "type": "arrow",
+          "id": "arr033"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt021",
+      "type": "text",
+      "x": 798,
+      "y": 178.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Log masuk \u2014 ID + peranan (RBAC)",
+      "originalText": "Log masuk \u2014 ID + peranan (RBAC)",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box020",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box022",
+      "type": "rectangle",
+      "x": 790,
+      "y": 238,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt023"
+        },
+        {
+          "type": "arrow",
+          "id": "arr033"
+        },
+        {
+          "type": "arrow",
+          "id": "arr035"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt023",
+      "type": "text",
+      "x": 798,
+      "y": 256.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "MO hantar permohonan / borang antibiotik digital",
+      "originalText": "MO hantar permohonan / borang antibiotik digital",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box022",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box024",
+      "type": "rectangle",
+      "x": 790,
+      "y": 316,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt025"
+        },
+        {
+          "type": "arrow",
+          "id": "arr035"
+        },
+        {
+          "type": "arrow",
+          "id": "arr037"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt025",
+      "type": "text",
+      "x": 798,
+      "y": 334.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "FMS lulus / tolak dalam sistem (authenticity)",
+      "originalText": "FMS lulus / tolak dalam sistem (authenticity)",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box024",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box026",
+      "type": "rectangle",
+      "x": 790,
+      "y": 394,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt027"
+        },
+        {
+          "type": "arrow",
+          "id": "arr037"
+        },
+        {
+          "type": "arrow",
+          "id": "arr039"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt027",
+      "type": "text",
+      "x": 798,
+      "y": 412.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Baki stok auto-dikira \u00b7 kad petak elektronik",
+      "originalText": "Baki stok auto-dikira \u00b7 kad petak elektronik",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box026",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box028",
+      "type": "rectangle",
+      "x": 790,
+      "y": 472,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt029"
+        },
+        {
+          "type": "arrow",
+          "id": "arr039"
+        },
+        {
+          "type": "arrow",
+          "id": "arr041"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt029",
+      "type": "text",
+      "x": 798,
+      "y": 490.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Pendispensan \u2192 daftar pesakit auto \u00b7 keluaran (-stok)",
+      "originalText": "Pendispensan \u2192 daftar pesakit auto \u00b7 keluaran (-stok)",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box028",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box030",
+      "type": "rectangle",
+      "x": 790,
+      "y": 550,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#ebfbee",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt031"
+        },
+        {
+          "type": "arrow",
+          "id": "arr041"
+        },
+        {
+          "type": "arrow",
+          "id": "arr047"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt031",
+      "type": "text",
+      "x": 798,
+      "y": 568.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "Baki kuota masa nyata \u00b7 laporan & papan pemuka",
+      "originalText": "Baki kuota masa nyata \u00b7 laporan & papan pemuka",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box030",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr032",
+      "type": "arrow",
+      "x": 350.0,
+      "y": 214,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box008",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box010",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr033",
+      "type": "arrow",
+      "x": 1070.0,
+      "y": 214,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box020",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box022",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr034",
+      "type": "arrow",
+      "x": 350.0,
+      "y": 292,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box010",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box012",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr035",
+      "type": "arrow",
+      "x": 1070.0,
+      "y": 292,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box022",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box024",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr036",
+      "type": "arrow",
+      "x": 350.0,
+      "y": 370,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box012",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box014",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr037",
+      "type": "arrow",
+      "x": 1070.0,
+      "y": 370,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box024",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box026",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr038",
+      "type": "arrow",
+      "x": 350.0,
+      "y": 448,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box014",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box016",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr039",
+      "type": "arrow",
+      "x": 1070.0,
+      "y": 448,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box026",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box028",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr040",
+      "type": "arrow",
+      "x": 350.0,
+      "y": 526,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box016",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box018",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr041",
+      "type": "arrow",
+      "x": 1070.0,
+      "y": 526,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box028",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box030",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box042",
+      "type": "rectangle",
+      "x": 70,
+      "y": 628,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "#ffe3e3",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt043"
+        },
+        {
+          "type": "arrow",
+          "id": "arr046"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt043",
+      "type": "text",
+      "x": 78,
+      "y": 646.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "\u26a0  lambat \u00b7 terdedah ralat \u00b7 sukar dipantau",
+      "originalText": "\u26a0  lambat \u00b7 terdedah ralat \u00b7 sukar dipantau",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box042",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box044",
+      "type": "rectangle",
+      "x": 790,
+      "y": 628,
+      "width": 560,
+      "height": 54,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt045"
+        },
+        {
+          "type": "arrow",
+          "id": "arr047"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt045",
+      "type": "text",
+      "x": 798,
+      "y": 646.875,
+      "width": 544,
+      "height": 16.25,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "\u2713  pantas \u00b7 tepat \u00b7 terpantau \u00b7 data dalam premis",
+      "originalText": "\u2713  pantas \u00b7 tepat \u00b7 terpantau \u00b7 data dalam premis",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box044",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr046",
+      "type": "arrow",
+      "x": 350.0,
+      "y": 604,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#c92a2a",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box018",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box042",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr047",
+      "type": "arrow",
+      "x": 1070.0,
+      "y": 604,
+      "width": 0.0,
+      "height": 24,
+      "strokeColor": "#2b8a3e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0.0,
+          24
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box030",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box044",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "box048",
+      "type": "rectangle",
+      "x": 670,
+      "y": 380,
+      "width": 80,
+      "height": 70,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "#fff9db",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 3
+      },
+      "boundElements": [
+        {
+          "type": "text",
+          "id": "txt049"
+        },
+        {
+          "type": "arrow",
+          "id": "arr050"
+        },
+        {
+          "type": "arrow",
+          "id": "arr051"
+        }
+      ]
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "txt049",
+      "type": "text",
+      "x": 678,
+      "y": 406.875,
+      "width": 64,
+      "height": 16.25,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": null,
+      "boundElements": [],
+      "text": "INOVASI",
+      "originalText": "INOVASI",
+      "fontSize": 13,
+      "fontFamily": 1,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "box048",
+      "lineHeight": 1.25,
+      "baseline": 13
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr050",
+      "type": "arrow",
+      "x": 660,
+      "y": 415.0,
+      "width": 10,
+      "height": 0.0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          10,
+          0.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box002",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box048",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    },
+    {
+      "angle": 0,
+      "strokeStyle": "solid",
+      "roughness": 1,
+      "opacity": 100,
+      "groupIds": [],
+      "frameId": null,
+      "seed": 1,
+      "versionNonce": 1,
+      "version": 1,
+      "isDeleted": false,
+      "updated": 1700000000000,
+      "link": null,
+      "locked": false,
+      "id": "arr051",
+      "type": "arrow",
+      "x": 750,
+      "y": 415.0,
+      "width": 10,
+      "height": 0.0,
+      "strokeColor": "#1e1e1e",
+      "backgroundColor": "transparent",
+      "fillStyle": "solid",
+      "strokeWidth": 2,
+      "roundness": {
+        "type": 2
+      },
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          10,
+          0.0
+        ]
+      ],
+      "startBinding": {
+        "elementId": "box048",
+        "focus": 0,
+        "gap": 6
+      },
+      "endBinding": {
+        "elementId": "box004",
+        "focus": 0,
+        "gap": 6
+      },
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "boundElements": [],
+      "lastCommittedPoint": null
+    }
+  ],
+  "appState": {
+    "gridSize": null,
+    "viewBackgroundColor": "#ffffff"
+  },
+  "files": {}
+}

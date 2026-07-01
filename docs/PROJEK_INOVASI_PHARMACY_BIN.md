@@ -186,6 +186,11 @@ Evolusi prototaip dari prototaip 1 hingga prototaip akhir ditunjukkan dalam *Raj
 > PostgreSQL setempat. **Tiada data dihantar ke pelayan awan luar.** Salinan sandar (backup) pangkalan data
 > dibuat secara berkala ke storan dalaman fasiliti.
 
+![Rajah 3: Seni bina hosting setempat & aliran proses sistem Pharmacy Bin Keeper](./pharmacy-bin-keeper-flow.svg)
+
+*Rajah 3: Seni bina hosting setempat (Docker + Supabase di PC pejabat) dan aliran proses aplikasi
+merentas peranan (Admin, Farmasi, MO, FMS). Fail boleh sunting: `pharmacy-bin-keeper-flow.excalidraw`.*
+
 *(Pilihan) Projek boleh didaftarkan dengan Perbadanan Harta Intelek Malaysia (MyIPO) di bawah kategori
 hak cipta — [NO MyIPO] (Lampiran 5).*
 
@@ -216,6 +221,11 @@ Semua Pegawai Farmasi, Penolong Pegawai Farmasi, Pegawai Perubatan dan Pakar Per
 ---
 
 ## 2.0 SEBELUM DAN SELEPAS INOVASI DIHASILKAN
+
+![Rajah 3a: Perbandingan proses sebelum (manual) vs selepas (digital) inovasi](./sebelum-selepas.svg)
+
+*Rajah 3a: Ringkasan perbandingan proses kerja sebelum (manual) dan selepas (digital, self‑hosted)
+pelaksanaan Pharmacy Bin Keeper. Fail boleh sunting: `sebelum-selepas.excalidraw`.*
 
 ### 2.1 KEADAAN SEBELUM INOVASI
 

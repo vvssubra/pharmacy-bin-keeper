@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1420" height="820" viewBox="0 0 1420 820" font-family="Segoe UI, Helvetica, Arial, sans-serif">
+<rect width="1420" height="820" fill="#ffffff"/>
+<defs>
+<marker id="a1" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#1e1e1e"/></marker>
+<marker id="a2" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#868e96"/></marker>
+<marker id="a3" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#495057"/></marker>
+<marker id="a4" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#099268"/></marker>
+<marker id="a5" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#c92a2a"/></marker>
+<marker id="a6" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#2b8a3e"/></marker>
+</defs>
+<text x="60" y="50.0" fill="#1e1e1e" font-size="24" font-weight="700" text-anchor="start">Pharmacy Bin Keeper — Perbandingan Proses Sebelum vs Selepas Inovasi</text>
+<rect x="40" y="90" width="620" height="650" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<rect x="760" y="90" width="620" height="650" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="60" y="128.0" fill="#c92a2a" font-size="18" font-weight="700" text-anchor="start">SEBELUM — Manual</text>
+<text x="780" y="128.0" fill="#2b8a3e" font-size="18" font-weight="700" text-anchor="start">SELEPAS — Digital · Self-hosted</text>
+<rect x="70" y="160" width="560" height="54" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="187.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">MO tulis borang / slip preskripsi manual</text>
+<rect x="70" y="238" width="560" height="54" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="265.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Jumpa · telefon · WhatsApp FMS untuk bincang</text>
+<rect x="70" y="316" width="560" height="54" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="343.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Dapatkan tandatangan timbal FMS di slip</text>
+<rect x="70" y="394" width="560" height="54" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="421.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Farmasi kira baki manual (kad petak / KEWPS)</text>
+<rect x="70" y="472" width="560" height="54" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="499.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Cari lokasi ubat — tiada rujukan berpusat</text>
+<rect x="70" y="550" width="560" height="54" rx="10" fill="#fff5f5" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="577.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Dispens — slip mudah tercicir / tulisan tak jelas</text>
+<rect x="790" y="160" width="560" height="54" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="187.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Log masuk — ID + peranan (RBAC)</text>
+<rect x="790" y="238" width="560" height="54" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="265.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">MO hantar permohonan / borang antibiotik digital</text>
+<rect x="790" y="316" width="560" height="54" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="343.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">FMS lulus / tolak dalam sistem (authenticity)</text>
+<rect x="790" y="394" width="560" height="54" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="421.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Baki stok auto-dikira · kad petak elektronik</text>
+<rect x="790" y="472" width="560" height="54" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="499.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Pendispensan → daftar pesakit auto · keluaran (-stok)</text>
+<rect x="790" y="550" width="560" height="54" rx="10" fill="#ebfbee" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="577.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">Baki kuota masa nyata · laporan &amp; papan pemuka</text>
+<line x1="350.0" y1="220.0" x2="350.0" y2="229.0" stroke="#c92a2a" stroke-width="2" marker-end="url(#a5)"/>
+<line x1="1070.0" y1="220.0" x2="1070.0" y2="229.0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#a6)"/>
+<line x1="350.0" y1="298.0" x2="350.0" y2="307.0" stroke="#c92a2a" stroke-width="2" marker-end="url(#a5)"/>
+<line x1="1070.0" y1="298.0" x2="1070.0" y2="307.0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#a6)"/>
+<line x1="350.0" y1="376.0" x2="350.0" y2="385.0" stroke="#c92a2a" stroke-width="2" marker-end="url(#a5)"/>
+<line x1="1070.0" y1="376.0" x2="1070.0" y2="385.0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#a6)"/>
+<line x1="350.0" y1="454.0" x2="350.0" y2="463.0" stroke="#c92a2a" stroke-width="2" marker-end="url(#a5)"/>
+<line x1="1070.0" y1="454.0" x2="1070.0" y2="463.0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#a6)"/>
+<line x1="350.0" y1="532.0" x2="350.0" y2="541.0" stroke="#c92a2a" stroke-width="2" marker-end="url(#a5)"/>
+<line x1="1070.0" y1="532.0" x2="1070.0" y2="541.0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#a6)"/>
+<rect x="70" y="628" width="560" height="54" rx="10" fill="#ffe3e3" stroke="#c92a2a" stroke-width="2"/>
+<text x="350.0" y="655.0" fill="#c92a2a" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">⚠  lambat · terdedah ralat · sukar dipantau</text>
+<rect x="790" y="628" width="560" height="54" rx="10" fill="#d3f9d8" stroke="#2b8a3e" stroke-width="2"/>
+<text x="1070.0" y="655.0" fill="#2b8a3e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">✓  pantas · tepat · terpantau · data dalam premis</text>
+<line x1="350.0" y1="610.0" x2="350.0" y2="619.0" stroke="#c92a2a" stroke-width="2" marker-end="url(#a5)"/>
+<line x1="1070.0" y1="610.0" x2="1070.0" y2="619.0" stroke="#2b8a3e" stroke-width="2" marker-end="url(#a6)"/>
+<rect x="670" y="380" width="80" height="70" rx="10" fill="#fff9db" stroke="#1e1e1e" stroke-width="2"/>
+<text x="710.0" y="415.0" fill="#1e1e1e" font-size="13" text-anchor="middle" dominant-baseline="middle" font-weight="500">INOVASI</text>
+<line x1="666.0" y1="415.0" x2="661.0" y2="415.0" stroke="#1e1e1e" stroke-width="2" marker-end="url(#a1)"/>
+<line x1="756.0" y1="415.0" x2="751.0" y2="415.0" stroke="#1e1e1e" stroke-width="2" marker-end="url(#a1)"/>
+</svg>
